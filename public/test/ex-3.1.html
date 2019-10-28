@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>New User</title>
+</head>
+<body>
+	<form action="ex-3.1.php" method="post" enctype="multipart/form-data">
+		<label>Alias: <input type="text" name="alias"></label><br>
+		<label>Password: <input type="password" name="password"></label><br>
+		<label>Password (repeat): <input type="password" name="password_repeat"></label><br>
+		<label>Age: <input type="number" name="age" min="18" max="150"></label><br>
+		<label>E-mail: <input type="email" name="email"></label><br>
+		<label>Gender: <select name="gender">
+			<option></option>
+			<option value="male">Male</option>
+			<option value="female">Female</option>
+			<option value="other">Other</option>
+		</select></label><br>
+		<label>Avatar: <input type="file" name="avatar"></label><br>
+		<input type="submit" name="">
+	</form>
+</body>
+</html>

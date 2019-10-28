@@ -1,0 +1,1 @@
+<?php echo empty($_GET['a']) || empty($_GET['b']) || !is_numeric($_GET['a']) || !is_numeric($_GET['b']) ? "ERROR" : $_GET['a'] + $_GET['b'];
