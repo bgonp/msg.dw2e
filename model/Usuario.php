@@ -35,7 +35,7 @@ class Usuario extends Database {
 		return $usuario;
 	}
 
-	public static function new( $email, $nombre, $password, $avatar ){
+	public static function new( $email, $nombre, $password, $avatar = "" ){
 		$email = self::escape($email);
 		$nombre = self::escape($nombre);
 		$password = self::hash($password);
@@ -43,7 +43,7 @@ class Usuario extends Database {
 		if (empty($email) || empty($nombre) || empty($password)) throw new Exception("Faltan datos de usuario");
 		$sql = "INSERT INTO usuario (email, nombre, password, avatar) VALUES ('$email', '$nombre', '$password', '$avatar')";
 		self::query($sql);
-		if( !($id = self::insertId()) ) throw new Exception("No se creó usuario");
+		if( !($id = self::insertId()) ) throw new Exception("No se creó usuario, quizá el e-mail ya esta en uso");
 		return new Usuario($id, $email, $nombre, $password);
 	}
 

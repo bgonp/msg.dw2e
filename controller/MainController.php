@@ -8,9 +8,9 @@ class MainController {
 				$response = self::{$_POST['action']}($_POST);
 			} catch (Exception $ex) {
 				$response = ['error' => 1, 'message' => $ex->getMessage()];
-			} catch (Error $er) {
+			}/* catch (Error $er) {
 				$response = ['error' => 1, 'message' => 'Ocurrió un error inesperado'];
-			}
+			}*/
 		} else {
 			$response = ['error' => 1, 'message' => 'Operación no válida'];
 		}
