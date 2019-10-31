@@ -1,8 +1,6 @@
 <?php
 
-require_once "autoload.php";
-
-class Mensaje {
+class Mensaje extends Database {
 
 	private $id;
 	private $fecha;
@@ -26,7 +24,7 @@ class Mensaje {
 		$this->destacado = $destacado;
 	}
 
-	public static function Get($id){
+	public static function get($id){
 		if (($id = intval($id)) <= 0) die("ID de mensaje inválido");
 		$sql = "
 			SELECT m.id,
@@ -42,7 +40,7 @@ class Mensaje {
 			LEFT JOIN usuario u
 			ON m.usuario_id = u.id
 			WHERE m.id = $id";
-		$mensaje_db = Database::query($sql);
+		$mensaje_db = self::query($sql);
 		if (!$mensaje_db || $mensaje_db->num_rows == 0) die("No existe mensaje");
 		$mensaje = $mensaje_db->fetch_assoc();
 		return new Mensaje(
@@ -58,22 +56,22 @@ class Mensaje {
 		);
 	}
 
-	public static function New($usuario_id, $chat_id, $contenido){
+	public static function new($usuario_id, $chat_id, $contenido){
 		$usuario_id = intval($usuario_id);
 		$chat_id = intval($chat_id);
-		$contenido = Database::Escape($contenido);
+		$contenido = self::escape($contenido);
 		$oculto = $oculto ? 1 : 0;
 		$destacado = $oculto ? 1 : 0;
 		if (empty($usuario_id) || empty($chat_id) || empty($contenido)) die("No se creó mensaje");
 		$sql = "INSERT INTO mensaje (usuario_id, chat_id, contenido) VALUES ($usuario_id, $chat_id, '$contenido')";
-		Database::query($sql);
-		if( !($id = Database::InsertId()) ) die("No se creó mensaje");
-		return Mensaje::Get($id);
+		self::query($sql);
+		if( !($id = self::insertId()) ) die("No se creó mensaje");
+		return Mensaje::get($id);
 	}
 
-	public static function List($result_set){
+	public static function list($result_set){
 		$mensajes = [];
-		if (get_class($result_set) == 'mysqli_result')
+		if (is_object($result_set) && get_class($result_set) == 'mysqli_result')
 			while ($msg = $result_set->fetch_assoc())
 				$mensajes[$msg['id']] = new Mensaje(
 					$msg['id'],
@@ -110,7 +108,7 @@ class Mensaje {
 	}
 
 	public function usuario(){
-		return Usuario::Get($this->usuario_id);
+		return Usuario::get($this->usuario_id);
 	}
 
 	public function chat_id(){
@@ -118,12 +116,12 @@ class Mensaje {
 	}
 
 	public function chat(){
-		return Chat::Get($this->chat_id);
+		return Chat::get($this->chat_id);
 	}
 
 	public function contenido( $contenido = null ){
 		if (is_null($contenido)) return $this->contenido;
-		if( !($contenido = Database::Escape($contenido)) ) return false;
+		if( !($contenido = self::escape($contenido)) ) return false;
 		$this->contenido = $contenido;
 		return true;
 	}
@@ -142,7 +140,7 @@ class Mensaje {
 
 	public function save(){
 		$sql = "UPDATE usuario SET email = '{$this->email}', nombre = '{$this->nombre}', password = '{$this->password}' WHERE id = {$this->id}";
-		if (Database::query($sql) === false) return false;
+		if (self::query($sql) === false) return false;
 		return true;
 	}
 

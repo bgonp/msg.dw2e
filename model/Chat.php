@@ -1,8 +1,6 @@
 <?php
 
-require_once "autoload.php";
-
-class Chat {
+class Chat extends Database {
 	
 	private $id;
 	private $fecha;
@@ -28,7 +26,7 @@ class Chat {
 		$this->n_usuarios = $n_usuarios;
 	}
 
-	public static function Get($id){
+	public static function get($id){
 		if (!($id = intval($id))) die("ID de chat inválido");
 		$sql = "
 			SELECT c.id,
@@ -45,28 +43,28 @@ class Chat {
 			LEFT JOIN participa p ON c.id = p.chat_id
 			WHERE c.id = $id
 			GROUP BY c.id";
-		$chat_db = Database::query($sql);
+		$chat_db = self::query($sql);
 		if (!$chat_db || $chat_db->num_rows == 0) die("No existe chat");
 		$chat = $chat_db->fetch_assoc();
 		return new Chat($chat['id'], $chat['fecha'], $chat['nombre'], $chat['descripcion'], $chat['imagen'], $chat['oculto'], $chat['cerrado'], $chat['n_mensajes'], $chat['n_usuarios']);
 	}
 
-	public static function New($nombre, $descripcion, $imagen = "", $oculto = false, $cerrado = false){
-		$nombre = Database::Escape($nombre);
-		$descripcion = Database::Escape($descripcion);
-		$imagen = Database::Escape($imagen);
+	public static function new($nombre, $descripcion, $imagen = "", $oculto = false, $cerrado = false){
+		$nombre = self::escape($nombre);
+		$descripcion = self::escape($descripcion);
+		$imagen = self::escape($imagen);
 		$oculto = $oculto ? 1 : 0;
 		$cerrado = $cerrado ? 1 : 0;
 		if (empty($nombre)) die("No se creó chat");
 		$sql = "INSERT INTO chat (nombre, descripcion, imagen, oculto, cerrado) VALUES ('$nombre', '$descripcion', '$imagen', $oculto, $cerrado)";
-		Database::query($sql);
-		if (!($id = Database::InsertId())) die("No se creó chat");
-		return Chat::Get($id);
+		self::query($sql);
+		if (!($id = self::insertId())) die("No se creó chat");
+		return Chat::get($id);
 	}
 
-	public static function List($result_set){
+	public static function list($result_set){
 		$chats = [];
-		if (get_class($result_set) == 'mysqli_result')
+		if (is_object($result_set) && get_class($result_set) == 'mysqli_result')
 			while ($chat = $result_set->fetch_assoc())
 				$chats[$chat['id']] = new Chat(
 					$chat['id'],
@@ -85,25 +83,25 @@ class Chat {
 	}
 
 	public function addUsuario( $usuario ){
-		if( is_numeric($usuario) ) $usuario = Usuario::Get($usuario);
-		if (get_class($usuario) != 'Usuario') return false;
+		if (is_numeric($usuario)) $usuario = Usuario::get($usuario);
+		if (!is_object($usuario) || get_class($usuario) != 'Usuario') return false;
 		$sql = "INSERT INTO participa (chat_id, usuario_id) VALUES ({$this->id}, {$usuario->id()})";
-		if (!Database::Query($sql)) return false;
+		if (!self::query($sql)) return false;
 		$this->usuarios = null;
 		return true;
 	}
 
 	public function removeUsuario( $usuario ){
-		if (get_class($usuario) != 'Usuario') return false;
+		if (!is_object($usuario) || get_class($usuario) != 'Usuario') return false;
 		$sql = "DELETE FROM participa WHERE chat_id = {$this->id} AND usuario_id = {$usuario->id}";
-		if (!Database::Query($sql)) return false;
+		if (!self::query($sql)) return false;
 		$this->usuarios = null;
 		return true;
 	}
 
 	public function addMensaje( $usuario_id, $mensaje ){
 		if (!$this->usuarios($usuario_id)) return "A";
-		if (!($mensaje = Mensaje::New($usuario_id, $this->id, $mensaje))) return "B";
+		if (!($mensaje = Mensaje::new($usuario_id, $this->id, $mensaje))) return "B";
 		$this->mensajes = null;
 		return $mensaje;
 	}
@@ -118,21 +116,21 @@ class Chat {
 
 	public function nombre($nombre = null){
 		if (is_null($nombre)) return $this->nombre;
-		if (!($nombre = Database::Escape($nombre))) return false;
+		if (!($nombre = self::escape($nombre))) return false;
 		$this->nombre = $nombre;
 		return true;
 	}
 
 	public function descripcion($descripcion = null){
 		if (is_null($descripcion)) return $this->descripcion;
-		if (!($descripcion = Database::Escape($descripcion))) return false;
+		if (!($descripcion = self::escape($descripcion))) return false;
 		$this->descripcion = $descripcion;
 		return true;
 	}
 
 	public function imagen($imagen = null){
 		if (is_null($imagen)) return $this->imagen;
-		if (!($imagen = Database::Escape($imagen))) return false;
+		if (!($imagen = self::escape($imagen))) return false;
 		$this->imagen = $imagen;
 		return true;
 	}
@@ -175,8 +173,8 @@ class Chat {
 				WHERE m.chat_id = {$this->id}
 				ORDER BY m.fecha DESC
 				LIMIT 100";
-			$result = Database::Query($sql);
-			$this->mensajes = Mensaje::List($result);
+			$result = self::query($sql);
+			$this->mensajes = Mensaje::list($result);
 		}
 		return $this->mensajes;
 	}
@@ -193,8 +191,8 @@ class Chat {
 				ON u.id = p.usuario_id
 				WHERE p.chat_id = {$this->id}
 				ORDER BY u.nombre ASC";
-			$result = Database::Query($sql);
-			$this->usuarios = Usuario::List($result);
+			$result = self::query($sql);
+			$this->usuarios = Usuario::list($result);
 		}
 		if (is_null($usuario_id)) return $this->usuarios;
 		return $this->usuarios[$usuario_id] ?? false;

@@ -1,0 +1,22 @@
+<div id="login-form">
+	<ul class="tabs">
+		<li><a href="#" class="tab active" data-target="login-form">Login</a></li>
+		<li><a href="#" class="tab" data-target="register-form">Register</a></li>
+	</ul>
+	<div class="tabs-content">
+		<div class="login-form"><form action="ajax.php" method="post">
+			<input type="hidden" name="action" value="login">
+			<input type="email" name="email" required>
+			<input type="password" name="password" required>
+			<input type="submit" class="btn btn-login" value="Login">
+		</form></div>
+		<div class="register-form" style="display: none"><form action="ajax.php" method="post">
+			<input type="hidden" name="action" value="register">
+			<input type="text" name="nombre" required>
+			<input type="email" name="email" required>
+			<input type="password" name="password" required>
+			<input type="password" name="password_rep" required>
+			<input type="submit" class="btn btn-register" value="Register">
+		</form></div>
+	</div>
+</div>

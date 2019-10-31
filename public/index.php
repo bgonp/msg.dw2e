@@ -1,16 +1,22 @@
 <?php
 
+require_once "../autoload.php";
+
+MainController::main();
+
+/*
+
 session_start();
 
 require_once "../inc/autoload.php";
 
-/*$c = Chat::Get(1);
-$c->addUsuario(1);
-$c->addUsuario(2);
-$c = Chat::Get(2);
-$c->addUsuario(1);
-$c->addUsuario(2);
-$c->addUsuario(3);*/
+//$c = Chat::Get(1);
+//$c->addUsuario(1);
+//$c->addUsuario(2);
+//$c = Chat::Get(2);
+//$c->addUsuario(1);
+//$c->addUsuario(2);
+//$c->addUsuario(3);
 
 if ($_SESSION['loggedin']){
 	$u = Usuario::Get($_SESSION['usuario_id']);
