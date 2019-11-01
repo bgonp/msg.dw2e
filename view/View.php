@@ -40,6 +40,7 @@ abstract class View {
 		foreach ($chats as $chat) {
 			$replace['{{CHATS}}'] .= self::chat($chat);
 		}
+		if ($replace['{{CHATS}}'] == "") $replace['{{CHATS}}'] = "No chats yet...";
 		return strtr(file_get_contents(HTML_DIR.'chats.html'), $replace);
 	}
 	
@@ -48,7 +49,7 @@ abstract class View {
 			'{{CHAT}}' => $chat->id(),
 			'{{NOMBRE}}' => $chat->nombre()
 		];
-		return strtr(file_get_contents(HTML_DIR.'chats.html'), $replace);
+		return strtr(file_get_contents(HTML_DIR.'chat.html'), $replace);
 	}
 	
 	private static function contactos($contactos) {
@@ -56,6 +57,7 @@ abstract class View {
 		foreach ($contactos as $contacto) {
 			$replace['{{CONTACTOS}}'] .= self::contacto($contacto);
 		}
+		if ($replace['{{CONTACTOS}}'] == "") $replace['{{CONTACTOS}}'] = "No friends yet...";
 		return strtr(file_get_contents(HTML_DIR.'contactos.html'), $replace);
 	}
 	
@@ -64,7 +66,7 @@ abstract class View {
 			'{{CONTACTO}}' => $contacto->id(),
 			'{{NOMBRE}}' => $contacto->nombre()
 		];
-		return strtr(file_get_contents(HTML_DIR.'contactos.html'), $replace);
+		return strtr(file_get_contents(HTML_DIR.'contacto.html'), $replace);
 	}
 
 }

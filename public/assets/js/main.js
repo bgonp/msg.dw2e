@@ -21,7 +21,9 @@ $(document).ready(function(){
 	});
 
 	tabs_buttons.click(function(event){
+		tabs_buttons.removeClass('active');
 		tabs_contents.hide();
+		$(this).addClass('active');
 		$('.tab-content.' + $(this).data('target')).show();
 		event.preventDefault();
 	});
