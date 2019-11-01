@@ -27,8 +27,8 @@ class SessionController {
 	public static function logout() {
 		session_start();
 		$_SESSION = [];
+		setcookie(session_name(), "", time() - 3600);
 		session_destroy();
-		setcookie(session_name(), 0, 0);
 	}
 
 }

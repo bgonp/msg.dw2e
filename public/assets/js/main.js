@@ -13,7 +13,7 @@ $(document).ready(function(){
 			type: type,
 			data: data
 		}).done(function(data){
-			console.log(data);
+			console.log(data); // A BORRAR
 			var json = JSON.parse(data);
 			if (json.refresh) location.reload();
 		});
