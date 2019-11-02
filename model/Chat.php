@@ -6,36 +6,30 @@ class Chat extends Database {
 	private $fecha;
 	private $nombre;
 	private $descripcion;
-	private $imagen;
-	private $oculto;
-	private $cerrado;
+	private $privado;
 	private $mensajes;
 	private $usuarios;
 	private $n_mensajes;
 	private $n_usuarios;
 
-	private function __construct($id, $fecha, $nombre, $descripcion, $imagen, $oculto, $cerrado, $n_mensajes, $n_usuarios){
+	private function __construct($id, $fecha, $nombre, $descripcion, $privado, $n_mensajes, $n_usuarios){
 		$this->id = $id;
 		$this->fecha = $fecha;
 		$this->nombre = $nombre;
 		$this->descripcion = $descripcion;
-		$this->imagen = $imagen;
-		$this->oculto = $oculto;
-		$this->cerrado = $cerrado;
+		$this->privado = $privado;
 		$this->n_mensajes = $n_mensajes;
 		$this->n_usuarios = $n_usuarios;
 	}
 
-	public static function get($id){
+	public static function get($id) {
 		if (!($id = intval($id))) die("ID de chat inválido");
 		$sql = "
 			SELECT c.id,
 				   c.fecha,
 				   c.nombre,
 				   c.descripcion,
-				   c.imagen,
-				   c.oculto,
-				   c.cerrado,
+				   c.privado,
 				   COUNT(m.id) n_mensajes,
 				   COUNT(p.usuario_id) n_usuarios
 			FROM chat c
@@ -46,17 +40,15 @@ class Chat extends Database {
 		$chat_db = self::query($sql);
 		if (!$chat_db || $chat_db->num_rows == 0) die("No existe chat");
 		$chat = $chat_db->fetch_assoc();
-		return new Chat($chat['id'], $chat['fecha'], $chat['nombre'], $chat['descripcion'], $chat['imagen'], $chat['oculto'], $chat['cerrado'], $chat['n_mensajes'], $chat['n_usuarios']);
+		return new Chat($chat['id'], $chat['fecha'], $chat['nombre'], $chat['descripcion'], $chat['privado'], $chat['n_mensajes'], $chat['n_usuarios']);
 	}
 
-	public static function new($nombre, $descripcion, $imagen = "", $oculto = false, $cerrado = false){
+	public static function new($nombre, $descripcion, $privado = false) {
 		$nombre = self::escape($nombre);
 		$descripcion = self::escape($descripcion);
-		$imagen = self::escape($imagen);
-		$oculto = $oculto ? 1 : 0;
-		$cerrado = $cerrado ? 1 : 0;
+		$privado = $privado ? 1 : 0;
 		if (empty($nombre)) die("No se creó chat");
-		$sql = "INSERT INTO chat (nombre, descripcion, imagen, oculto, cerrado) VALUES ('$nombre', '$descripcion', '$imagen', $oculto, $cerrado)";
+		$sql = "INSERT INTO chat (nombre, descripcion, privado) VALUES ('$nombre', '$descripcion', $privado)";
 		self::query($sql);
 		if (!($id = self::insertId())) die("No se creó chat");
 		return Chat::get($id);
@@ -71,27 +63,23 @@ class Chat extends Database {
 					$chat['fecha'],
 					$chat['nombre'],
 					$chat['descripcion'],
-					$chat['imagen'],
-					$chat['oculto'],
-					$chat['cerrado'],
-					boolval($chat['oculto']),
-					boolval($chat['destacado']),
+					$chat['privado'],
 					$chat['n_mensajes'],
 					$chat['n_usuarios']
 				);
 		return $chats;
 	}
 
-	public function addUsuario( $usuario ){
+	public function addUsuario($usuario) {
 		if (is_numeric($usuario)) $usuario = Usuario::get($usuario);
 		if (!is_object($usuario) || get_class($usuario) != 'Usuario') return false;
-		$sql = "INSERT INTO participa (chat_id, usuario_id) VALUES ({$this->id}, {$usuario->id()})";
+		$sql = "INSERT INTO participa (chat_id, usuario_id) VALUES ({$this->id}, {$usuario->id})";
 		if (!self::query($sql)) return false;
 		$this->usuarios = null;
 		return true;
 	}
 
-	public function removeUsuario( $usuario ){
+	public function removeUsuario($usuario) {
 		if (!is_object($usuario) || get_class($usuario) != 'Usuario') return false;
 		$sql = "DELETE FROM participa WHERE chat_id = {$this->id} AND usuario_id = {$usuario->id}";
 		if (!self::query($sql)) return false;
@@ -99,9 +87,9 @@ class Chat extends Database {
 		return true;
 	}
 
-	public function addMensaje( $usuario_id, $mensaje ){
-		if (!$this->usuarios($usuario_id)) return "A";
-		if (!($mensaje = Mensaje::new($usuario_id, $this->id, $mensaje))) return "B";
+	public function addMensaje($usuario_id, $mensaje) {
+		if (!$this->usuarios($usuario_id)) return false;
+		if (!($mensaje = Mensaje::new($usuario_id, $this->id, $mensaje))) return false;
 		$this->mensajes = null;
 		return $mensaje;
 	}
@@ -128,22 +116,9 @@ class Chat extends Database {
 		return true;
 	}
 
-	public function imagen($imagen = null){
-		if (is_null($imagen)) return $this->imagen;
-		if (!($imagen = self::escape($imagen))) return false;
-		$this->imagen = $imagen;
-		return true;
-	}
-
-	public function oculto($oculto = null){
-		if (is_null($oculto)) return $this->oculto;
-		$this->oculto = boolval($oculto);
-		return true;
-	}
-
-	public function cerrado($cerrado = null){
-		if (is_null($cerrado)) return $this->cerrado;
-		$this->cerrado = boolval($cerrado);
+	public function privado($privado = null){
+		if (is_null($privado)) return $this->privado;
+		$this->privado = boolval($privado);
 		return true;
 	}
 
@@ -160,13 +135,10 @@ class Chat extends Database {
 			$sql = "
 				SELECT m.id,
 					   m.fecha,
-					   m.fecha_edit,
 					   m.usuario_id,
 					   u.nombre usuario_nombre,
 					   m.chat_id,
-					   m.contenido,
-					   m.oculto,
-					   m.destacado
+					   m.contenido
 				FROM mensaje m
 				LEFT JOIN usuario u
 				ON m.usuario_id = u.id
@@ -196,6 +168,36 @@ class Chat extends Database {
 		}
 		if (is_null($usuario_id)) return $this->usuarios;
 		return $this->usuarios[$usuario_id] ?? false;
+	}
+
+	public function save() {
+		$sql = "
+			UPDATE chat SET
+			nombre = '{$this->nombre}',
+			descripcion = '{$this->descripcion}',
+			privado = {$this->privado}
+			WHERE id = {$this->id}";
+		if (self::query($sql) === false) return false;
+		return true;
+	}
+
+	public function toArray($depth = 1){
+		$chat = [
+			'id' => $this->id,
+			'fecha' => $this->fecha,
+			'nombre' => $this->nombre,
+			'descripcion' => $this->descripcion
+		];
+		if ($depth > 0) {
+			$depth--;
+			$chat['mensajes'] = [];
+			$chat['usuarios'] = [];
+			foreach ($this->mensajes() as $mensaje)
+				$chat['mensajes'][] = $mensaje->toArray($depth);
+			foreach ($this->usuarios() as $usuario)
+				$chat['usuarios'][] = $usuario->toArray($depth);
+		}
+		return $chat;
 	}
 
 }

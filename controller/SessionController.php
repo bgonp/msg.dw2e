@@ -19,13 +19,11 @@ class SessionController {
 	}
 
 	public static function logged( $usuario ) {
-		session_start();
 		$_SESSION['logged'] = true;
 		$_SESSION['usuarioId'] = $usuario->id();
 	}
 
 	public static function logout() {
-		session_start();
 		$_SESSION = [];
 		setcookie(session_name(), "", time() - 3600);
 		session_destroy();

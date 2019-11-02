@@ -4,9 +4,9 @@ abstract class View {
 
 	public static function main($usuario) {
 		$contenido = self::menu($usuario);
-		$contenido .= self::chats($usuario->chats());
-		$contenido .= self::contactos($usuario->contactos());
-		$contenido .= file_get_contents(HTML_DIR.'mensajes.html');
+		$contenido .= self::sidebar($usuario->chats(), $usuario->amigos(), $usuario->pendientes());
+		$contenido .= self::mensajes();
+		$contenido .= self::alert();
 		echo self::page($contenido);
 	}
 
@@ -28,45 +28,58 @@ abstract class View {
 	
 	private static function menu($usuario) {
 		$replace = [
-			'{{USUARIO}}' => $usuario->id(),
-			'{{NOMBRE}}' => $usuario->nombre(),
-			'{{AVATAR}}' => $usuario->avatar()
+			'{{ID}}' => $usuario->id(),
+			'{{EMAIL}}' => $usuario->email(),
+			'{{NOMBRE}}' => $usuario->nombre()
 		];
 		return strtr(file_get_contents(HTML_DIR.'menu.html'), $replace);
 	}
 	
-	private static function chats($chats) {
-		$replace = ['{{CHATS}}' => ""];
-		foreach ($chats as $chat) {
+	private static function sidebar($chats, $amigos, $pendientes) {
+		$replace = [
+			'{{CHATS}}' => "",
+			'{{AMIGOS}}' => "",
+			'{{PENDIENTES}}' => ""
+		];
+		foreach ($chats as $chat)
 			$replace['{{CHATS}}'] .= self::chat($chat);
-		}
-		if ($replace['{{CHATS}}'] == "") $replace['{{CHATS}}'] = "No chats yet...";
-		return strtr(file_get_contents(HTML_DIR.'chats.html'), $replace);
+		foreach ($amigos as $amigo)
+			$replace['{{AMIGOS}}'] .= self::amigo($amigo);
+		foreach ($pendientes as $pendiente)
+			$replace['{{PENDIENTES}}'] .= self::pendiente($pendiente);
+		return strtr(file_get_contents(HTML_DIR.'sidebar.html'), $replace);
 	}
 	
 	private static function chat($chat) {
 		$replace = [
-			'{{CHAT}}' => $chat->id(),
+			'{{ID}}' => $chat->id(),
 			'{{NOMBRE}}' => $chat->nombre()
 		];
 		return strtr(file_get_contents(HTML_DIR.'chat.html'), $replace);
 	}
 	
-	private static function contactos($contactos) {
-		$replace = ['{{CONTACTOS}}' => ""];
-		foreach ($contactos as $contacto) {
-			$replace['{{CONTACTOS}}'] .= self::contacto($contacto);
-		}
-		if ($replace['{{CONTACTOS}}'] == "") $replace['{{CONTACTOS}}'] = "No friends yet...";
-		return strtr(file_get_contents(HTML_DIR.'contactos.html'), $replace);
+	private static function amigo($amigo) {
+		$replace = [
+			'{{ID}}' => $amigo->id(),
+			'{{NOMBRE}}' => $amigo->nombre()
+		];
+		return strtr(file_get_contents(HTML_DIR.'amigo.html'), $replace);
 	}
 	
-	private static function contacto($contacto) {
+	private static function pendiente($pendiente) {
 		$replace = [
-			'{{CONTACTO}}' => $contacto->id(),
-			'{{NOMBRE}}' => $contacto->nombre()
+			'{{ID}}' => $pendiente->id(),
+			'{{NOMBRE}}' => $pendiente->nombre()
 		];
-		return strtr(file_get_contents(HTML_DIR.'contacto.html'), $replace);
+		return strtr(file_get_contents(HTML_DIR.'pendiente.html'), $replace);
+	}
+
+	private static function mensajes() {
+		return file_get_contents(HTML_DIR.'mensajes.html');
+	}
+
+	private static function alert() {
+		return file_get_contents(HTML_DIR.'alert.html');
 	}
 
 }

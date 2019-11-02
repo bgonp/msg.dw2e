@@ -8,16 +8,18 @@ class Usuario extends Database {
 	private $password;
 	private $avatar;
 	private $chats;
-	private $contactos;
+	private $amigos;
+	private $pendientes;
 
-	private function __construct( $id, $email, $nombre, $password ){
+	private function __construct($id, $email, $nombre, $password, $avatar) {
 		$this->id = $id;
 		$this->email = $email;
 		$this->nombre = $nombre;
 		$this->password = $password;
+		$this->avatar = $avatar;
 	}
 
-	public static function get( $id_o_email, $password = null ){
+	public static function get($id_o_email, $password = null) {
 		if (is_numeric($id_o_email)){
 			$id = intval($id_o_email);
 			if ($id <= 0) throw new Exception("Identificación de usuario inválida");
@@ -30,24 +32,26 @@ class Usuario extends Database {
 		$user_db = self::query($sql);
 		if ($user_db->num_rows == 0) throw new Exception("No existe usuario");
 		$user = $user_db->fetch_assoc();
-		$usuario = new Usuario($user['id'], $user['email'], $user['nombre'], $user['password']);
+		$usuario = new Usuario($user['id'], $user['email'], $user['nombre'], $user['password'], $user['avatar']);
 		if (!empty($password) && !$usuario->verificar($password)) throw new Exception("Autentificación errónea");
 		return $usuario;
 	}
 
-	public static function new( $email, $nombre, $password, $avatar = "" ){
+	public static function new($email, $nombre, $password, $avatar = null) {
+		if (!Helper::validEmail($email)) throw new Exception("E-mail no válido");
+		if (!Helper::validNombre($nombre)) throw new Exception("Nombre no válido");
+		if (!Helper::validPassword($password)) throw new Exception("Contraseña no válida");
+		if (!is_null($avatar) && !($avatar = Helper::uploadImagen($avatar))) throw new Exception("Avatar no válido");
 		$email = self::escape($email);
 		$nombre = self::escape($nombre);
 		$password = self::hash($password);
-		$avatar = self::escape($avatar);
-		if (empty($email) || empty($nombre) || empty($password)) throw new Exception("Faltan datos de usuario");
 		$sql = "INSERT INTO usuario (email, nombre, password, avatar) VALUES ('$email', '$nombre', '$password', '$avatar')";
 		self::query($sql);
 		if( !($id = self::insertId()) ) throw new Exception("No se creó usuario, quizá el e-mail ya esta en uso");
-		return new Usuario($id, $email, $nombre, $password);
+		return new Usuario($id, $email, $nombre, $password, $avatar);
 	}
 
-	public static function list( $result_set ){
+	public static function list($result_set) {
 		$usuarios = [];
 		if (is_object($result_set) && get_class($result_set) == 'mysqli_result')
 			while ($user = $result_set->fetch_assoc())
@@ -55,52 +59,52 @@ class Usuario extends Database {
 					$user['id'],
 					$user['email'],
 					$user['nombre'],
-					$user['password']
+					$user['password'],
+					$user['avatar']
 				);
 		return $usuarios;
 	}
 
-	public function id(){
+	public function id() {
 		return $this->id;
 	}
 
-	public function email( $email = null ){
+	public function email($email = null) {
 		if (is_null($email)) return $this->email;
-		if ( !($email = self::escape($email)) ) return false;
+		if ( !Helper::validEmail($email) || !($email = self::escape($email)) ) return false;
 		$this->email = $email;
 		return true;
 	}
 
-	public function nombre( $nombre = null ){
+	public function nombre($nombre = null) {
 		if (is_null($nombre)) return $this->nombre;
-		if ( !($nombre = self::escape($nombre)) ) return false;
+		if (!Helper::validNombre($nombre) || !($nombre = self::escape($nombre))) return false;
 		$this->nombre = $nombre;
 		return true;
 	}
 
-	public function password( $password ){
-		if (!($password = self::hash($password))) return false;
+	public function password($password) {
+		if ( !Helper::validPassword($password) || !($password = self::hash($password))) return false;
 		$this->password = $password;
 		return true;
 	}
 
-	public function avatar( $avatar = null ){
+	public function avatar($avatar = null) {
 		if (is_null($avatar)) return $this->avatar;
-		if ( !($avatar = self::escape($avatar)) ) return false;
+		if (!($avatar = Helper::uploadImagen($avatar))) return false;
+		Helper::removeImagen($this->avatar);
 		$this->avatar = $avatar;
 		return true;
 	}
 
-	public function chats( $chat_id = null ){
+	public function chats($chat_id = null) {
 		if (!is_array($this->chats)){
 			$sql = "
 				SELECT c.id,
 					   c.fecha,
 					   c.nombre,
 					   c.descripcion,
-					   c.imagen,
-					   c.oculto,
-					   c.cerrado,
+					   c.privado,
 					   COUNT(m.id) n_mensajes,
 					   COUNT(p.usuario_id) n_usuarios
 				FROM chat c
@@ -113,7 +117,7 @@ class Usuario extends Database {
 			$this->chats = Chat::list($result);
 		}
 		if (is_null($chat_id)) return $this->chats;
-		return $this->chats[$chat_id] ?? false;
+		return $this->chats[intval($chat_id)] ?? false;
 	}
 
 	public function getPrivateChat($usuario_id) {
@@ -129,58 +133,116 @@ class Usuario extends Database {
 			HAVING n_usuarios = 2";
 	}
 
-	public function contactos( $contacto_id = null ){
-		if (!is_array($this->contactos)){
-			$sql = "
-				SELECT u.id,
-					   u.email,
-					   u.nombre,
-					   u.password
+	public function amigos($amigo_id = null) {
+		if (!is_array($this->amigos))
+			$this->amigos = self::contactos($amigo_id, Helper::ACEPTADO);
+		if (is_null($amigo_id)) return $this->amigos;
+		return $this->amigos[intval($amigo_id)] ?? false;
+	}
+
+	public function pendientes($pendiente_id = null) {
+		if (!is_array($this->pendientes))
+			$this->pendientes = self::contactos($pendiente_id, Helper::PENDIENTE);
+		if (is_null($pendiente_id)) return $this->pendientes;
+		return $this->pendientes[intval($pendiente_id)] ?? false;
+	}
+
+	private function contactos($contacto_id, $estado) {
+		$sql = "
+			SELECT u.id,
+				   u.email,
+				   u.nombre,
+				   u.password,
+				   u.avatar
+			FROM usuario u
+			WHERE id IN (
+				SELECT IF(c.usuario_1_id = {$this->id}, c.usuario_2_id, c.usuario_1_id) usuario_id
 				FROM contacto c
-				LEFT JOIN usuario u
-				ON c.contacto_id = u.id
-				WHERE c.usuario_id = {$this->id}
-				AND c.bloqueado = 0
-				ORDER BY u.nombre ASC";
-			$result = self::query($sql);
-			$this->contactos = self::list($result);
-		}
-		if (is_null($contacto_id)) return $this->contactos;
-		return $this->contactos[$contacto_id] ?? false;
+				WHERE c.estado = {$estado}
+				AND (c.usuario_1_id = {$this->id} OR c.usuario_2_id = {$this->id})
+			)
+			ORDER BY u.nombre ASC";
+		$result = self::query($sql);
+		return self::list($result);
 	}
 
-	public function addContacto( $id_o_email ){
+	public function addContacto($id_o_email) {
 		$contacto = self::get($id_o_email);
-		$sql = "INSERT INTO contacto (usuario_id, contacto_id) VALUES ({$this->id}, {$contacto->id})";
-		if( !(self::query($sql)) ) throw new Exception("No se creó contacto");
-		$this->contactos = null;
+		if ($contacto->id === $this->id) throw new Exception("No puedes ser tu propio contacto");		
+		$user1_id = min($this->id, $contacto->id);
+		$user2_id = max($this->id, $contacto->id);
+		$sql = "
+			INSERT INTO contacto (usuario_1_id, usuario_2_id, usuario_estado_id)
+			VALUES ({$user1_id}, {$user2_id}, {$this->id})";
+		if (!self::query($sql)) throw new Exception("No se creó contacto");
 		return true;
 	}
 
-	public function removeContacto( $contacto_id ){
-		if (!($contacto = $this->contactos( $contacto_id ))) throw new Exception( "No existe contacto");
-		$sql = "UPDATE contacto SET bloqueado = 1 WHERE usuario_id = {$this->id} AND contacto_id = {$contacto->id}";
-		if( !(self::query($sql)) ) throw new Exception("No se eliminó contacto");
-		$this->contactos = null;
+	public function updateContacto($contacto_id, $estado) {
+		if (!is_numeric($estado)) throw new Exception( "Error de estado de contacto");
+		$estado = intval($estado);
+		$user1_id = min($this->id, $contacto_id);
+		$user2_id = max($this->id, $contacto_id);
+		if ($estado === Helper::ACEPTADO || $estado === Helper::RECHAZADO)
+			$condition = "estado = ".Helper::PENDIENTE." AND usuario_estado_id = {$contacto_id}";
+		else if ($estado == Helper::BLOQUEADO)
+			$condition = "estado = ".Helper::ACEPTADO;
+		else
+			throw new Exception("Error de estado de contacto");			
+		$sql = "
+			UPDATE contacto SET estado = {$estado}, usuario_estado_id = {$this->id}
+			WHERE usuario_1_id = {$user1_id}
+			AND usuario_2_id = {$user2_id}
+			AND $condition";
+		if (!self::query($sql)) throw new Exception("No se actualizó contacto");
+		$this->amigos = null;
+		$this->pendientes = null;
 		return true;
 	}
 
-	public function verificar( $password ){
+	public function verificar($password) {
 		return password_verify( $password, $this->password );
 	}
 
-	public function save(){
-		$sql = "UPDATE usuario SET email = '{$this->email}', nombre = '{$this->nombre}', password = '{$this->password}' WHERE id = {$this->id}";
+	public function save() {
+		$sql = "
+			UPDATE usuario SET
+			email = '{$this->email}',
+			nombre = '{$this->nombre}',
+			password = '{$this->password}',
+			avatar = '{$this->avatar}'
+			WHERE id = {$this->id}";
 		if (self::query($sql) === false) return false;
 		return true;
 	}
 
-	public function delete(){
+	public function delete() {
 		$this->email = $this->nombre = $this->password = '';
 		return $this->save();
 	}
 
-	private static function hash( $password ){
+	public function toArray($depth = 1) {
+		$usuario = [
+			'id' => $this->id,
+			'email' => $this->email,
+			'nombre' => $this->nombre
+		];
+		if ($depth > 0) {
+			$depth--;
+			$usuario['chats'] = [];
+			$usuario['amigos'] = [];
+			$usuario['pendientes'] = [];
+			foreach ($this->chats() as $chat)
+				$usuario['chats'][] = $chat->toArray($depth);
+			foreach ($this->amigos() as $amigo)
+				$usuario['amigos'][] = $amigo->toArray($depth);
+			foreach ($this->pendientes() as $pendiente)
+				$usuario['pendientes'][] = $pendiente->toArray($depth);
+		}
+		return $usuario;
+	}
+
+	private static function hash($password) {
 		return password_hash($password, PASSWORD_BCRYPT);
 	}
 

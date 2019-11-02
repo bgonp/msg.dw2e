@@ -1,13 +1,14 @@
 <div id="menu">
-	<ul class="tabs">
-		<li><a href="#" class="tab active" data-target="chats-menu">Chats</a></li>
-		<li><a href="#" class="tab" data-target="friends-menu">Friends</a></li>
-	</ul>
-	<ul>
-		<li>{{USUARIO}}</li>
-		<li>{{NOMBRE}}</li>
-		<li>{{AVATAR}}</li>
-	</ul>
+	<form action="ajax.php" method="post" enctype="multipart/form-data">
+		<input type="hidden" name="action" value="editProfile">
+		<input type="email" name="email" value="{{EMAIL}}" required>
+		<input type="text" name="name" value="{{NOMBRE}}" required>
+		<input type="password" name="password">
+		<input type="password" name="password_rep">
+		<input type="file" name="avatar">
+		<img src="/avatar.php?id={{ID}}">
+		<input type="submit" value="Editar">
+	</form>
 	<form action="ajax.php" method="post">
 		<input type="hidden" name="action" value="logout">
 		<input type="submit" value="Logout">

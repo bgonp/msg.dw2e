@@ -1,0 +1,13 @@
+<li class="pendiente">
+	<div class="nombre">{{NOMBRE}}</div>
+	<form action="ajax.php" method="post">
+		<input type="hidden" name="action" value="acceptFriend">
+		<input type="hidden" name="request_id" value="{{ID}}">
+		<input type="submit" value="Accept">
+	</form>
+	<form action="ajax.php" method="post">
+		<input type="hidden" name="action" value="rejectFriend">
+		<input type="hidden" name="request_id" value="{{ID}}">
+		<input type="submit" value="Reject">
+	</form>
+</li>
