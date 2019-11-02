@@ -5,20 +5,16 @@ class Chat extends Database {
 	private $id;
 	private $fecha;
 	private $nombre;
-	private $descripcion;
 	private $privado;
 	private $mensajes;
 	private $usuarios;
-	private $n_mensajes;
 	private $n_usuarios;
 
-	private function __construct($id, $fecha, $nombre, $descripcion, $privado, $n_mensajes, $n_usuarios){
+	private function __construct($id, $fecha, $nombre, $privado, $n_usuarios){
 		$this->id = $id;
 		$this->fecha = $fecha;
 		$this->nombre = $nombre;
-		$this->descripcion = $descripcion;
 		$this->privado = $privado;
-		$this->n_mensajes = $n_mensajes;
 		$this->n_usuarios = $n_usuarios;
 	}
 
@@ -28,9 +24,7 @@ class Chat extends Database {
 			SELECT c.id,
 				   c.fecha,
 				   c.nombre,
-				   c.descripcion,
 				   c.privado,
-				   COUNT(m.id) n_mensajes,
 				   COUNT(p.usuario_id) n_usuarios
 			FROM chat c
 			LEFT JOIN mensaje m ON c.id = m.chat_id
@@ -40,15 +34,13 @@ class Chat extends Database {
 		$chat_db = self::query($sql);
 		if (!$chat_db || $chat_db->num_rows == 0) die("No existe chat");
 		$chat = $chat_db->fetch_assoc();
-		return new Chat($chat['id'], $chat['fecha'], $chat['nombre'], $chat['descripcion'], $chat['privado'], $chat['n_mensajes'], $chat['n_usuarios']);
+		return new Chat($chat['id'], $chat['fecha'], $chat['nombre'], $chat['privado'], $chat['n_usuarios']);
 	}
 
-	public static function new($nombre, $descripcion, $privado = false) {
+	public static function new($nombre = "", $privado = false) {
 		$nombre = self::escape($nombre);
-		$descripcion = self::escape($descripcion);
 		$privado = $privado ? 1 : 0;
-		if (empty($nombre)) die("No se creó chat");
-		$sql = "INSERT INTO chat (nombre, descripcion, privado) VALUES ('$nombre', '$descripcion', $privado)";
+		$sql = "INSERT INTO chat (nombre, privado) VALUES ('$nombre', $privado)";
 		self::query($sql);
 		if (!($id = self::insertId())) die("No se creó chat");
 		return Chat::get($id);
@@ -62,9 +54,7 @@ class Chat extends Database {
 					$chat['id'],
 					$chat['fecha'],
 					$chat['nombre'],
-					$chat['descripcion'],
 					$chat['privado'],
-					$chat['n_mensajes'],
 					$chat['n_usuarios']
 				);
 		return $chats;
@@ -109,21 +99,10 @@ class Chat extends Database {
 		return true;
 	}
 
-	public function descripcion($descripcion = null){
-		if (is_null($descripcion)) return $this->descripcion;
-		if (!($descripcion = self::escape($descripcion))) return false;
-		$this->descripcion = $descripcion;
-		return true;
-	}
-
 	public function privado($privado = null){
 		if (is_null($privado)) return $this->privado;
 		$this->privado = boolval($privado);
 		return true;
-	}
-
-	public function n_mensajes(){
-		return $this->n_mensajes;
 	}
 
 	public function n_usuarios(){
@@ -157,7 +136,8 @@ class Chat extends Database {
 				SELECT u.id,
 					   u.email,
 					   u.nombre,
-					   u.password
+					   u.password,
+					   u.avatar
 				FROM usuario u
 				LEFT JOIN participa p
 				ON u.id = p.usuario_id
@@ -174,14 +154,13 @@ class Chat extends Database {
 		$sql = "
 			UPDATE chat SET
 			nombre = '{$this->nombre}',
-			descripcion = '{$this->descripcion}',
 			privado = {$this->privado}
 			WHERE id = {$this->id}";
 		if (self::query($sql) === false) return false;
 		return true;
 	}
 
-	public function newMensajesArray($last_id) {
+	public function newMensajes($last_id) {
 		$sql = "
 			SELECT m.id,
 				   m.fecha,
@@ -197,25 +176,14 @@ class Chat extends Database {
 			ORDER BY m.fecha DESC
 			LIMIT 100";
 		$result = self::query($sql);
-		$mensajes = [];
-		while ($mensaje = $result->fetch_assoc())
-			$mensajes[] = [
-				'id' => $mensaje['id'],
-				'fecha' => $mensaje['fecha'],
-				'usuario_id' => $mensaje['usuario_id'],
-				'usuario_nombre' => $mensaje['usuario_nombre'],
-				'chat_id' => $mensaje['chat_id'],
-				'contenido' => $mensaje['contenido']
-			];
-		return $mensajes;
+		return $result->fetch_all(MYSQLI_ASSOC);
 	}
 
 	public function toArray($depth = 1){
 		$chat = [
 			'id' => $this->id,
 			'fecha' => $this->fecha,
-			'nombre' => $this->nombre,
-			'descripcion' => $this->descripcion
+			'nombre' => $this->nombre
 		];
 		if ($depth > 0) {
 			$depth--;

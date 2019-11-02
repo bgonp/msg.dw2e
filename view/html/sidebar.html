@@ -4,10 +4,10 @@
 		<li><a href="#" class="tab" data-target="friends-menu">Friends</a></li>
 		<li><a href="#" class="tab" data-target="requests-menu">Requests</a></li>
 	</ul>
-	<div class="tab-content chats-menu">
-		<ul class="chats-list">{{CHATS}}</ul>
+	<div id="chats" class="tab-content chats-menu">
+		<ul class="chats-list">{{CHATS}}<li class="empty-chat" style="display: none"><a href="#"></a></li></ul>
 	</div>
-	<div class="tab-content friends-menu" style="display: none">
+	<div id="friends" class="tab-content friends-menu" style="display: none">
 		<form action="ajax.php" method="post">
 			<input type="hidden" name="action" value="requestFriend">
 			<input type="text" name="email" placeholder="Friend's e-mail...">
@@ -15,7 +15,7 @@
 		</form>
 		<ul class="friends-list">{{AMIGOS}}</ul>
 	</div>
-	<div class="tab-content requests-menu" style="display: none">
+	<div id="requests" class="tab-content requests-menu" style="display: none">
 		<ul class="requests-list">{{PENDIENTES}}</ul>
 	</div>
 </div>

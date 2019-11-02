@@ -12,6 +12,7 @@ abstract class View {
 
 	public static function login(){
 		$contenido = file_get_contents(HTML_DIR.'login.html');
+		$contenido .= self::alert();
 		echo self::page($contenido);
 	}
 	

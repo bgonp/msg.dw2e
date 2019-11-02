@@ -16,7 +16,7 @@ class MainController {
 				$response = ['type' => 'error', 'message' => $ex->getMessage()];
 			}
 		} else {
-			$response = ['type' => 'error', 'message' => 'Operación no válida'];
+			$response = ['type' => 'error', 'message' => 'Operación no válida: '.$_POST["action"]];
 		}
 		echo json_encode($response);
 	}
@@ -126,6 +126,7 @@ class MainController {
 			} else if ($chat->addMensaje($usuario->id(), $post['mensaje']) === false) {
 				$response = ['type' => 'error', 'message' => 'No se añadió el mensaje'];
 			} else {
+				$usuario->readChat($chat->id());
 				$response = ['update' => 'chat', 'chat_id' => $chat->id()];
 			}
 		}
@@ -140,6 +141,7 @@ class MainController {
 			if (!($chat = $usuario->chats($post['chat_id']))) {
 				$response = ['type' => 'error', 'message' => 'Chat incorrecto'];
 			} else {
+				$usuario->readChat($chat->id());
 				$response = $chat->toArray();
 				$response['usuario_id'] = SessionController::usuarioId();
 			}
@@ -147,7 +149,7 @@ class MainController {
 		return $response;
 	}
 
-	private static function updateChat($post, $files) {
+	private static function updateMessages($post, $files) {
 		if (empty($post['chat_id']) || empty($post['last_msg'])) {
 			$response = ['type' => 'error', 'message' => 'Falta identificador de chat'];
 		} else {
@@ -155,13 +157,19 @@ class MainController {
 			if (!($chat = $usuario->chats($post['chat_id']))) {
 				$response = ['type' => 'error', 'message' => 'Chat incorrecto'];
 			} else {
+				$usuario->readChat($chat->id());
 				$response = [
-					'mensajes' => $chat->newMensajesArray($post['last_msg']),
+					'mensajes' => $chat->newMensajes($post['last_msg']),
 					'usuario_id' => SessionController::usuarioId()
 				];
 			}
 		}
 		return $response;
+	}
+
+	private static function updateChats($post, $files) {
+		$usuario = Usuario::get(SessionController::usuarioId());
+		return ['chats' => $usuario->newChats()];
 	}
 
 }

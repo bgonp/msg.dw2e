@@ -103,21 +103,50 @@ class Usuario extends Database {
 				SELECT c.id,
 					   c.fecha,
 					   c.nombre,
-					   c.descripcion,
 					   c.privado,
 					   COUNT(m.id) n_mensajes,
-					   COUNT(p.usuario_id) n_usuarios
+					   COUNT(p.usuario_id) n_usuarios,
+					   MAX(m.fecha) last_msg
 				FROM chat c
 				LEFT JOIN mensaje m ON c.id = m.chat_id
 				LEFT JOIN participa p ON c.id = p.chat_id
 				WHERE p.usuario_id = {$this->id}
 				GROUP BY c.id
-				ORDER BY c.nombre ASC";
+				ORDER BY last_msg DESC";
 			$result = self::query($sql);
 			$this->chats = Chat::list($result);
 		}
 		if (is_null($chat_id)) return $this->chats;
 		return $this->chats[intval($chat_id)] ?? false;
+	}
+
+	public function readChat($chat_id) {
+		$chat_id = intval($chat_id);
+		$sql = "
+			UPDATE participa p SET p.last_readed = (
+				SELECT MAX(m.id) FROM mensaje m WHERE m.chat_id = {$chat_id}
+			) WHERE p.usuario_id = {$this->id} AND p.chat_id = {$chat_id};";
+		return self::query($sql) !== false;
+	}
+
+	public function newChats() {
+		$sql = "
+			SELECT c.id,
+				   c.fecha,
+				   c.nombre,
+				   c.privado,
+				   COUNT(m.id) n_mensajes,
+				   COUNT(p.usuario_id) n_usuarios,
+				   MAX(m.fecha) last_msg
+			FROM mensaje m
+			LEFT JOIN chat c ON m.chat_id = c.id
+			LEFT JOIN participa p ON c.id = p.chat_id
+			WHERE p.usuario_id = {$this->id}
+			AND (m.id > p.last_readed OR p.last_readed IS NULL)
+			GROUP BY c.id
+			ORDER BY last_msg DESC";
+		$result = self::query($sql);
+		return $result->fetch_all(MYSQLI_ASSOC);
 	}
 
 	public function getPrivateChat($usuario_id) {
