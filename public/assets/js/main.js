@@ -39,7 +39,8 @@ $(document).ready(function() {
 				data = JSON.parse(data);
 				if (data.update)
 					switch (data.update) {
-						case 'chat': updateMessages(true); break;
+						case 'chats': updateChats(true); break;
+						case 'messages': updateMessages(true); break;
 						case 'page': location.reload(); break;
 						default: showAlert('error', 'Error al recibir información del servidor');
 					}					
@@ -95,8 +96,6 @@ function loadChat(chat_id) {
 				last_msg = data.mensajes[0].id;
 				for (let msg of data.mensajes)
 					mensajes.prepend(cloneMessage(msg.contenido, msg.fecha, msg.usuario_nombre, msg.usuario_id == data.usuario_id));
-			} else {
-				showAlert('info', 'No hay mensajes');
 			}
 		}
 	});
@@ -135,7 +134,8 @@ function updateChats() {
 				if (data.chats && data.chats.length > 0) {
 					data.chats.reverse();
 					for (let chat of data.chats){
-						chats.prepend(cloneChat(chat.id, chat.nombre, current_chat != chat.id));
+						if (chat.last_msg || chats.find('.chat-'+chat.id).length == 0)
+							chats.prepend(cloneChat(chat.id, chat.nombre, current_chat != chat.id));
 					}
 				}
 			}
@@ -158,7 +158,7 @@ function cloneMessage(contenido, fecha, usuario, propio) {
 function cloneChat(id, nombre, nuevo) {
 	let chat_dom = empty_chat.clone();
 	let chat_dom_a = chat_dom.find('a');
-	$('#chats .a-chat.chat-'+id).remove();
+	$('#chats .chat-'+id).remove();
 	chat_dom_a.text(nombre);
 	chat_dom_a.data('id', id);
 	chatsClicables(chat_dom_a);

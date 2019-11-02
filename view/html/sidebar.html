@@ -8,9 +8,14 @@
 		<ul class="chats-list">{{CHATS}}<li class="empty-chat" style="display: none"><a href="#"></a></li></ul>
 	</div>
 	<div id="friends" class="tab-content friends-menu" style="display: none">
-		<form action="ajax.php" method="post">
+		<form action="ajax.php" method="post" id="create-chat-form">
+			<input type="hidden" name="action" value="createChat">
+			<input type="text" name="name" placeholder="Nombre del chat...">
+			<input type="submit" value="New chat">
+		</form>
+		<form action="ajax.php" method="post" id="request-friend-form">
 			<input type="hidden" name="action" value="requestFriend">
-			<input type="text" name="email" placeholder="Friend's e-mail...">
+			<input type="email" name="email" placeholder="Friend's e-mail...">
 			<input type="submit" value="Add">
 		</form>
 		<ul class="friends-list">{{AMIGOS}}</ul>

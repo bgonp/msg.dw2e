@@ -63,7 +63,7 @@ class Chat extends Database {
 	public function addUsuario($usuario) {
 		if (is_numeric($usuario)) $usuario = Usuario::get($usuario);
 		if (!is_object($usuario) || get_class($usuario) != 'Usuario') return false;
-		$sql = "INSERT INTO participa (chat_id, usuario_id) VALUES ({$this->id}, {$usuario->id})";
+		$sql = "INSERT INTO participa (chat_id, usuario_id) VALUES ({$this->id}, {$usuario->id()})";
 		if (!self::query($sql)) return false;
 		$this->usuarios = null;
 		return true;
@@ -71,7 +71,7 @@ class Chat extends Database {
 
 	public function removeUsuario($usuario) {
 		if (!is_object($usuario) || get_class($usuario) != 'Usuario') return false;
-		$sql = "DELETE FROM participa WHERE chat_id = {$this->id} AND usuario_id = {$usuario->id}";
+		$sql = "DELETE FROM participa WHERE chat_id = {$this->id} AND usuario_id = {$usuario->id()}";
 		if (!self::query($sql)) return false;
 		$this->usuarios = null;
 		return true;

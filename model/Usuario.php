@@ -106,7 +106,7 @@ class Usuario extends Database {
 					   c.privado,
 					   COUNT(m.id) n_mensajes,
 					   COUNT(p.usuario_id) n_usuarios,
-					   MAX(m.fecha) last_msg
+					   COALESCE(MAX(m.id),0) last_msg
 				FROM chat c
 				LEFT JOIN mensaje m ON c.id = m.chat_id
 				LEFT JOIN participa p ON c.id = p.chat_id
@@ -137,12 +137,12 @@ class Usuario extends Database {
 				   c.privado,
 				   COUNT(m.id) n_mensajes,
 				   COUNT(p.usuario_id) n_usuarios,
-				   MAX(m.fecha) last_msg
-			FROM mensaje m
-			LEFT JOIN chat c ON m.chat_id = c.id
+				   MAX(m.id) last_msg
+			FROM chat c
+			LEFT JOIN mensaje m ON c.id = m.chat_id
 			LEFT JOIN participa p ON c.id = p.chat_id
 			WHERE p.usuario_id = {$this->id}
-			AND (m.id > p.last_readed OR p.last_readed IS NULL)
+			AND (m.id IS NULL OR m.id > p.last_readed OR p.last_readed IS NULL)
 			GROUP BY c.id
 			ORDER BY last_msg DESC";
 		$result = self::query($sql);

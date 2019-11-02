@@ -1,13 +1,9 @@
 <li class="pendiente">
+	<input type="checkbox" form="create-chat-form" name="members[]" value="{{ID}}">
 	<div class="nombre">{{NOMBRE}}</div>
 	<form action="ajax.php" method="post">
 		<input type="hidden" name="action" value="blockFriend">
 		<input type="hidden" name="friend_id" value="{{ID}}">
 		<input type="submit" value="Block">
-	</form>
-	<form action="ajax.php" method="post">
-		<input type="hidden" name="action" value="writeFriend">
-		<input type="hidden" name="friend_id" value="{{ID}}">
-		<input type="submit" value="Reject">
 	</form>
 </li>

@@ -127,7 +127,7 @@ class MainController {
 				$response = ['type' => 'error', 'message' => 'No se añadió el mensaje'];
 			} else {
 				$usuario->readChat($chat->id());
-				$response = ['update' => 'chat', 'chat_id' => $chat->id()];
+				$response = ['update' => 'messages', 'chat_id' => $chat->id()];
 			}
 		}
 		return $response;
@@ -170,6 +170,31 @@ class MainController {
 	private static function updateChats($post, $files) {
 		$usuario = Usuario::get(SessionController::usuarioId());
 		return ['chats' => $usuario->newChats()];
+	}
+
+	private static function createChat($post, $files) {
+		if (empty($post['name'])) {
+			$response = ['type' => 'error', 'message' => 'Falta un nombre para el chat'];
+		} else if (!isset($post['members']) || !is_array($post['members'])) {
+			$response = ['type' => 'error', 'message' => 'Selecciona al menos un amigo'];
+		} else {
+			$usuario = Usuario::get(SessionController::usuarioId());
+			$amigos = [];
+			foreach ($post['members'] as $amigo)
+				if (!$usuario->amigos($amigo))
+					return ['type' => 'error', 'message' => 'Algún miembro no es tu amigo'];
+			$chat = Chat::new($post['name']);
+			$chat->addUsuario($usuario);
+			$todos = true;
+			foreach ($post['members'] as $member)
+				if (!$chat->addUsuario($member)) $todos = false;
+			$response = ['update' => 'chats'];
+			if (!$todos) {
+				$response['type'] = 'error';
+				$response['message'] = 'Algún amigo no se pudo agregar al chat';
+			}
+		}
+		return $response;
 	}
 
 }
