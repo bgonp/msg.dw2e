@@ -36,6 +36,7 @@ $(document).ready(function() {
 			type: type,
 			data: formData,
 			success: function(data) {
+				console.log(data); // A BORRAR
 				data = JSON.parse(data);
 				if (data.update)
 					switch (data.update) {
@@ -45,7 +46,7 @@ $(document).ready(function() {
 						case 'page': location.reload(); break;
 						default: showAlert('error', 'Error al recibir información del servidor');
 					}					
-				else if (data.message)
+				if (data.message)
 					showAlert(data.type, data.message);
 			},
 	        cache: false,
@@ -96,19 +97,23 @@ function showAlert(type, message) {
 }
 
 function loadChat(chat_id) {
+	chats.find('.a-chat.active').removeClass('active');
+	chats.find('.a-chat.chat-'+chat_id).addClass('active');
 	$.post("ajax.php", { action: "loadChat", chat_id: chat_id }, function(data) {
 		data = JSON.parse(data);
 		if (data.message) {
 			showAlert(data.type, data.message);
 		} else {
 			current_chat = data.id;
-			mensajes.find('.a-mensaje').remove();
+			mensajes.find('.a-message').remove();
 			$('#send-message-form input[name="chat_id"]').val(current_chat);
 			$('#send-message-form input[name="mensaje"]').prop('disabled', false);
+			$('#send-message-form input[type="submit"]').prop('disabled', false);
 			if (data.mensajes && data.mensajes.length > 0) {
 				last_msg = data.mensajes[0].id;
 				for (let msg of data.mensajes)
 					mensajes.prepend(cloneMessage(msg.contenido, msg.fecha, msg.usuario_nombre, msg.usuario_id == data.usuario_id));
+				mensajes.scrollTop(mensajes[0].scrollHeight);
 			}
 		}
 	});
@@ -129,6 +134,7 @@ function updateMessages(clear_input = false) {
 						last_msg = msg.id;
 						mensajes.append(cloneMessage(msg.contenido, msg.fecha, msg.usuario_nombre, msg.usuario_id == data.usuario_id));
 					}
+					mensajes.scrollTop(mensajes[0].scrollHeight);
 				}
 			}
 			check_messages = true;
@@ -158,8 +164,18 @@ function updateChats() {
 }
 
 function updateUserdata() {
-	// TODO
-	console.log('userdata');
+	$.post("ajax.php", { action: "updateUserdata" }, function(data) {
+		data = JSON.parse(data);
+		if (data.message) {
+			showAlert(data.type, data.message);
+		} else {
+			$('#menu .saludo span').text(data.nombre);
+			$('#menu .edit-profile input[name="name"]').val(data.nombre);
+			$('#menu .edit-profile input[name="email"]').val(data.email);
+			$('#menu .edit-profile input[type="password"]').val('');
+			$('#menu .avatar img').attr('src','/avatar.php?id='+data.id+'&'+(new Date().getTime()));
+		}
+	});
 }
 
 function cloneMessage(contenido, fecha, usuario, propio) {
@@ -168,20 +184,22 @@ function cloneMessage(contenido, fecha, usuario, propio) {
 	mensaje_dom.find('.fecha').text(fecha);
 	mensaje_dom.find('.autor').text(usuario);
 	if (propio) mensaje_dom.addClass('propio');
-	mensaje_dom.removeClass('empty-message').addClass('a-mensaje');
+	mensaje_dom.removeClass('empty-message').addClass('a-message');
 	mensaje_dom.show();
 	return mensaje_dom;
 }
 
-function cloneChat(id, nombre, nuevo) {
+function cloneChat(id, nombre, unread) {
 	let chat_dom = empty_chat.clone();
 	let chat_dom_a = chat_dom.find('a');
-	$('#chats .chat-'+id).remove();
+	let old_chat = $('#chats .chat-'+id);
+	let clases = 'a-chat chat-'+id+(old_chat.hasClass('active')?' active':'');
+	old_chat.remove();
 	chat_dom_a.text(nombre);
 	chat_dom_a.data('id', id);
 	chatsClicables(chat_dom_a);
-	if (nuevo) chat_dom.addClass('nuevo');
-	chat_dom.removeClass('empty-chat').addClass('a-chat chat-'+id);
+	if (unread) chat_dom.addClass('unread');
+	chat_dom.removeClass('empty-chat').addClass(clases);
 	chat_dom.show();
 	return chat_dom;
 }
@@ -190,6 +208,6 @@ function chatsClicables(chats) {
 	chats.click(function(event) {
 		event.preventDefault();
 		loadChat($(this).data('id'));
-		$(this).parent().removeClass('nuevo');
+		$(this).parent().removeClass('unread');
 	});
 }

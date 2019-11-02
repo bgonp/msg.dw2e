@@ -9,13 +9,15 @@ class Chat extends Database {
 	private $mensajes;
 	private $usuarios;
 	private $n_usuarios;
+	private $unread;
 
-	private function __construct($id, $fecha, $nombre, $privado, $n_usuarios){
+	private function __construct($id, $fecha, $nombre, $privado, $n_usuarios, $unread = false){
 		$this->id = $id;
 		$this->fecha = $fecha;
 		$this->nombre = $nombre;
 		$this->privado = $privado;
 		$this->n_usuarios = $n_usuarios;
+		$this->unread = $unread;
 	}
 
 	public static function get($id) {
@@ -55,7 +57,8 @@ class Chat extends Database {
 					$chat['fecha'],
 					$chat['nombre'],
 					$chat['privado'],
-					$chat['n_usuarios']
+					$chat['n_usuarios'],
+					$chat['unread']
 				);
 		return $chats;
 	}
@@ -109,11 +112,15 @@ class Chat extends Database {
 		return $this->n_usuarios;
 	}
 
+	public function unread(){
+		return $this->unread;
+	}
+
 	public function mensajes(){
 		if (!is_array($this->mensajes)){
 			$sql = "
 				SELECT m.id,
-					   m.fecha,
+					   DATE_FORMAT(m.fecha, '%H:%i %d/%m/%Y') fecha,
 					   m.usuario_id,
 					   u.nombre usuario_nombre,
 					   m.chat_id,
@@ -163,7 +170,7 @@ class Chat extends Database {
 	public function newMensajes($last_id) {
 		$sql = "
 			SELECT m.id,
-				   m.fecha,
+				   DATE_FORMAT(m.fecha, '%H:%i %d/%m/%Y') fecha,
 				   m.usuario_id,
 				   u.nombre usuario_nombre,
 				   m.chat_id,

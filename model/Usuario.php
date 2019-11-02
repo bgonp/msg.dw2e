@@ -106,13 +106,14 @@ class Usuario extends Database {
 					   c.privado,
 					   COUNT(m.id) n_mensajes,
 					   COUNT(p.usuario_id) n_usuarios,
-					   COALESCE(MAX(m.id),0) last_msg
+					   MAX(m.id) last_msg,
+					   IF(MAX(m.id) > p.last_readed, 1, 0) unread
 				FROM chat c
 				LEFT JOIN mensaje m ON c.id = m.chat_id
 				LEFT JOIN participa p ON c.id = p.chat_id
 				WHERE p.usuario_id = {$this->id}
 				GROUP BY c.id
-				ORDER BY last_msg DESC";
+				ORDER BY unread DESC, last_msg DESC";
 			$result = self::query($sql);
 			$this->chats = Chat::list($result);
 		}

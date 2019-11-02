@@ -57,7 +57,8 @@ abstract class View {
 	private static function chat($chat) {
 		$replace = [
 			'{{ID}}' => $chat->id(),
-			'{{NOMBRE}}' => $chat->nombre()
+			'{{NOMBRE}}' => $chat->nombre(),
+			'{{CLASE}}' => $chat->unread() ? ' unread' : ''
 		];
 		return strtr(file_get_contents(HTML_DIR.'chat.html'), $replace);
 	}

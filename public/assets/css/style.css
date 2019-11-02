@@ -78,6 +78,7 @@ input, .btn {
 	font-family: 'Roboto', 'Arial', sans-serif;
 	font-size: 1rem;
 	line-height: 1.3rem;
+	text-shadow: none;
 	box-sizing: border-box;
 }
 input[disabled] {
@@ -153,6 +154,7 @@ input[type="submit"], .btn {
 #menu {
 	position: relative;
 	width: 100%;
+	height: 56px;
 	padding: 0 20px;
 	background: #1B377A;
 	color: #FFFFFF;
@@ -215,6 +217,7 @@ input[type="submit"], .btn {
 	background: #FFFFFF;
 	box-shadow: 0 0 30px rgba(0,0,0,0.1);
 	text-align:	left;
+	z-index: 10;
 }
 #menu .edit-profile::after {
 	content: '';
@@ -241,4 +244,188 @@ input[type="submit"], .btn {
 	display: block;
 	margin-top: 5px;
 	width: 280px;
+}
+
+/*
+	SIDEBAR
+*/
+#sidebar {
+	position: absolute;
+	top: 56px;
+	bottom: 0;
+	left: 0;
+	width: 40%;
+	border-right: 1px solid #939db5;
+}
+#sidebar .tabs {
+	position: relative;
+	width: 100%;
+	height: 56px;
+}
+#sidebar .tabs > li {
+	position: relative;
+	display: inline-block;
+	width: 33.33%;
+}
+#sidebar .tabs .tab {
+	display: block;
+	color: #1B377A;
+	padding: 20px;
+	width: 100%;
+	text-align: center;
+	border-right: 1px solid #939db5;
+	border-bottom: 1px solid #939db5;
+	margin-bottom: -1px;
+}
+#sidebar .tabs > li:last-child .tab {
+	border-right: none;
+}
+#sidebar .tabs > li .tab.active {
+	border-bottom: none;
+	font-weight: 700;
+}
+#sidebar .tab-content {
+	position: absolute;
+	top: 76px;
+	right: 20px;
+	bottom: 20px;
+	left: 20px;
+	background: #FFFFFF;
+	border: 1px solid #939db5;
+	border-radius: 3px;
+	box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+	overflow: auto;
+}
+
+/*
+	CHATS
+*/
+#chats .a-chat {
+	position: relative;
+	background: #FFFFFF;
+	border-bottom: 1px solid #939db5;
+}
+#chats .a-chat a {
+	display: block;
+	padding: 20px;
+	transition: background .1s ease;
+	color: #1B377A;
+}
+#chats .a-chat.active a,
+#chats .a-chat a:hover {
+	background: #F0F5FF;
+}
+#chats .a-chat.active a,
+#chats .a-chat.unread a {
+	font-weight: 700;
+}
+#chats .a-chat.unread a::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: 0;
+	border-top: 25px solid #1B377A;
+	border-left: 25px solid transparent;
+}
+
+/*
+	MESSAGES
+*/
+#messages {
+	position: absolute;
+	top: 56px;
+	bottom: 0;
+	right: 0;
+	width: 60%;
+}
+#messages #send-message-form {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 20px;
+	background: #1B377A;
+}
+#messages #send-message-form input[name="mensaje"] {
+	display: inline-block;
+	width: 85%;
+	border-right: none;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+#messages #send-message-form .btn-send {
+	width: 15%;
+	font-weight: 700;
+	color: #1B377A;
+	background: #F0F5FF;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	border-color: #939db5;
+	border-left: none;
+	float: right;
+}
+#messages .messages-list {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 72px;
+	left: 0;
+	overflow: auto;
+}
+#messages .messages-list .a-message {
+	position: relative;
+	display: block;
+	margin: 20px auto 20px 20px;
+	width: max-content;
+	max-width: 80%;
+	background: #FFF;
+	padding: 12px 20px;
+	border: 1px solid rgba(0,0,0,0.1);
+	border-radius: 3px;
+	box-shadow: 0 0 20px rgba(0,0,0,0.02);
+	color: #1B377A;
+}
+#messages .messages-list .a-message.propio {
+	margin: 20px 20px 20px auto;
+	text-align: right;
+}
+#messages .messages-list .a-message::before,
+#messages .messages-list .a-message::after,
+#messages .messages-list .a-message.propio::before,
+#messages .messages-list .a-message.propio::after {
+	content: '';
+	position: absolute;
+	top: 100%;
+	margin-top: -2px;
+	border-top: 12px solid #FFFFFF;
+}
+#messages .messages-list .a-message:not(.propio)::before,
+#messages .messages-list .a-message:not(.propio)::after {
+	left: 0;
+	border-right: 12px solid transparent;
+}
+#messages .messages-list .a-message.propio::before,
+#messages .messages-list .a-message.propio::after {
+	right: 0;
+	border-left: 12px solid transparent;
+}
+#messages .messages-list .a-message:not(.propio)::before {
+	left: -1px;
+	margin-top: 0;
+	border-top-color: rgba(0,0,0,0.05);
+}
+#messages .messages-list .a-message.propio::before {
+	right: -1px;
+	margin-top: 0;
+	border-top-color: rgba(0,0,0,0.05);
+}
+#messages .messages-list .a-message .autor {
+	font-size: 0.8rem;
+	font-weight: 700;
+	margin-bottom: 8px;
+}
+#messages .messages-list .a-message .fecha {
+	font-size: 0.8rem;
+	font-weight: 700;
+	margin-top: 8px;
 }

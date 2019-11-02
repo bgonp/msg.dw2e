@@ -1,15 +1,14 @@
 <div id="messages">
 	<ul class="messages-list">
 		<li class="empty-message">
+			<div class="autor"></div>
 			<p class="contenido"></p>
 			<div class="fecha"></div>
-			<div class="autor"></div>
 		</li>
 	</ul>
 	<form action="ajax.php" method="post" id="send-message-form">
 		<input type="hidden" name="action" value="sendMessage">
 		<input type="hidden" name="chat_id" value="0">
-		<input type="text" name="mensaje" placeholder="Write your message..." disabled>
-		<input type="submit" class="btn btn-send" value="Send">
+		<input type="text" name="mensaje" placeholder="Write your message..." disabled><input type="submit" class="btn btn-send" value="Send" disabled>
 	</form>
 </div>

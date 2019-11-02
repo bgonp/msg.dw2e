@@ -172,6 +172,10 @@ class MainController {
 		return ['chats' => $usuario->newChats()];
 	}
 
+	private static function updateUserdata($post, $files) {
+		return Usuario::get(SessionController::usuarioId())->toArray(0);
+	}
+
 	private static function createChat($post, $files) {
 		if (empty($post['name'])) {
 			$response = ['type' => 'error', 'message' => 'Falta un nombre para el chat'];
