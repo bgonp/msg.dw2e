@@ -36,36 +36,36 @@ class MainController {
 	}
 
 	private static function login($post, $files) {
-		if (!isset($post['email']) || !isset($post['password'])) {
+		if (empty($post['email']) || empty($post['password'])) {
 			$response = ['type' => 'error', 'message' => 'Falta información'];
 		} else {
 			$usuario = Usuario::get($post['email'], $post['password']);
 			SessionController::logged($usuario);
-			$response = ['refresh' => 'page'];
+			$response = ['update' => 'page'];
 		}
 		return $response;
 	}
 
 	private static function logout($post, $files) {
 		SessionController::logout();
-		return ['refresh' => 'page'];
+		return ['update' => 'page'];
 	}
 
 	private static function register($post, $files) {
-		if (!isset($post['email']) || !isset($post['nombre']) || !isset($post['password']) || !isset($post['password_rep'])) {
+		if (empty($post['email']) || empty($post['nombre']) || empty($post['password']) || empty($post['password_rep'])) {
 			$response = ['type' => 'error', 'message' => 'Falta información'];
 		} else if ($post['password'] !== $post['password_rep']) {
 			$response = ['type' => 'error', 'message' => 'Las contraseñas no coinciden'];
 		} else {
 			$usuario = Usuario::new($post['email'], $post['nombre'], $post['password'], $files['avatar']);
 			SessionController::logged($usuario);
-			$response = ['refresh' => 'page'];
+			$response = ['update' => 'page'];
 		}
 		return $response;
 	}
 
 	private static function editProfile($post, $files) {
-		if (!isset($post['email']) || !isset($post['name']) || !isset($post['password']) || !isset($post['password_rep'])) {
+		if (empty($post['email']) || empty($post['name']) || !isset($post['password']) || !isset($post['password_rep'])) {
 			$response = ['type' => 'error', 'message' => 'Falta información'];
 		} else if (!empty($post['password']) && $post['password'] !== $post['password_rep']) {
 			$response = ['type' => 'error', 'message' => 'Las contraseñas no coinciden'];
@@ -115,10 +115,10 @@ class MainController {
 	}
 
 	private static function sendMessage($post, $files) {
-		if (!isset($post['chat_id']) || !isset($post['mensaje'])) {
+		if (empty($post['chat_id']) || empty($post['mensaje'])) {
 			$response = ['type' => 'error', 'message' => 'Falta información'];
-		} else if (empty($post['mensaje']) || strlen($post['mensaje']) > 1000){
-			$response = ['type' => 'error', 'message' => 'El mensaje debe tener entre 1 y 1000 caracteres'];
+		} else if (strlen($post['mensaje']) > 1000){
+			$response = ['type' => 'error', 'message' => 'El mensaje puede tener 1000 caracteres máximo'];
 		} else {
 			$usuario = Usuario::get(SessionController::usuarioId());
 			if (!($chat = $usuario->chats($post['chat_id']))) {
@@ -126,14 +126,14 @@ class MainController {
 			} else if ($chat->addMensaje($usuario->id(), $post['mensaje']) === false) {
 				$response = ['type' => 'error', 'message' => 'No se añadió el mensaje'];
 			} else {
-				$response = ['refresh' => 'chat', 'chat_id' => $chat->id()];
+				$response = ['update' => 'chat', 'chat_id' => $chat->id()];
 			}
 		}
 		return $response;
 	}
 
 	private static function loadChat($post, $files) {
-		if (!isset($post['chat_id']) || empty($post['chat_id'])) {
+		if (empty($post['chat_id'])) {
 			$response = ['type' => 'error', 'message' => 'Falta identificador de chat'];
 		} else {
 			$usuario = Usuario::get(SessionController::usuarioId());
@@ -142,6 +142,23 @@ class MainController {
 			} else {
 				$response = $chat->toArray();
 				$response['usuario_id'] = SessionController::usuarioId();
+			}
+		}
+		return $response;
+	}
+
+	private static function updateChat($post, $files) {
+		if (empty($post['chat_id']) || empty($post['last_msg'])) {
+			$response = ['type' => 'error', 'message' => 'Falta identificador de chat'];
+		} else {
+			$usuario = Usuario::get(SessionController::usuarioId());
+			if (!($chat = $usuario->chats($post['chat_id']))) {
+				$response = ['type' => 'error', 'message' => 'Chat incorrecto'];
+			} else {
+				$response = [
+					'mensajes' => $chat->newMensajesArray($post['last_msg']),
+					'usuario_id' => SessionController::usuarioId()
+				];
 			}
 		}
 		return $response;

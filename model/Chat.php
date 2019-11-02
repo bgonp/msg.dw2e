@@ -181,6 +181,35 @@ class Chat extends Database {
 		return true;
 	}
 
+	public function newMensajesArray($last_id) {
+		$sql = "
+			SELECT m.id,
+				   m.fecha,
+				   m.usuario_id,
+				   u.nombre usuario_nombre,
+				   m.chat_id,
+				   m.contenido
+			FROM mensaje m
+			LEFT JOIN usuario u
+			ON m.usuario_id = u.id
+			WHERE m.chat_id = {$this->id}
+			AND m.id > $last_id
+			ORDER BY m.fecha DESC
+			LIMIT 100";
+		$result = self::query($sql);
+		$mensajes = [];
+		while ($mensaje = $result->fetch_assoc())
+			$mensajes[] = [
+				'id' => $mensaje['id'],
+				'fecha' => $mensaje['fecha'],
+				'usuario_id' => $mensaje['usuario_id'],
+				'usuario_nombre' => $mensaje['usuario_nombre'],
+				'chat_id' => $mensaje['chat_id'],
+				'contenido' => $mensaje['contenido']
+			];
+		return $mensajes;
+	}
+
 	public function toArray($depth = 1){
 		$chat = [
 			'id' => $this->id,

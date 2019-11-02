@@ -117,8 +117,8 @@ class Mensaje extends Database {
 			'fecha' => $this->fecha,
 			'usuario_id' => $this->usuario_id,
 			'usuario_nombre' => $this->usuario_nombre,
-			'contenido' => $this->contenido,
-			'chat_id' => $this->chat_id
+			'chat_id' => $this->chat_id,
+			'contenido' => $this->contenido
 		];
 		if ($depth > 0) {
 			$depth--;
