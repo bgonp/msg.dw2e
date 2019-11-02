@@ -84,7 +84,7 @@ class MainController {
 				$response = ['type' => 'error', 'message' => 'Nada que actualizar'];
 			} else {
 				$usuario->save();
-				$response = ['type' => 'success', 'message' => 'Perfil actualizado correctamente'];
+				$response = ['type' => 'success', 'message' => 'Perfil actualizado correctamente', 'update' => 'userdata'];
 			}
 		}
 		return $response;

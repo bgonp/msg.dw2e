@@ -1,16 +1,31 @@
 <div id="menu">
-	<form action="ajax.php" method="post" enctype="multipart/form-data">
-		<input type="hidden" name="action" value="editProfile">
-		<input type="email" name="email" value="{{EMAIL}}" required>
-		<input type="text" name="name" value="{{NOMBRE}}" required>
-		<input type="password" name="password">
-		<input type="password" name="password_rep">
-		<input type="file" name="avatar">
-		<img src="/avatar.php?id={{ID}}">
-		<input type="submit" value="Editar">
-	</form>
-	<form action="ajax.php" method="post">
+	<div class="saludo">Hello, {{NOMBRE}}!</div>
+	<a href="#" class="edit-profile-btn">
+		<div class="avatar"><img src="/avatar.php?id={{ID}}"></div>
+		<span>My profile</span>
+	</a>
+	<form action="ajax.php" method="post" class="logout">
 		<input type="hidden" name="action" value="logout">
-		<input type="submit" value="Logout">
+		<input type="submit" value="Logout" class="btn btn-logout">
 	</form>
+	<div class="edit-profile" style="display: none">
+		<h2>Edit profile</h2>
+		<hr>
+		<form action="ajax.php" method="post" enctype="multipart/form-data">
+			<input type="hidden" name="action" value="editProfile">
+			<label class="form-elem"><span>E-mail</span>
+				<input type="email" name="email" value="{{EMAIL}}" required></label>
+			<label class="form-elem"><span>Nombre</span>
+				<input type="text" name="name" value="{{NOMBRE}}" required></label>
+			<label class="form-elem"><span>Password</span>
+				<input type="password" name="password"></label>
+			<label class="form-elem"><span>Password (repeat)</span>
+				<input type="password" name="password_rep"></label>
+			<label class="form-elem"><span>Avatar</span>
+				<input type="file" name="avatar" style="display: none">
+				<a href="#" class="btn btn-upload">Change avatar</a></label>
+			<hr>
+			<input type="submit" value="Save" class="btn">
+		</form>
+	</div>
 </div>

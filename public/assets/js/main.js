@@ -13,9 +13,9 @@ var check_chats = true;
 
 $(document).ready(function() {
 
-	forms = $('#main form[action="ajax.php"]');
-	tabs_buttons = $('#main .tabs a.tab');
-	tabs_contents = $('#main .tab-content');
+	forms = $('#content form[action="ajax.php"]');
+	tabs_buttons = $('#content .tabs a.tab');
+	tabs_contents = $('#content .tab-content');
 	alert_msg = $('#alert-msg');
 	mensajes = $('#messages .messages-list');
 	empty_msg = $('#messages .empty-message');
@@ -41,6 +41,7 @@ $(document).ready(function() {
 					switch (data.update) {
 						case 'chats': updateChats(true); break;
 						case 'messages': updateMessages(true); break;
+						case 'userdata': updateUserdata(); break;
 						case 'page': location.reload(); break;
 						default: showAlert('error', 'Error al recibir información del servidor');
 					}					
@@ -68,10 +69,22 @@ $(document).ready(function() {
 		alert_msg.fadeOut(200);
 	});
 	
-	setInterval(function() {
-		updateChats();
-		if (current_chat) updateMessages();
-	}, 1000);
+	if ($('#content.main').length > 0){
+		setInterval(function() {
+			updateChats();
+			if (current_chat) updateMessages();
+		}, 1000);
+	}
+
+	$('.edit-profile-btn').click(function(event) {
+		event.preventDefault();
+		$('.edit-profile').slideToggle(200);
+	});
+
+	$('.btn-upload').click(function(event) {
+		event.preventDefault();
+		$(this).siblings('input[type="file"]').click();
+	});
 
 });
 
@@ -142,6 +155,11 @@ function updateChats() {
 			check_chats = true;
 		});
 	}
+}
+
+function updateUserdata() {
+	// TODO
+	console.log('userdata');
 }
 
 function cloneMessage(contenido, fecha, usuario, propio) {

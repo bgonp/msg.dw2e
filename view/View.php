@@ -7,13 +7,13 @@ abstract class View {
 		$contenido .= self::sidebar($usuario->chats(), $usuario->amigos(), $usuario->pendientes());
 		$contenido .= self::mensajes();
 		$contenido .= self::alert();
-		echo self::page($contenido);
+		echo self::page($contenido,'main');
 	}
 
 	public static function login(){
 		$contenido = file_get_contents(HTML_DIR.'login.html');
 		$contenido .= self::alert();
-		echo self::page($contenido);
+		echo self::page($contenido,'login');
 	}
 	
 	public static function error($mensaje) {
@@ -22,8 +22,11 @@ abstract class View {
 		echo self::page($contenido);
 	}
 
-	private static function page($contenido) {
-		$replace = ['{{CONTENIDO}}' => $contenido];
+	private static function page($contenido, $clase) {
+		$replace = [
+			'{{CONTENIDO}}' => $contenido,
+			'{{CLASE}}' => $clase
+		];
 		return strtr(file_get_contents(HTML_DIR.'page.html'), $replace);
 	}
 	
