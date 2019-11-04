@@ -1,25 +1,35 @@
 <div id="login-form">
 	<ul class="tabs">
-		<li><a href="#" class="tab active" data-target="login-form">Login</a></li>
-		<li><a href="#" class="tab" data-target="register-form">Register</a></li>
+		<li><a href="#" class="tab active" data-target="login-form">Login</a>
+		<li><a href="#" class="tab" data-target="register-form">Register</a>
 	</ul>
 	<div class="form-container">
 		<div class="login-form tab-content">
 			<form action="ajax.php" method="post">
 				<input type="hidden" name="action" value="login">
-				<label><span>E-mail</span><input type="email" name="email" required></label>
-				<label><span>Password</span><input type="password" name="password" required></label>
+				<label class="form-elem"><span>E-mail</span>
+					<input type="email" name="email" required></label>
+				<label class="form-elem"><span>Password</span>
+					<input type="password" name="password" required></label>
+				<hr>
 				<input type="submit" class="btn btn-login" value="Login">
 			</form>
 		</div>
 		<div class="register-form tab-content" style="display: none">
 			<form action="ajax.php" method="post" enctype="multipart/form-data">
 				<input type="hidden" name="action" value="register">
-				<label><span>Name</span><input type="text" name="nombre" required></label>
-				<label><span>E-mail</span><input type="email" name="email" required></label>
-				<label><span>Password</span><input type="password" name="password" required></label>
-				<label><span>Re-Password</span><input type="password" name="password_rep" required></label>
-				<label><span>Avatar</span><input type="file" name="avatar"></label>
+				<label class="form-elem"><span>Name</span>
+					<input type="text" name="nombre" required></label>
+				<label class="form-elem"><span>E-mail</span>
+					<input type="email" name="email" required></label>
+				<label class="form-elem"><span>Password</span>
+					<input type="password" name="password" required></label>
+				<label class="form-elem"><span>Re-Password</span>
+					<input type="password" name="password_rep" required></label>
+				<label class="form-elem"><span>Avatar</span>
+					<input type="file" name="avatar" style="display: none">
+					<a href="#" class="btn btn-upload">Upload avatar</a></label>
+				<hr>
 				<input type="submit" class="btn btn-register" value="Register">
 			</form>
 		</div>

@@ -9,7 +9,7 @@ class Helper {
 	public const BLOQUEADO = 4;
 
 	public static function validNombre($nombre) {
-		$pattern = "/^[a-zA-Z\s].{4,16}$/";
+		$pattern = "/^[a-zA-Z\s].{4,32}$/";
 		return preg_match( $pattern, $nombre );
 	}
 

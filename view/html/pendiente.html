@@ -1,13 +1,18 @@
-<li class="pendiente">
-	<div class="nombre">{{NOMBRE}}</div>
-	<form action="ajax.php" method="post">
-		<input type="hidden" name="action" value="acceptFriend">
-		<input type="hidden" name="request_id" value="{{ID}}">
-		<input type="submit" value="Accept">
-	</form>
-	<form action="ajax.php" method="post">
-		<input type="hidden" name="action" value="rejectFriend">
-		<input type="hidden" name="request_id" value="{{ID}}">
-		<input type="submit" value="Reject">
-	</form>
+<li class="a-request deletable">
+	<div class="datos">
+		<div class="nombre">{{NOMBRE}}</div>
+		<div class="email">{{EMAIL}}</div>
+	</div>
+	<div class="buttons">
+		<form action="ajax.php" method="post" class="delete-parent">
+			<input type="hidden" name="action" value="acceptFriend">
+			<input type="hidden" name="request_id" value="{{ID}}">
+			<input type="submit" class="btn btn-accept" value="Accept">
+		</form>
+		<form action="ajax.php" method="post" class="confirmable delete-parent">
+			<input type="hidden" name="action" value="rejectFriend">
+			<input type="hidden" name="request_id" value="{{ID}}">
+			<input type="submit" class="btn btn-decline" value="Decline">
+		</form>
+	</div>
 </li>

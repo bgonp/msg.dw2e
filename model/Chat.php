@@ -5,28 +5,27 @@ class Chat extends Database {
 	private $id;
 	private $fecha;
 	private $nombre;
-	private $privado;
 	private $mensajes;
 	private $usuarios;
 	private $n_usuarios;
-	private $unread;
+	private $last_msg;
+	private $last_readed;
 
-	private function __construct($id, $fecha, $nombre, $privado, $n_usuarios, $unread = false){
+	private function __construct($id, $fecha, $nombre, $n_usuarios, $last_msg = 0, $last_readed = 0){
 		$this->id = $id;
 		$this->fecha = $fecha;
 		$this->nombre = $nombre;
-		$this->privado = $privado;
 		$this->n_usuarios = $n_usuarios;
-		$this->unread = $unread;
+		$this->last_msg = $last_msg ?? 0;
+		$this->last_readed = $last_readed ?? 0;
 	}
 
 	public static function get($id) {
-		if (!($id = intval($id))) die("ID de chat inválido");
+		if (!($id = intval($id))) throw new Exception("ID de chat inválido");
 		$sql = "
 			SELECT c.id,
 				   c.fecha,
 				   c.nombre,
-				   c.privado,
 				   COUNT(p.usuario_id) n_usuarios
 			FROM chat c
 			LEFT JOIN mensaje m ON c.id = m.chat_id
@@ -34,17 +33,16 @@ class Chat extends Database {
 			WHERE c.id = $id
 			GROUP BY c.id";
 		$chat_db = self::query($sql);
-		if (!$chat_db || $chat_db->num_rows == 0) die("No existe chat");
+		if (!$chat_db || $chat_db->num_rows == 0) throw new Exception("No existe chat");
 		$chat = $chat_db->fetch_assoc();
-		return new Chat($chat['id'], $chat['fecha'], $chat['nombre'], $chat['privado'], $chat['n_usuarios']);
+		return new Chat($chat['id'], $chat['fecha'], $chat['nombre'], $chat['n_usuarios']);
 	}
 
-	public static function new($nombre = "", $privado = false) {
-		$nombre = self::escape($nombre);
-		$privado = $privado ? 1 : 0;
-		$sql = "INSERT INTO chat (nombre, privado) VALUES ('$nombre', $privado)";
+	public static function new($nombre = "") {
+		if (!Helper::validNombre($nombre) || !($nombre = self::escape($nombre))) throw new Exception("Nombre no válido");
+		$sql = "INSERT INTO chat (nombre) VALUES ('$nombre')";
 		self::query($sql);
-		if (!($id = self::insertId())) die("No se creó chat");
+		if (!($id = self::insertId())) throw new Exception("No se creó chat");
 		return Chat::get($id);
 	}
 
@@ -56,9 +54,9 @@ class Chat extends Database {
 					$chat['id'],
 					$chat['fecha'],
 					$chat['nombre'],
-					$chat['privado'],
 					$chat['n_usuarios'],
-					$chat['unread']
+					$chat['last_msg'],
+					$chat['last_readed']
 				);
 		return $chats;
 	}
@@ -97,14 +95,8 @@ class Chat extends Database {
 
 	public function nombre($nombre = null){
 		if (is_null($nombre)) return $this->nombre;
-		if (!($nombre = self::escape($nombre))) return false;
+		if (!Helper::validNombre($nombre) || !($nombre = self::escape($nombre))) return false;
 		$this->nombre = $nombre;
-		return true;
-	}
-
-	public function privado($privado = null){
-		if (is_null($privado)) return $this->privado;
-		$this->privado = boolval($privado);
 		return true;
 	}
 
@@ -113,7 +105,7 @@ class Chat extends Database {
 	}
 
 	public function unread(){
-		return $this->unread;
+		return $this->last_msg > $this->last_readed;
 	}
 
 	public function mensajes(){
@@ -124,7 +116,8 @@ class Chat extends Database {
 					   m.usuario_id,
 					   u.nombre usuario_nombre,
 					   m.chat_id,
-					   m.contenido
+					   m.contenido,
+					   IF(m.id > {$this->last_readed}, 1, 0) unread
 				FROM mensaje m
 				LEFT JOIN usuario u
 				ON m.usuario_id = u.id
@@ -160,8 +153,7 @@ class Chat extends Database {
 	public function save() {
 		$sql = "
 			UPDATE chat SET
-			nombre = '{$this->nombre}',
-			privado = {$this->privado}
+			nombre = '{$this->nombre}'
 			WHERE id = {$this->id}";
 		if (self::query($sql) === false) return false;
 		return true;
@@ -190,16 +182,18 @@ class Chat extends Database {
 		$chat = [
 			'id' => $this->id,
 			'fecha' => $this->fecha,
-			'nombre' => $this->nombre
+			'nombre' => $this->nombre,
+			'last_msg' => $this->last_msg,
+			'last_readed' => $this->last_readed
 		];
 		if ($depth > 0) {
 			$depth--;
-			$chat['mensajes'] = [];
-			$chat['usuarios'] = [];
+			$chat['messages'] = [];
+			$chat['users'] = [];
 			foreach ($this->mensajes() as $mensaje)
-				$chat['mensajes'][] = $mensaje->toArray($depth);
+				$chat['messages'][] = $mensaje->toArray($depth);
 			foreach ($this->usuarios() as $usuario)
-				$chat['usuarios'][] = $usuario->toArray($depth);
+				$chat['users'][] = $usuario->toArray($depth);
 		}
 		return $chat;
 	}

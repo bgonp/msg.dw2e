@@ -9,7 +9,9 @@ class Usuario extends Database {
 	private $avatar;
 	private $chats;
 	private $amigos;
+	private $amigos_last;
 	private $pendientes;
+	private $pendientes_last;
 
 	private function __construct($id, $email, $nombre, $password, $avatar) {
 		$this->id = $id;
@@ -37,15 +39,16 @@ class Usuario extends Database {
 		return $usuario;
 	}
 
-	public static function new($email, $nombre, $password, $avatar = null) {
-		if (!Helper::validEmail($email)) throw new Exception("E-mail no válido");
-		if (!Helper::validNombre($nombre)) throw new Exception("Nombre no válido");
+	public static function new($email, $nombre, $password, $avatar = ['error'=>1]) {
+		if (!Helper::validEmail($email) || !($email = self::escape($email))) throw new Exception("E-mail no válido");
+		if (!Helper::validNombre($nombre) || !($nombre = self::escape($nombre))) throw new Exception("Nombre no válido");
 		if (!Helper::validPassword($password)) throw new Exception("Contraseña no válida");
-		if (!is_null($avatar) && !($avatar = Helper::uploadImagen($avatar))) throw new Exception("Avatar no válido");
-		$email = self::escape($email);
-		$nombre = self::escape($nombre);
+		if ($avatar['error']) $avatar = '';
+		else if (!($avatar = Helper::uploadImagen($avatar))) throw new Exception("Avatar no válido");
 		$password = self::hash($password);
-		$sql = "INSERT INTO usuario (email, nombre, password, avatar) VALUES ('$email', '$nombre', '$password', '$avatar')";
+		$sql = "
+			INSERT INTO usuario (email, nombre, password, avatar)
+			VALUES ('$email', '$nombre', '$password', '$avatar')";
 		self::query($sql);
 		if( !($id = self::insertId()) ) throw new Exception("No se creó usuario, quizá el e-mail ya esta en uso");
 		return new Usuario($id, $email, $nombre, $password, $avatar);
@@ -103,17 +106,16 @@ class Usuario extends Database {
 				SELECT c.id,
 					   c.fecha,
 					   c.nombre,
-					   c.privado,
 					   COUNT(m.id) n_mensajes,
 					   COUNT(p.usuario_id) n_usuarios,
-					   MAX(m.id) last_msg,
-					   IF(MAX(m.id) > p.last_readed, 1, 0) unread
+					   p.last_readed,
+					   MAX(m.id) last_msg
 				FROM chat c
 				LEFT JOIN mensaje m ON c.id = m.chat_id
 				LEFT JOIN participa p ON c.id = p.chat_id
 				WHERE p.usuario_id = {$this->id}
 				GROUP BY c.id
-				ORDER BY unread DESC, last_msg DESC";
+				ORDER BY IF(MAX(m.id) > p.last_readed, 1, 0) DESC, last_msg DESC";
 			$result = self::query($sql);
 			$this->chats = Chat::list($result);
 		}
@@ -135,9 +137,9 @@ class Usuario extends Database {
 			SELECT c.id,
 				   c.fecha,
 				   c.nombre,
-				   c.privado,
 				   COUNT(m.id) n_mensajes,
 				   COUNT(p.usuario_id) n_usuarios,
+				   p.last_readed,
 				   MAX(m.id) last_msg
 			FROM chat c
 			LEFT JOIN mensaje m ON c.id = m.chat_id
@@ -150,24 +152,21 @@ class Usuario extends Database {
 		return $result->fetch_all(MYSQLI_ASSOC);
 	}
 
-	public function getPrivateChat($usuario_id) {
-		$usuario_id = intval($usuario_id);
-		$sql = "
-			SELECT c.id, COUNT(*) n_usuarios
-			FROM participa p
-			LEFT JOIN chat c
-			ON p.chat_id = c.id
-			WHERE c.privado = 1
-			AND (p.usuario_id = {$this->id}	OR p.usuario_id = $usuario_id)
-			GROUP BY c.id
-			HAVING n_usuarios = 2";
-	}
-
 	public function amigos($amigo_id = null) {
 		if (!is_array($this->amigos))
 			$this->amigos = self::contactos($amigo_id, Helper::ACEPTADO);
 		if (is_null($amigo_id)) return $this->amigos;
 		return $this->amigos[intval($amigo_id)] ?? false;
+	}
+
+	public function amigos_last(){
+		if (is_null($this->amigos_last))
+			$this->amigos_last = $this->lastContacto(Helper::ACEPTADO);
+		return $this->amigos_last;
+	}
+
+	public function newFriends($last) {
+		return $this->newContactos($last, Helper::ACEPTADO);
 	}
 
 	public function pendientes($pendiente_id = null) {
@@ -177,7 +176,18 @@ class Usuario extends Database {
 		return $this->pendientes[intval($pendiente_id)] ?? false;
 	}
 
+	public function pendientes_last(){
+		if (is_null($this->pendientes_last))
+			$this->pendientes_last = $this->lastContacto(Helper::PENDIENTE);
+		return $this->pendientes_last;
+	}
+
+	public function newRequests($last) {
+		return $this->newContactos($last, Helper::PENDIENTE);
+	}
+
 	private function contactos($contacto_id, $estado) {
+		$and = $estado == Helper::PENDIENTE ? " AND c.usuario_estado_id <> {$this->id}" : "";
 		$sql = "
 			SELECT u.id,
 				   u.email,
@@ -188,7 +198,7 @@ class Usuario extends Database {
 			WHERE id IN (
 				SELECT IF(c.usuario_1_id = {$this->id}, c.usuario_2_id, c.usuario_1_id) usuario_id
 				FROM contacto c
-				WHERE c.estado = {$estado}
+				WHERE c.estado = {$estado}{$and}
 				AND (c.usuario_1_id = {$this->id} OR c.usuario_2_id = {$this->id})
 			)
 			ORDER BY u.nombre ASC";
@@ -196,15 +206,47 @@ class Usuario extends Database {
 		return self::list($result);
 	}
 
+	private function newContactos($last, $estado) {
+		$and = $estado == Helper::PENDIENTE ? " AND c.usuario_estado_id <> {$this->id}" : "";
+		$sql = "
+			SELECT u.id,
+				   u.nombre,
+				   u.email,
+				   t.fecha_upd
+			FROM usuario u
+			RIGHT JOIN (
+				SELECT
+					c.fecha_upd, IF(c.usuario_1_id = {$this->id}, c.usuario_2_id, c.usuario_1_id) usuario_id
+				FROM contacto c
+				WHERE c.estado = {$estado}{$and}
+				AND (c.usuario_1_id = {$this->id} OR c.usuario_2_id = {$this->id})
+				AND fecha_upd > '{$last}'
+			) t
+			ON u.id = t.usuario_id
+			ORDER BY t.fecha_upd DESC";
+		$result = self::query($sql);
+		return $result->fetch_all(MYSQLI_ASSOC);
+	}
+
+	private function lastContacto($estado) {
+		$sql = "
+			SELECT MAX(c.fecha_upd) fecha_upd
+			FROM contacto c
+			WHERE (c.usuario_1_id = {$this->id} OR c.usuario_2_id = {$this->id})
+			AND c.estado = {$estado}";
+		$result = self::query($sql);
+		return $result->num_rows > 0 ? $result->fetch_assoc()['fecha_upd'] : 0;
+	}
+
 	public function addContacto($id_o_email) {
 		$contacto = self::get($id_o_email);
-		if ($contacto->id === $this->id) throw new Exception("No puedes ser tu propio contacto");		
+		if ($contacto->id === $this->id) throw new Exception("No puedes ser tu propio amigo");		
 		$user1_id = min($this->id, $contacto->id);
 		$user2_id = max($this->id, $contacto->id);
 		$sql = "
 			INSERT INTO contacto (usuario_1_id, usuario_2_id, usuario_estado_id)
 			VALUES ({$user1_id}, {$user2_id}, {$this->id})";
-		if (!self::query($sql)) throw new Exception("No se creó contacto");
+		if (!self::query($sql)) throw new Exception("No se pudo solicitar amistad");
 		return true;
 	}
 

@@ -1,3 +1,9 @@
-<li class="a-chat chat-{{ID}}{{CLASE}}">
+<li class="a-chat chat-{{ID}}{{CLASE}} deletable">
 	<a href="#" data-id="{{ID}}">{{NOMBRE}}</a>
+	<form action="ajax.php" method="post" class="confirmable delete-parent">
+		<input type="hidden" name="action" value="leaveChat">
+		<input type="hidden" name="chat_id" value="{{ID}}">
+		<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
+	</form>
+	<ul class="members-list"></ul>
 </li>

@@ -9,7 +9,7 @@ abstract class Database {
 			$conf = json_decode(file_get_contents(CONFIG_DIR.'database.json'));
 			$conn = new mysqli($conf->host, $conf->user, $conf->pass, $conf->name);
 			if ($conn->connect_errno)
-				die("Fallo al conectar a BD: " . $conn->connect_error);
+				throw new Exception("Fallo al conectar a base de datos");
 			else
 				self::$conn = $conn;
 		}

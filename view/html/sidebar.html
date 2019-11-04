@@ -1,26 +1,76 @@
 <div id="sidebar">
 	<ul class="tabs">
-		<li><a href="#" class="tab active" data-target="chats-menu">Chats</a>
-		<li><a href="#" class="tab" data-target="friends-menu">Friends</a>
-		<li><a href="#" class="tab" data-target="requests-menu">Requests</a>
+		<li><a href="#" class="tab chats active" data-target="chats-menu">Chats</a>
+		<li><a href="#" class="tab friends" data-target="friends-menu">Friends</a>
+		<li><a href="#" class="tab requests" data-target="requests-menu">Requests</a>
 	</ul>
 	<div id="chats" class="tab-content chats-menu">
-		<ul class="chats-list">{{CHATS}}<li class="empty-chat" style="display: none"><a href="#"></a></li></ul>
+		<ul class="chats-list">
+			{{CHATS}}
+			<li class="empty-chat deletable" style="display: none">
+				<a href="#"></a>
+				<form action="ajax.php" method="post" class="confirmable delete-parent">
+					<input type="hidden" name="action" value="leaveChat">
+					<input type="hidden" name="chat_id" value="">
+					<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
+				</form>
+				<ul class="members-list">
+					<li class="empty-member" style="display: none"><strong class="name"></strong> (<span class="email"></span>)</li>
+				</ul>
+			</li>
+		</ul>
 	</div>
 	<div id="friends" class="tab-content friends-menu" style="display: none">
-		<form action="ajax.php" method="post" id="create-chat-form">
-			<input type="hidden" name="action" value="createChat">
-			<input type="text" name="name" placeholder="Nombre del chat...">
-			<input type="submit" value="New chat">
-		</form>
-		<form action="ajax.php" method="post" id="request-friend-form">
+		<form action="ajax.php" method="post" id="request-friend-form" class="empty-on-submit">
 			<input type="hidden" name="action" value="requestFriend">
 			<input type="email" name="email" placeholder="Friend's e-mail...">
 			<input type="submit" value="Add">
 		</form>
 		<ul class="friends-list">{{AMIGOS}}</ul>
+		<form action="ajax.php" method="post" id="create-chat-form" class="empty-on-submit">
+			<input type="hidden" name="action" value="createChat">
+			<input type="text" name="name" placeholder="Chat name...">
+			<input type="submit" value="New chat">
+		</form>
+		<li class="empty-friend deletable" style="display: none">
+			<div class="avatar"><img src=""></div>
+			<div class="datos">
+				<div class="nombre"></div>
+				<div class="email"></div>
+			</div>
+			<div class="buttons">
+				<label class="custom-checkbox">
+					<input type="checkbox" form="create-chat-form" name="members[]" value="">
+					<span class="checked"><i class="fa fa-check-square-o"></i></span>
+					<span class="unchecked"><i class="fa fa-square-o"></i></span>
+				</label>
+				<form action="ajax.php" method="post" class="confirmable delete-parent">
+					<input type="hidden" name="action" value="blockFriend">
+					<input type="hidden" name="friend_id" value="">
+					<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
+				</form>
+			</div>
+		</li>
 	</div>
 	<div id="requests" class="tab-content requests-menu" style="display: none">
 		<ul class="requests-list">{{PENDIENTES}}</ul>
+		<li class="empty-request deletable" style="display: none">
+			<div class="datos">
+				<div class="nombre"></div>
+				<div class="email"></div>
+			</div>
+			<div class="buttons">
+				<form action="ajax.php" method="post" class="delete-parent">
+					<input type="hidden" name="action" value="acceptFriend">
+					<input type="hidden" name="request_id" value="">
+					<input type="submit" class="btn btn-accept" value="Accept">
+				</form>
+				<form action="ajax.php" method="post" class="confirmable delete-parent">
+					<input type="hidden" name="action" value="rejectFriend">
+					<input type="hidden" name="request_id" value="">
+					<input type="submit" class="btn btn-decline" value="Decline">
+				</form>
+			</div>
+		</li>
 	</div>
 </div>

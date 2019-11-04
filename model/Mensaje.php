@@ -8,14 +8,16 @@ class Mensaje extends Database {
 	private $usuario_nombre;
 	private $chat_id;
 	private $contenido;
+	private $unread;
 
-	private function __construct($id, $fecha, $usuario_id, $usuario_nombre, $chat_id, $contenido) {
+	private function __construct($id, $fecha, $usuario_id, $usuario_nombre, $chat_id, $contenido, $unread = false) {
 		$this->id = $id;
 		$this->fecha = $fecha;
 		$this->usuario_id = $usuario_id;
 		$this->usuario_nombre = $usuario_nombre;
 		$this->chat_id = $chat_id;
 		$this->contenido = $contenido;
+		$this->unread = $unread;
 	}
 
 	public static function get($id) {
@@ -65,7 +67,8 @@ class Mensaje extends Database {
 					$msg['usuario_id'],
 					$msg['usuario_nombre'],
 					$msg['chat_id'],
-					$msg['contenido']
+					$msg['contenido'],
+					$msg['unread']
 				);
 		return $mensajes;
 	}
@@ -103,6 +106,10 @@ class Mensaje extends Database {
 		if( !($contenido = self::escape($contenido)) ) return false;
 		$this->contenido = $contenido;
 		return true;
+	}
+
+	public function unread() {
+		return $this->unread;
 	}
 
 	public function save() {

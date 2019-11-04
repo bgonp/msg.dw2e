@@ -6,7 +6,7 @@
 			<div class="fecha"></div>
 		</li>
 	</ul>
-	<form action="ajax.php" method="post" id="send-message-form">
+	<form action="ajax.php" method="post" id="send-message-form" class="empty-on-submit">
 		<input type="hidden" name="action" value="sendMessage">
 		<input type="hidden" name="chat_id" value="0">
 		<input type="text" name="mensaje" placeholder="Write your message..." disabled><input type="submit" class="btn btn-send" value="Send" disabled>
