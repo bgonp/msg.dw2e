@@ -7,18 +7,24 @@ class Usuario extends Database {
 	private $nombre;
 	private $password;
 	private $avatar;
+	private $confirmado;
+	private $clave;
+	private $caducidad;
 	private $chats;
 	private $amigos;
 	private $amigos_last;
 	private $pendientes;
 	private $pendientes_last;
 
-	private function __construct($id, $email, $nombre, $password, $avatar) {
+	private function __construct($id, $email, $nombre, $password, $avatar, $confirmado = 0, $clave = "", $caducidad = 0) {
 		$this->id = $id;
 		$this->email = $email;
 		$this->nombre = $nombre;
 		$this->password = $password;
 		$this->avatar = $avatar;
+		$this->confirmado = $confirmado;
+		$this->clave = $clave;
+		$this->caducidad = $caducidad > 0 ? strtotime($caducidad) : 0;
 	}
 
 	public static function get($id_o_email, $password = null) {
@@ -34,7 +40,16 @@ class Usuario extends Database {
 		$user_db = self::query($sql);
 		if ($user_db->num_rows == 0) throw new Exception("No existe usuario");
 		$user = $user_db->fetch_assoc();
-		$usuario = new Usuario($user['id'], $user['email'], $user['nombre'], $user['password'], $user['avatar']);
+		$usuario = new Usuario(
+			$user['id'],
+			$user['email'],
+			$user['nombre'],
+			$user['password'],
+			$user['avatar'],
+			$user['confirmado'],
+			$user['clave'],
+			$user['caducidad']
+		);
 		if (!empty($password) && !$usuario->verificar($password)) throw new Exception("Autentificación errónea");
 		return $usuario;
 	}
@@ -97,6 +112,12 @@ class Usuario extends Database {
 		if (!($avatar = Helper::uploadImagen($avatar))) return false;
 		Helper::removeImagen($this->avatar);
 		$this->avatar = $avatar;
+		return true;
+	}
+
+	public function confirmado($confirmado = null) {
+		if (is_null($confirmado)) return $this->confirmado;
+		$this->confirmado = $confirmado ? 1 : 0;
 		return true;
 	}
 
@@ -186,6 +207,30 @@ class Usuario extends Database {
 		return $this->newContactos($last, Helper::PENDIENTE);
 	}
 
+	public function checkClave($clave) {
+		return !empty($clave) && $this->clave == $clave && time() <= $this->caducidad;
+	}
+
+	public function getNewClave() {
+		$this->clave = Helper::randomString(32);
+		$this->caducidad = time()+60*60*24;
+		$this->save();
+		return $this->clave;
+	}
+
+	public function removeClave() {
+		$this->clave = "";
+		$this->caducidad = time();
+		$this->save();
+	}
+
+	public function confirm() {
+		$this->confirmado = 1;
+		$this->clave = "";
+		$this->caducidad = time();
+		$this->save();
+	}
+
 	private function contactos($contacto_id, $estado) {
 		$and = $estado == Helper::PENDIENTE ? " AND c.usuario_estado_id <> {$this->id}" : "";
 		$sql = "
@@ -273,16 +318,20 @@ class Usuario extends Database {
 	}
 
 	public function verificar($password) {
-		return password_verify( $password, $this->password );
+		return $this->confirmado && password_verify( $password, $this->password );
 	}
 
 	public function save() {
+		$caducidad = $this->caducidad ? date('"Y-m-d H:i:s"', $this->caducidad) : 'NULL';
 		$sql = "
 			UPDATE usuario SET
 			email = '{$this->email}',
 			nombre = '{$this->nombre}',
 			password = '{$this->password}',
-			avatar = '{$this->avatar}'
+			avatar = '{$this->avatar}',
+			confirmado = '{$this->confirmado}',
+			clave = '{$this->clave}',
+			caducidad = {$caducidad}
 			WHERE id = {$this->id}";
 		if (self::query($sql) === false) return false;
 		return true;

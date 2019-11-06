@@ -8,7 +8,7 @@
 		<ul class="chats-list">
 			{{CHATS}}
 			<li class="empty-chat deletable" style="display: none">
-				<a href="#"></a>
+				<a href="#" class="chat-link"></a>
 				<form action="ajax.php" method="post" class="confirmable delete-parent">
 					<input type="hidden" name="action" value="leaveChat">
 					<input type="hidden" name="chat_id" value="">
@@ -16,6 +16,14 @@
 				</form>
 				<ul class="members-list">
 					<li class="empty-member" style="display: none"><strong class="name"></strong> (<span class="email"></span>)</li>
+					<li class="add-member" style="display: none">
+						<form action="ajax.php" method="post" class="add-member-form">
+							<input type="hidden" name="action" value="addMember">
+							<input type="hidden" name="chat_id" value="">
+							<input type="text" name="friend_id" value="" placeholder="Add member by ID...">
+							<button type="submit"><i class="fa fa-plus"></i></button>
+						</form>
+					</li>
 				</ul>
 			</li>
 		</ul>
@@ -23,7 +31,7 @@
 	<div id="friends" class="tab-content friends-menu" style="display: none">
 		<form action="ajax.php" method="post" id="request-friend-form" class="empty-on-submit">
 			<input type="hidden" name="action" value="requestFriend">
-			<input type="email" name="email" placeholder="Friend's e-mail...">
+			<input type="email" name="email" placeholder="Add friends by e-mail...">
 			<input type="submit" value="Add">
 		</form>
 		<ul class="friends-list">{{AMIGOS}}</ul>

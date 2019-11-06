@@ -11,12 +11,13 @@
 					<input type="email" name="email" required></label>
 				<label class="form-elem"><span>Password</span>
 					<input type="password" name="password" required></label>
+				<a href="#" class="tab active btn-reset" data-target="recover-form">I don't remember my password</a>
 				<hr>
 				<input type="submit" class="btn btn-login" value="Login">
 			</form>
 		</div>
 		<div class="register-form tab-content" style="display: none">
-			<form action="ajax.php" method="post" enctype="multipart/form-data">
+			<form action="ajax.php" method="post" enctype="multipart/form-data" class="empty-on-submit">
 				<input type="hidden" name="action" value="register">
 				<label class="form-elem"><span>Name</span>
 					<input type="text" name="nombre" required></label>
@@ -31,6 +32,16 @@
 					<a href="#" class="btn btn-upload">Upload avatar</a></label>
 				<hr>
 				<input type="submit" class="btn btn-register" value="Register">
+			</form>
+		</div>
+		<div class="recover-form tab-content" style="display: none">
+			<h2>Recover your password</h2>
+			<form action="ajax.php" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="action" value="resetSend">
+				<label class="form-elem"><span>E-mail</span>
+					<input type="email" name="email" required></label>
+				<hr>
+				<input type="submit" class="btn btn-register" value="Reset password">
 			</form>
 		</div>
 	</div>

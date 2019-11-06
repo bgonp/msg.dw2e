@@ -1,17 +1,19 @@
-var forms, tabs_buttons, tabs_contents, alert_msg;
+var forms, tabs_buttons, tabs_contents, alert_msg, check = true;
 var messages, empty_msg, check_messages = true, last_readed = -1;
-var chats, empty_chat, current_chat, check_chats = true;
-var friends, empty_friend, check_friends = true, last_friend = "";
-var requests, empty_request, check_requests = true, last_request = "";
+var chats, empty_chat, current_chat = 0;
+var friends, empty_friend, last_friend = "";
+var requests, empty_request, last_request = "";
 var current_chat_dom, empty_member;
-var update_interval = 2000;
+var update_interval = 500;
+var usuario_id;
 
 $(document).ready(function() {
 
 	forms = $('#content form[action="ajax.php"]');
-	tabs_buttons = $('#content .tabs a.tab');
+	tabs_buttons = $('#content a.tab');
 	tabs_contents = $('#content .tab-content');
 	alert_msg = $('#alert-msg');
+	loading = $('#loading');
 	messages = $('#messages .messages-list');
 	empty_msg = $('#messages .empty-message');
 	chats = $('#chats .chats-list');
@@ -40,12 +42,7 @@ $(document).ready(function() {
 	});
 	
 	if ($('#content.main').length > 0){
-		setInterval(function() {
-			updateChats();
-			setTimeout(updateFriends, update_interval*0.25);
-			setTimeout(updateRequests, update_interval*0.5);
-			if (current_chat) setTimeout(updateMessages, update_interval*0.75);
-		}, update_interval);
+		setInterval(function() { update(); }, update_interval);
 	}
 
 	$('.edit-profile-btn').click(function(event) {
@@ -68,123 +65,117 @@ function showAlert(type, message) {
 }
 
 function loadChat(chat_id) {
+	if (chats.find('.a-chat.active.chat-'+chat_id).length > 0) return;
 	chats.find('.a-chat.active').removeClass('active');
 	current_chat_dom = chats.find('.a-chat.chat-'+chat_id);
 	$.post("ajax.php", { action: "loadChat", chat_id: chat_id }, function(data) {
 		data = processData(data);
 		if (data.id) {
-			current_chat = data.id;
-			messages.find('.a-message').remove();
-			$('#send-message-form input[name="chat_id"]').val(current_chat);
-			$('#send-message-form input[name="mensaje"]').prop('disabled', false);
-			$('#send-message-form input[type="submit"]').prop('disabled', false);
-			if (data.messages && data.messages.length > 0) {
-				for (let msg of data.messages) {
-					let propio = msg.usuario_id == data.usuario_id;
-					let nuevo = parseInt(msg.id) > data.last_readed;
-					messages.prepend(cloneMessage(msg.contenido, msg.fecha, msg.usuario_nombre, propio, nuevo));
-				}
-				last_readed = parseInt(data.last_msg);
-				messages.scrollTop(messages[0].scrollHeight);
-			}
+			loadMessages(data.id, data.last_readed, data.last_msg, data.messages);
 			if (data.users && data.users.length > 0) {
 				let members = current_chat_dom.find('.members-list');
-				members.empty();
+				members.find('.a-member').remove();
+				data.users.reverse();
 				for (let member of data.users)
-					members.append(cloneMember(member.nombre, member.email));
+					members.prepend(cloneMember(member.nombre, member.email));
 			}
 			current_chat_dom.addClass('active');
 		}
 	});
 }
 
-function updateMessages() {
-	if (check_messages) {
-		check_messages = false;
-		$.post("ajax.php", { action: "updateMessages", chat_id: current_chat, last_readed: last_readed }, function(data) {
-			data = processData(data);
-			if (data.messages && data.messages.length > 0) {
-				data.messages.reverse();
-				for (let msg of data.messages){
-					last_readed = msg.id;
-					messages.append(cloneMessage(msg.contenido, msg.fecha, msg.usuario_nombre, msg.usuario_id == data.usuario_id));
-				}
-				messages.scrollTop(messages[0].scrollHeight);
-			}
-			check_messages = true;
-		});
+function loadMessages(chat_id = 0, last_readed = 0, last_msg = 0, messages_list = false) {
+	current_chat = chat_id;
+	messages.find('.a-message').remove();
+	$('#send-message-form input[name="chat_id"]').val(current_chat);
+	$('#send-message-form input[name="mensaje"]').prop('disabled', current_chat ? false : true);
+	$('#send-message-form input[type="submit"]').prop('disabled', current_chat ? false : true);
+	if (messages_list && messages_list.length > 0) {
+		for (let msg of messages_list) {
+			let propio = msg.usuario_id == usuario_id;
+			let nuevo = parseInt(msg.id) > last_readed;
+			messages.prepend(cloneMessage(msg.contenido, msg.fecha, msg.usuario_nombre, propio, nuevo));
+		}
+		last_readed = parseInt(last_msg);
+		messages.scrollTop(messages[0].scrollHeight);
 	}
 }
 
-function updateChats() {
-	if (check_chats) {
-		check_chats = false;
-		$.post("ajax.php", { action: "updateChats" }, function(data) {
+function update() {
+	if (!check) return;
+	check = false;
+	$.post("ajax.php", {
+			action: "update",
+			chat_id: current_chat,
+			last_friend: last_friend,
+			last_readed: last_readed,
+			last_request: last_request
+		}, function(data) {
 			data = processData(data);
-			if (data.chats && data.chats.length > 0) {
-				let updated = false;
-				data.chats.reverse();
-				for (let chat of data.chats)
-					if (chat.last_msg || chats.find('.chat-'+chat.id).length == 0) {
-						chats.prepend(cloneChat(chat.id, chat.nombre, current_chat != chat.id));
-						updated = true;
-					}
-				if (updated) tabs_buttons.filter('.chats:not(.active)').addClass('new');
-			}
-			check_chats = true;
-		});
-	}
+			if (data.friends && data.friends.length > 0)
+				updateFriends(data.friends);
+			if (data.requests && data.requests.length > 0)
+				updateRequests(data.requests);
+			if (data.chats && data.chats.length > 0)
+				updateChats(data.chats);
+			if (data.messages && data.messages.length > 0)
+				updateMessages(data.messages, data.usuario_id);
+			check = true;
+		}
+	);
 }
 
-function updateFriends() {
-	if (check_friends) {
-		check_friends = false;
-		$.post("ajax.php", { action: "updateFriends", last: last_friend }, function(data) {
-			data = processData(data);
-			if (data.friends && data.friends.length > 0) {
-				let updated = false;
-				data.friends.reverse();
-				for (let friend of data.friends) {
-					if (friend.fecha_upd > last_friend) last_friend = friend.fecha_upd;
-					friends.prepend(cloneFriend(friend.id, friend.nombre, friend.email));
-					updated = true;
-				}
-				if (updated) tabs_buttons.filter('.friends:not(.active)').addClass('new');
-			}
-			check_friends = true;
-		});
+function updateMessages(messages_list, usuario_id) {
+	var propio = false;
+	messages_list.reverse();
+	for (let msg of messages_list){
+		propio = msg.usuario_id == usuario_id;
+		if (propio) messages.find('.a-message.nuevo').removeClass('nuevo');
+		last_readed = msg.id;
+		messages.append(cloneMessage(msg.contenido, msg.fecha, msg.usuario_nombre, propio, !propio ));
 	}
+	messages.scrollTop(messages[0].scrollHeight);
 }
 
-function updateRequests() {
-	if (check_requests) {
-		check_requests = false;
-		$.post("ajax.php", { action: "updateRequests", last: last_request }, function(data) {
-			data = processData(data);
-			if (data.requests && data.requests.length > 0) {
-				let updated = false;
-				data.requests.reverse();
-				for (let request of data.requests){
-					if (request.fecha_upd > last_request) last_request = request.fecha_upd;
-					requests.prepend(cloneRequest(request.id, request.nombre, request.email));
-					updated = true;
-				}
-				if (updated) tabs_buttons.filter('.requests:not(.active)').addClass('new');
-			}
-			check_requests = true;
-		});
-	}
+function updateChats($chats_list) {
+	var updated = false;
+	$chats_list.reverse();
+	for (let chat of $chats_list)
+		if (chat.last_msg || chats.find('.chat-'+chat.id).length == 0) {
+			chats.prepend(cloneChat(chat.id, chat.nombre, current_chat != chat.id));
+			updated = true;
+		}
+	if (updated) tabs_buttons.filter('.chats:not(.active)').addClass('new');
 }
 
-function updateUserdata() {
-	$.post("ajax.php", { action: "updateUserdata" }, function(data) {
-		data = processData(data);
-		$('#menu .saludo span').text(data.nombre);
-		$('#menu .edit-profile input[name="name"]').val(data.nombre);
-		$('#menu .edit-profile input[name="email"]').val(data.email);
-		$('#menu .edit-profile input[type="password"]').val('');
-		$('#menu .avatar img').attr('src','/avatar.php?id='+data.id+'&'+(new Date().getTime()));
-	});
+function updateFriends(friends_list) {
+	var updated = false;
+	friends_list.reverse();
+	for (let friend of friends_list) {
+		if (friend.fecha_upd > last_friend) last_friend = friend.fecha_upd;
+		friends.prepend(cloneFriend(friend.id, friend.nombre, friend.email));
+		updated = true;
+	}
+	if (updated) tabs_buttons.filter('.friends:not(.active)').addClass('new');
+}
+
+function updateRequests(requests_list) {
+	var updated = false;
+	requests_list.reverse();
+	for (let request of requests_list){
+		if (request.fecha_upd > last_request) last_request = request.fecha_upd;
+		requests.prepend(cloneRequest(request.id, request.nombre, request.email));
+		updated = true;
+	}
+	if (updated) tabs_buttons.filter('.requests:not(.active)').addClass('new');
+}
+
+function updateUserdata(userdata) {
+	$('#menu .saludo span').text(userdata.nombre);
+	$('#menu .edit-profile input[name="name"]').val(userdata.nombre);
+	$('#menu .edit-profile input[name="email"]').val(userdata.email);
+	$('#menu .edit-profile input[type="password"]').val('');
+	$('#menu .avatar img').attr('src','/avatar.php?id='+userdata.id+'&'+(new Date().getTime()));
 }
 
 function cloneMessage(contenido, fecha, usuario, propio, nuevo = false) {
@@ -200,18 +191,21 @@ function cloneMessage(contenido, fecha, usuario, propio, nuevo = false) {
 }
 
 function cloneChat(id, nombre, unread) {
-	let chat_dom = empty_chat.clone();
-	let chat_dom_a = chat_dom.find('a');
-	let old_chat = $('#chats .chat-'+id);
-	let clases = 'a-chat chat-'+id+(old_chat.hasClass('active')?' active':'');
-	old_chat.remove();
-	chat_dom_a.text(nombre);
-	chat_dom_a.data('id', id);
-	chatsClicables(chat_dom_a);
-	chat_dom.find('input[name="chat_id"]').val(id);
+	let chat_dom = $('#chats .chat-'+id);
+	if (chat_dom.length == 0) {
+		chat_dom = empty_chat.clone();
+		chatsClicables(chat_dom.find('.chat-link'));
+		formsClicables(chat_dom.find('form[action="ajax.php"]'));
+		chat_dom.find('input[name="chat_id"]').val(id);
+		chat_dom.removeClass('empty-chat').addClass('a-chat chat-'+id);
+		chat_dom.find('.chat-link').data('id', id);
+		chat_dom.show();
+		chat_dom.find('.chat-link').text(nombre);
+		if (unread) chat_dom.addClass('unread');
+		return null;
+	}
+	chat_dom.find('.chat-link').text(nombre);
 	if (unread) chat_dom.addClass('unread');
-	chat_dom.removeClass('empty-chat').addClass(clases);
-	chat_dom.show();
 	return chat_dom;
 }
 
@@ -258,6 +252,7 @@ function chatsClicables(chats) {
 function formsClicables(forms) {
 	forms.submit(function(event) {
 		var form = $(this);
+		var show_loading = setTimeout(function(){ loading.show(); }, 250);
 		event.preventDefault();
 		if (!$(this).hasClass('confirmable') || confirm('Are you sure?')) {
 			let url = $(this).attr('action');
@@ -270,10 +265,16 @@ function formsClicables(forms) {
 		        contentType: false,
 		        processData: false,
 				success: function(data) {
+					clearTimeout(show_loading);
+					loading.hide();
 					data = processData(data);
 					if (data.type != 'error'){
-						if (form.hasClass('delete-parent')) form.closest('.deletable').remove();
-						if (form.hasClass('empty-on-submit')) form[0].reset();
+						if (form.hasClass('unload-chat'))
+							loadMessages();
+						if (form.hasClass('delete-parent'))
+							form.closest('.deletable').remove();
+						if (form.hasClass('empty-on-submit'))
+							form[0].reset();
 					}
 				}
 			});
@@ -282,18 +283,12 @@ function formsClicables(forms) {
 }
 
 function processData(data) {
-	//console.log(data); // A BORRAR
+	console.log(data); // A BORRAR
 	data = JSON.parse(data);
+	if (data.redirect)
+		location.href = data.redirect;
 	if (data.update)
-		switch (data.update) {
-			case 'chats': updateChats(); break;
-			case 'messages': updateMessages(); break;
-			case 'userdata': updateUserdata(); break;
-			case 'friends': updateFriends(); break;
-			case 'requests': updateRequests(); break;
-			case 'page': location.reload(); break;
-			default: showAlert('error', 'Server side error');
-		}
+		update();
 	if (data.focus)
 		switch (data.focus) {
 			case 'chats': tabs_buttons.filter('.chats').click(); break;
@@ -301,6 +296,8 @@ function processData(data) {
 			case 'requests': tabs_buttons.filter('.requests').click(); break;
 			default: showAlert('error', 'Server side error');
 		}
+	if (data.userdata)
+		updateUserdata(data.userdata);
 	if (data.message)
 		showAlert(data.type, data.message);
 	return data;

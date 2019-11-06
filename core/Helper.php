@@ -39,7 +39,7 @@ class Helper {
 			return false;
 
 		do {
-			$filename = self::randomNombre().'.'.$extension;
+			$filename = self::randomString(16).'.'.$extension;
 		} while (file_exists(IMAGE_DIR.$filename));
 		if (!move_uploaded_file($imagen['tmp_name'], IMAGE_DIR.$filename))
 			return false;
@@ -53,11 +53,11 @@ class Helper {
 		return unlink(IMAGE_DIR.$imagen);
 	}
 
-	private static function randomNombre() {
+	public static function randomString($length) {
     	$chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     	$len = strlen($chars) - 1;
     	$result = '';
-    	for ($i=0; $i < 16; $i++) $result .= $chars[rand(0, $len)];
+    	for ($i = 0; $i < $length; $i++) $result .= $chars[rand(0, $len)];
     	return $result;
 	}
 

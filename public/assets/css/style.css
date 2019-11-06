@@ -120,24 +120,28 @@ input[type="submit"], .btn {
 	box-shadow: 0 0 30px rgba(0,0,0,0.4);
 	overflow: hidden;
 }
-#content.login {
-	position: relative;
-	height: 100vh;
-	width: 100%;
+#content.login,
+#content.recover,
+#content.error {
+	padding: 40px;
 }
 
 /*
 	LOGIN FORM
 */
 #login-form {
-	position: absolute;
-	top: 20%;
-	left: 50%;
 	width: 400px;
-	margin: 0 -200px;
+	max-width: 100%;
+	margin: 0 auto;
 	background: #F0F5FF;
 	box-shadow: 0 0 30px rgba(0,0,0,0.4);
 	border-radius: 3px;
+}
+#login-form h2 {
+	color: #1B377A;
+	font-size: 1.5rem;
+	text-align: center;
+	margin-bottom: 20px;
 }
 #login-form .tabs > li {
 	position: relative;
@@ -171,6 +175,40 @@ input[type="submit"], .btn {
 }
 #login-form input,
 #login-form .btn {
+	display: block;
+	margin-top: 5px;
+	width: 100%;
+}
+#login-form a.btn-reset {
+	color: #1B377A;
+}
+
+/*
+	RECOVER FORM
+*/
+#recover-form {
+	position: absolute;
+	top: 20%;
+	left: 50%;
+	width: 400px;
+	padding: 40px;
+	margin: 0 -200px;
+	background: #F0F5FF;
+	box-shadow: 0 0 30px rgba(0,0,0,0.4);
+	border-radius: 3px;
+}
+#recover-form h2 {
+	color: #1B377A;
+	font-size: 1.5rem;
+	text-align: center;
+}
+#recover-form .form-elem {
+	display: block;
+	color: #1B377A;
+	margin-bottom: 10px;
+}
+#recover-form input,
+#recover-form .btn {
 	display: block;
 	margin-top: 5px;
 	width: 100%;
@@ -232,6 +270,37 @@ input[type="submit"], .btn {
 	color: #FFFFFF;
 	background: #1B377A;
 	border-radius: 50%;
+}
+
+/*
+	LOADING
+*/
+#loading {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	display: block;
+	background: rgba(0,0,0,0.5);
+	z-index: 99;
+}
+#loading .circle {
+	position: absolute;
+	display: block;
+	top: 50%;
+	left: 50%;
+	margin: -50px;
+	width: 100px;
+	height: 100px;
+	border: 15px solid;
+	border-color: #F0F5FF rgba(240, 245, 255, 0.2);
+	border-radius: 50%;
+	animation: turn 2s linear infinite;
+}
+@keyframes turn {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /*
@@ -449,6 +518,11 @@ input[type="submit"], .btn {
 }
 #chats .a-chat .members-list .a-member {
 	margin-top: 6px;
+}
+#chats .a-chat .members-list .a-member .name {
+	display: block;
+}
+#chats .a-chat .members-list .btn-add-member {
 }
 
 /*

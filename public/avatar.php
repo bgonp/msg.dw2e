@@ -16,4 +16,4 @@ if (isset($_GET['id']) && SessionController::check()) {
 }
 $type = getimagesize(IMAGE_DIR.$imagen)['mime'];
 header("Content-Type: $type");
-echo file_get_contents(IMAGE_DIR.$imagen);
+readfile(IMAGE_DIR.$imagen);

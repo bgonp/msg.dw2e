@@ -1,0 +1,15 @@
+<div id="recover-form">
+	<h2>Reset password</h2>
+	<hr>
+	<form action="ajax.php" method="post">
+		<input type="hidden" name="action" value="resetPassword">
+		<input type="hidden" name="id" value="{{ID}}">
+		<input type="hidden" name="key" value="{{CLAVE}}">
+		<label class="form-elem"><span>Password</span>
+			<input type="password" name="password" required></label>
+		<label class="form-elem"><span>Re-Password</span>
+			<input type="password" name="password_rep" required></label>
+		<hr>
+		<input type="submit" class="btn btn-recover" value="Reset">
+	</form>
+</div>
