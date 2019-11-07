@@ -538,13 +538,13 @@ input[type="submit"], .btn {
 }
 #friends #create-chat-form input[type="text"] {
 	display: inline-block;
-	width: 75%;
+	width: 73%;
 	border-right: none;
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 }
 #friends #create-chat-form input[type="submit"] {
-	width: 25%;
+	width: 27%;
 	font-weight: 700;
 	color: #1B377A;
 	background: #F0F5FF;
@@ -693,35 +693,32 @@ input[type="submit"], .btn {
 	right: 0;
 	width: 60%;
 }
-#messages #send-message-form {
+#messages .members-list {
 	position: absolute;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	padding: 20px;
-	background: #1B377A;
-}
-#messages #send-message-form input[name="mensaje"] {
 	display: inline-block;
-	width: 85%;
-	border-right: none;
-	border-top-right-radius: 0;
-	border-bottom-right-radius: 0;
+	top: 0;
+	right: 0;
+	left: 0;
+	height: 57px;
+	padding: 10px 20px;
+	text-align: right;
+	border-bottom: 1px solid #939db5;
+	overflow: hidden;
 }
-#messages #send-message-form .btn-send {
-	width: 15%;
-	font-weight: 700;
-	color: #1B377A;
-	background: #F0F5FF;
-	border-top-left-radius: 0;
-	border-bottom-left-radius: 0;
-	border-color: #939db5;
-	border-left: none;
-	float: right;
+#messages .members-list .a-member {
+	display: inline-block;
+	width: 36px;
+	height: 36px;
+	margin-left: 10px;
+	border-radius: 50%;
+	overflow: hidden;
+}
+#messages .members-list .avatar {
+	width: 100%;
 }
 #messages .messages-list {
 	position: absolute;
-	top: 0;
+	top: 56px;
 	right: 0;
 	bottom: 72px;
 	left: 0;
@@ -796,4 +793,30 @@ input[type="submit"], .btn {
 	border-left: none;
 	border-top-right-radius: 3px;
 	border-bottom-right-radius: 3px;
+}
+#messages #send-message-form {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 20px;
+	background: #1B377A;
+}
+#messages #send-message-form input[name="mensaje"] {
+	display: inline-block;
+	width: 85%;
+	border-right: none;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+#messages #send-message-form .btn-send {
+	width: 15%;
+	font-weight: 700;
+	color: #1B377A;
+	background: #F0F5FF;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	border-color: #939db5;
+	border-left: none;
+	float: right;
 }

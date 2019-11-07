@@ -9,12 +9,13 @@ class Helper {
 	public const BLOQUEADO = 4;
 
 	public static function validNombre($nombre) {
-		$pattern = "/^[a-zA-Z\s].{4,32}$/";
+		return true;
+		$pattern = "/^[a-zA-Z\s].{3,32}$/";
 		return preg_match( $pattern, $nombre );
 	}
 
 	public static function validPassword($password) {
-		$pattern = "/^(?=.*[0-9]+)(?=.*[A-Z]+)(?=.*[a-z]+)(?=.*[^a-zA-Z0-9]+).{6,16}$/";
+		$pattern = "/^(?=.*[0-9]+)(?=.*[A-Z]+)(?=.*[a-z]+).{6,16}$/";
 		return preg_match( $pattern, $password );
 	}
 
@@ -35,7 +36,7 @@ class Helper {
 			return false;
 
 		$size = getimagesize($imagen['tmp_name']);
-		if ($size[0] > 500 || $size[1] > 500)
+		if ($size[0] > 1000 || $size[1] > 1000)
 			return false;
 
 		do {
@@ -59,6 +60,45 @@ class Helper {
     	$result = '';
     	for ($i = 0; $i < $length; $i++) $result .= $chars[rand(0, $len)];
     	return $result;
+	}
+
+	public static function error($error) {
+		switch ($error) {
+			case 'invalid_action':
+				return 'Operación no válida'; break;
+			case 'missing_data':
+				return 'Falta información'; break;
+			case 'pass_diff':
+				return 'Las contraseñas no coinciden'; break;
+			case 'pass_wrong':
+				return 'Autentificación incorrecta'; break;
+			case 'user_confirm':
+				return 'No se pudo verificar usuario'; break;
+			case 'user_wrong':
+				return 'Usuario incorrecto'; break;
+			case 'key_check':
+				return 'No se pudo verificar el enlace, quizás han pasado más de 24 horas'; break;
+			case 'file_size':
+				return 'La imagen es mayor que el límite establecido (1000x1000)'; break;
+			case 'file_weight':
+				return 'La imagen pesa más que el límite establecido (512KB)'; break;
+			case 'chat_name':
+				return 'Falta nombre de chat'; break;
+			case 'chat_member':
+				return 'Selecciona al menos un amigo'; break;
+			case 'chat_add':
+				return 'Alguien no se pudo agregar al chat'; break;
+			case 'chat_wrong':
+				return 'Chat incorrecto'; break;
+			case 'msg_add':
+				return 'No se pudo enviar el mensaje'; break;
+			case 'msg_wrong':
+				return 'El texto no puede contener más de 1000 caracteres'; break;
+			case 'no_friend':
+				return 'Alguien no es tu amigo'; break;
+			default:
+				return "Ocurrió un error inesperado: $error";
+		}
 	}
 
 }

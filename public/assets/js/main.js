@@ -1,11 +1,10 @@
-var forms, tabs_buttons, tabs_contents, alert_msg, check = true;
-var messages, empty_msg, check_messages = true, last_readed = -1;
-var chats, empty_chat, current_chat = 0;
-var friends, empty_friend, last_friend = "";
-var requests, empty_request, last_request = "";
-var current_chat_dom, empty_member;
-var update_interval = 500;
-var usuario_id;
+var forms, messages, chat_members, chats, friends, requests;
+var empty_msg, empty_chat, empty_friend, empty_request, empty_chats_member, empty_msgs_member;
+var tabs_buttons, tabs_contents, alert_msg, loading;
+
+var current_chat_dom, current_chat = 0, current_user = 0;
+var check = true, update_interval = 500;
+var last_readed_id = -1, last_friend = "", last_request = "";
 
 $(document).ready(function() {
 
@@ -16,13 +15,15 @@ $(document).ready(function() {
 	loading = $('#loading');
 	messages = $('#messages .messages-list');
 	empty_msg = $('#messages .empty-message');
+	chat_members = $('#messages .members-list');
+	empty_msgs_member = chat_members.find('.empty-member');
 	chats = $('#chats .chats-list');
 	empty_chat = $('#chats .empty-chat');
+	empty_chats_member = empty_chat.find('.empty-member');
 	friends = $('#friends .friends-list');
 	empty_friend = $('#friends .empty-friend');
 	requests = $('#requests .requests-list');
 	empty_request = $('#requests .empty-request');
-	empty_member = empty_chat.find('.empty-member');
 
 	formsClicables(forms);
 
@@ -75,9 +76,12 @@ function loadChat(chat_id) {
 			if (data.users && data.users.length > 0) {
 				let members = current_chat_dom.find('.members-list');
 				members.find('.a-member').remove();
+				chat_members.find('.a-member').remove();
 				data.users.reverse();
-				for (let member of data.users)
-					members.prepend(cloneMember(member.nombre, member.email));
+				for (let member of data.users) {
+					members.prepend(cloneChatsMember(member.nombre, member.email));
+					chat_members.prepend(cloneMsgsMember(member.id, member.nombre));
+				}
 			}
 			current_chat_dom.addClass('active');
 		}
@@ -92,11 +96,11 @@ function loadMessages(chat_id = 0, last_readed = 0, last_msg = 0, messages_list 
 	$('#send-message-form input[type="submit"]').prop('disabled', current_chat ? false : true);
 	if (messages_list && messages_list.length > 0) {
 		for (let msg of messages_list) {
-			let propio = msg.usuario_id == usuario_id;
+			let propio = msg.usuario_id == current_user;
 			let nuevo = parseInt(msg.id) > last_readed;
 			messages.prepend(cloneMessage(msg.contenido, msg.fecha, msg.usuario_nombre, propio, nuevo));
 		}
-		last_readed = parseInt(last_msg);
+		last_readed_id = parseInt(last_msg);
 		messages.scrollTop(messages[0].scrollHeight);
 	}
 }
@@ -108,10 +112,12 @@ function update() {
 			action: "update",
 			chat_id: current_chat,
 			last_friend: last_friend,
-			last_readed: last_readed,
+			last_readed: last_readed_id,
 			last_request: last_request
 		}, function(data) {
 			data = processData(data);
+			if (data.usuario_id != current_user)
+				current_user = data.usuario_id;
 			if (data.friends && data.friends.length > 0)
 				updateFriends(data.friends);
 			if (data.requests && data.requests.length > 0)
@@ -131,18 +137,18 @@ function updateMessages(messages_list, usuario_id) {
 	for (let msg of messages_list){
 		propio = msg.usuario_id == usuario_id;
 		if (propio) messages.find('.a-message.nuevo').removeClass('nuevo');
-		last_readed = msg.id;
+		last_readed_id = msg.id;
 		messages.append(cloneMessage(msg.contenido, msg.fecha, msg.usuario_nombre, propio, !propio ));
 	}
 	messages.scrollTop(messages[0].scrollHeight);
 }
 
-function updateChats($chats_list) {
+function updateChats(chats_list) {
 	var updated = false;
-	$chats_list.reverse();
-	for (let chat of $chats_list)
+	chats_list.reverse();
+	for (let chat of chats_list)
 		if (chat.last_msg || chats.find('.chat-'+chat.id).length == 0) {
-			chats.prepend(cloneChat(chat.id, chat.nombre, current_chat != chat.id));
+			cloneChat(chat.id, chat.nombre, current_chat != chat.id);
 			updated = true;
 		}
 	if (updated) tabs_buttons.filter('.chats:not(.active)').addClass('new');
@@ -200,13 +206,10 @@ function cloneChat(id, nombre, unread) {
 		chat_dom.removeClass('empty-chat').addClass('a-chat chat-'+id);
 		chat_dom.find('.chat-link').data('id', id);
 		chat_dom.show();
-		chat_dom.find('.chat-link').text(nombre);
-		if (unread) chat_dom.addClass('unread');
-		return null;
 	}
 	chat_dom.find('.chat-link').text(nombre);
 	if (unread) chat_dom.addClass('unread');
-	return chat_dom;
+	chats.prepend(chat_dom);
 }
 
 function cloneFriend(id, nombre, email) {
@@ -232,10 +235,18 @@ function cloneRequest(id, nombre, email) {
 	return request_dom;
 }
 
-function cloneMember(nombre, email) {
-	let member_dom = empty_member.clone();
+function cloneChatsMember(nombre, email) {
+	let member_dom = empty_chats_member.clone();
 	member_dom.find('.name').text(nombre);
 	member_dom.find('.email').text(email);
+	member_dom.removeClass('empty-member').addClass('a-member');
+	member_dom.show();
+	return member_dom;
+}
+
+function cloneMsgsMember(id, nombre) {
+	let member_dom = empty_msgs_member.clone();
+	member_dom.find('.avatar').attr('title', nombre).attr('src','/avatar.php?id='+id);
 	member_dom.removeClass('empty-member').addClass('a-member');
 	member_dom.show();
 	return member_dom;

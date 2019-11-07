@@ -37,7 +37,7 @@
 		<ul class="friends-list">{{AMIGOS}}</ul>
 		<form action="ajax.php" method="post" id="create-chat-form" class="empty-on-submit">
 			<input type="hidden" name="action" value="createChat">
-			<input type="text" name="name" placeholder="Chat name...">
+			<input type="text" name="name" placeholder="Chat name..." required>
 			<input type="submit" value="New chat">
 		</form>
 		<li class="empty-friend deletable" style="display: none">
