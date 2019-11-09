@@ -65,18 +65,17 @@ a {
 	text-decoration: none;
 }
 hr {
-	border: none;
-	background: #939db5;
-	height: 1px;
+	height: 0;
 	margin: 16px;
+	border: none;
+	border-bottom: 1px solid;
 }
 input, .btn {
 	background: #FFFFFF;
 	box-shadow: none;
-	color: #1B377A;
 	padding: 5px 10px;
 	margin: 0;
-	border: 1px solid #939db5;
+	border: 1px solid;
 	border-radius: 3px;
 	font-family: 'Roboto', 'Arial', sans-serif;
 	font-size: 1rem;
@@ -84,13 +83,8 @@ input, .btn {
 	text-shadow: none;
 	box-sizing: border-box;
 }
-input[disabled] {
-	background: #F0F5FF;
-}
 input[type="submit"], .btn {
-	background: #1B377A;
 	color: #FFFFFF;
-	border-color: #1B377A;
 	cursor: pointer;
 	text-align: center;
 }
@@ -116,13 +110,13 @@ input[type="submit"], .btn {
 	width: 100%;
 	max-width: 1000px;
 	margin: 0 auto;
-	background: #F0F5FF;
 	box-shadow: 0 0 30px rgba(0,0,0,0.4);
 	overflow: hidden;
 }
 #content.login,
 #content.recover,
-#content.error {
+#content.error,
+#content.options {
 	padding: 40px;
 }
 
@@ -133,12 +127,10 @@ input[type="submit"], .btn {
 	width: 400px;
 	max-width: 100%;
 	margin: 0 auto;
-	background: #F0F5FF;
 	box-shadow: 0 0 30px rgba(0,0,0,0.4);
 	border-radius: 3px;
 }
 #login-form h2 {
-	color: #1B377A;
 	font-size: 1.5rem;
 	text-align: center;
 	margin-bottom: 20px;
@@ -153,9 +145,8 @@ input[type="submit"], .btn {
 	width: 100%;
 	padding: 20px 40px;
 	text-align: center;
-	color: #1B377A;
-	border-right: 1px solid #939db5;
-	border-bottom: 1px solid #939db5;
+	border-right: 1px solid;
+	border-bottom: 1px solid;
 	margin-bottom: -1px;
 }
 #login-form .tabs > li:last-child .tab {
@@ -170,7 +161,6 @@ input[type="submit"], .btn {
 }
 #login-form .form-elem {
 	display: block;
-	color: #1B377A;
 	margin-bottom: 10px;
 }
 #login-form input,
@@ -179,32 +169,27 @@ input[type="submit"], .btn {
 	margin-top: 5px;
 	width: 100%;
 }
-#login-form a.btn-reset {
-	color: #1B377A;
+#login-form .btn {
+	color: #FFFFFF;
 }
 
 /*
 	RECOVER FORM
 */
 #recover-form {
-	position: absolute;
-	top: 20%;
-	left: 50%;
-	width: 400px;
 	padding: 40px;
-	margin: 0 -200px;
-	background: #F0F5FF;
+	width: 400px;
+	max-width: 100%;
+	margin: 0 auto;
 	box-shadow: 0 0 30px rgba(0,0,0,0.4);
 	border-radius: 3px;
 }
 #recover-form h2 {
-	color: #1B377A;
 	font-size: 1.5rem;
 	text-align: center;
 }
 #recover-form .form-elem {
 	display: block;
-	color: #1B377A;
 	margin-bottom: 10px;
 }
 #recover-form input,
@@ -215,18 +200,44 @@ input[type="submit"], .btn {
 }
 
 /*
+	OPTIONS PAGE
+*/
+#options {
+	padding: 20px 40px;
+	width: 600px;
+	max-width: 100%;
+	margin: 0 auto;
+	text-align: center;
+	box-shadow: 0 0 30px rgba(0,0,0,0.4);
+	border-radius: 3px;
+}
+#options h2 {
+	margin-bottom: 20px;
+	font-size: 1.5rem;
+	font-weight: 700;
+}
+#options .a-option {
+	text-align: left;
+}
+#options input {
+	display: block;
+	width: 100%;
+	margin: 5px 0 20px;
+	height: 32px;
+}
+#options input[type="color"] {
+	padding: 0 2px;
+}
+
+/*
 	ERROR PAGE
 */
 #error {
-	position: absolute;
-	top: 20%;
-	left: 50%;
-	width: 400px;
-	text-align: center;
 	padding: 20px 40px;
-	margin: 0 -200px;
-	color: #1B377A;
-	background: #F0F5FF;
+	width: 400px;
+	max-width: 100%;
+	margin: 0 auto;
+	text-align: center;
 	box-shadow: 0 0 30px rgba(0,0,0,0.4);
 	border-radius: 3px;
 }
@@ -253,7 +264,6 @@ input[type="submit"], .btn {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%,-50%);
-	background: #F0F5FF;
 	padding: 25px 50px;
 	border-radius: 3px;
 	box-shadow: 0 0 30px rgba(0,0,0,0.2);
@@ -268,7 +278,6 @@ input[type="submit"], .btn {
 	width: 2rem;
 	text-align: center;
 	color: #FFFFFF;
-	background: #1B377A;
 	border-radius: 50%;
 }
 
@@ -294,7 +303,7 @@ input[type="submit"], .btn {
 	width: 100px;
 	height: 100px;
 	border: 15px solid;
-	border-color: #F0F5FF rgba(240, 245, 255, 0.2);
+	border-color: #FFFFFF rgba(240, 245, 255, 0.2);
 	border-radius: 50%;
 	animation: turn 2s linear infinite;
 }
@@ -311,7 +320,6 @@ input[type="submit"], .btn {
 	width: 100%;
 	height: 56px;
 	padding: 0 20px;
-	background: #1B377A;
 	color: #FFFFFF;
 	text-align: right;
 	box-shadow: 0 0 30px rgba(0,0,0,0.2);
@@ -380,18 +388,16 @@ input[type="submit"], .btn {
 	top: 0;
 	left: 50%;
 	margin-left: -8px;
-	border-top: 8px solid #1B377A;
-	border-left: 8px solid transparent;
-	border-right: 8px solid transparent;
+	border-top: 8px solid;
+	border-left: 8px solid transparent!important;
+	border-right: 8px solid transparent!important;
 }
 #menu .edit-profile h2 {
-	color: #1B377A;
 	text-align: center;
 	font-size: 1.5rem;
 }
 #menu .edit-profile .form-elem {
 	display: block;
-	color: #1B377A;
 	margin-bottom: 10px;
 }
 #menu .edit-profile input,
@@ -399,6 +405,9 @@ input[type="submit"], .btn {
 	display: block;
 	margin-top: 5px;
 	width: 280px;
+}
+#menu .edit-profile .btn-upload {
+	color: #FFFFFF;
 }
 
 /*
@@ -410,7 +419,7 @@ input[type="submit"], .btn {
 	bottom: 0;
 	left: 0;
 	width: 40%;
-	border-right: 1px solid #939db5;
+	border-right: 1px solid;
 }
 #sidebar .tabs {
 	position: relative;
@@ -425,19 +434,17 @@ input[type="submit"], .btn {
 }
 #sidebar .tabs .tab {
 	display: block;
-	color: #1B377A;
-	padding: 20px;
+	padding: 20px 20px 19px;
 	width: 100%;
 	text-align: center;
-	border-right: 1px solid #939db5;
-	border-bottom: 1px solid #939db5;
-	margin-bottom: -1px;
+	border-right: 1px solid;
+	border-bottom: 1px solid;
 }
 #sidebar .tabs > li:last-child .tab {
 	border-right: none;
 }
 #sidebar .tabs > li .tab.active {
-	border-bottom: none;
+	border-bottom: 1px solid #FFFFFF;
 	font-weight: 700;
 	background: #FFFFFF;
 }
@@ -446,8 +453,8 @@ input[type="submit"], .btn {
 	position: absolute;
 	top: 0;
 	right: 0;
-	border-top: 20px solid #1B377A;
-	border-left: 20px solid transparent;
+	border-top: 20px solid;
+	border-left: 20px solid transparent!important;
 }
 #sidebar .tab-content {
 	position: absolute;
@@ -466,22 +473,15 @@ input[type="submit"], .btn {
 #chats .a-chat {
 	position: relative;
 	background: #FFFFFF;
-	border: 1px solid #939db5;
+	border: 1px solid;
 	margin: 0 0 10px;
 	border-radius: 3px;
 	overflow: hidden;
 }
-#chats .a-chat.active {
-	background: #F0F5FF;
-}
 #chats .a-chat a {
 	display: block;
 	padding: 14px 35px 14px 14px;
-	color: #1B377A;
 	transition: background .1s ease;
-}
-#chats .a-chat a:hover {
-	background: #F0F5FF;
 }
 #chats .a-chat.active a,
 #chats .a-chat.unread a {
@@ -492,8 +492,8 @@ input[type="submit"], .btn {
 	position: absolute;
 	top: 0;
 	right: 0;
-	border-top: 25px solid #1B377A;
-	border-left: 25px solid transparent;
+	border-top: 25px solid;
+	border-left: 25px solid transparent!important;
 }
 #chats .a-chat .btn-block {
 	position: absolute;
@@ -505,13 +505,11 @@ input[type="submit"], .btn {
 	border: none;
 	background: none;
 	border-radius: 0;
-	color: #1B377A;
 	cursor: pointer;
 }
 #chats .a-chat .members-list {
 	display: none;
 	padding: 5px 14px 14px;
-	color: #1B377A;
 }
 #chats .a-chat.active .members-list {
 	display: block;
@@ -528,46 +526,50 @@ input[type="submit"], .btn {
 /*
 	FRIENDS
 */
-#friends #create-chat-form {
+#friends #request-friend-form {
 	position: absolute;
-	bottom: 0;
+	top: 0px;
 	right: 0;
 	left: 0;
-	background: #1B377A;
 	padding: 20px;
+	background: #FFFFFF;
+	z-index: 10;
 }
-#friends #create-chat-form input[type="text"] {
+#friends #request-friend-form input[type="email"] {
 	display: inline-block;
-	width: 73%;
+	width: 75%;
 	border-right: none;
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 }
-#friends #create-chat-form input[type="submit"] {
-	width: 27%;
+#friends #request-friend-form input[type="submit"] {
+	width: 25%;
 	font-weight: 700;
-	color: #1B377A;
-	background: #F0F5FF;
+	color: #FFFFFF;
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
-	border-color: #939db5;
 	border-left: none;
 	float: right;
 }
+#friends .friends-list {
+	position: absolute;
+	top: 72px;
+	right: 0;
+	bottom: 72px;
+	left: 0;
+	padding: 0 20px;
+	overflow: auto;
+}
 #friends .a-friend {
 	position: relative;
-	color: #1B377A;
 	background: #FFFFFF;
 	padding: 14px;
-	border: 1px solid #939db5;
+	border: 1px solid;
 	margin: 0 0 10px;
 	border-radius: 3px;
 	font-size: 0;
 	transition: background .1s ease;
 	overflow: hidden;
-}
-#friends .a-friend:hover {
-	background: #F0F5FF;
 }
 #friends .a-friend .select {
 	display: inline-block;
@@ -610,7 +612,6 @@ input[type="submit"], .btn {
 	border: none;
 	background: none;
 	border-radius: 0;
-	color: #1B377A;
 	cursor: pointer;
 }
 #friends .a-friend .custom-checkbox {
@@ -619,24 +620,25 @@ input[type="submit"], .btn {
 	top: 13px;
 	right: 10px;
 }
-#friends #request-friend-form {
-	margin-bottom: 20px;
+#friends #create-chat-form {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	padding: 20px;
 }
-#friends #request-friend-form input[type="email"] {
+#friends #create-chat-form input[type="text"] {
 	display: inline-block;
-	width: 75%;
+	width: 73%;
 	border-right: none;
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 }
-#friends #request-friend-form input[type="submit"] {
-	width: 25%;
+#friends #create-chat-form input[type="submit"] {
+	width: 27%;
 	font-weight: 700;
-	background: #1B377A;
-	color: #FFFFFF;
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
-	border-color: #939db5;
 	border-left: none;
 	float: right;
 }
@@ -644,21 +646,16 @@ input[type="submit"], .btn {
 /*
 	REQUESTS
 */
-
 #requests .a-request {
 	position: relative;
-	color: #1B377A;
 	background: #FFFFFF;
 	padding: 14px;
-	border: 1px solid #939db5;
+	border: 1px solid;
 	margin: 0 0 10px;
 	border-radius: 3px;
 	font-size: 0;
 	transition: background .1s ease;
 	overflow: hidden;
-}
-#requests .a-request:hover {
-	background: #F0F5FF;
 }
 #requests .a-request .datos {
 	display: inline-block;
@@ -699,10 +696,10 @@ input[type="submit"], .btn {
 	top: 0;
 	right: 0;
 	left: 0;
-	height: 57px;
+	height: 56px;
 	padding: 10px 20px;
 	text-align: right;
-	border-bottom: 1px solid #939db5;
+	border-bottom: 1px solid;
 	overflow: hidden;
 }
 #messages .members-list .a-member {
@@ -735,7 +732,6 @@ input[type="submit"], .btn {
 	padding: 12px 20px;
 	border: 1px solid #E8E8E8;
 	border-radius: 3px;
-	color: #1B377A;
 }
 #messages .messages-list .a-message.propio {
 	margin: 20px 20px 20px auto;
@@ -788,7 +784,6 @@ input[type="submit"], .btn {
 	right: -4px;
 	bottom: -1px;
 	width: 6px;
-	background: #1B377F;
 	border: 1px solid #E8E8E8;
 	border-left: none;
 	border-top-right-radius: 3px;
@@ -800,7 +795,6 @@ input[type="submit"], .btn {
 	bottom: 0;
 	left: 0;
 	padding: 20px;
-	background: #1B377A;
 }
 #messages #send-message-form input[name="mensaje"] {
 	display: inline-block;
@@ -812,11 +806,8 @@ input[type="submit"], .btn {
 #messages #send-message-form .btn-send {
 	width: 15%;
 	font-weight: 700;
-	color: #1B377A;
-	background: #F0F5FF;
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
-	border-color: #939db5;
 	border-left: none;
 	float: right;
 }

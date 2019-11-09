@@ -2,7 +2,7 @@
 
 class MainController {
 
-	private const UNLOGGED_ACTIONS = ['login', 'register', 'resetSend', 'recover', 'resetPassword'];
+	private const UNLOGGED_ACTIONS = ['login', 'register', 'resetSend', 'recover', 'resetPassword', 'installApp'];
 
 	public static function ajax() {
 		if (!empty($_POST['action']) && method_exists(__CLASS__, $_POST['action'])){
@@ -23,22 +23,25 @@ class MainController {
 
 	public static function main() {
 		try {
-			if (!empty($_GET)) {
+			if (!Database::connect()) {
+				View::install(['color_main' => '#1b377a', 'color_bg' => '#f0f5ff', 'color_border' => '#939db5']);
+			} else if (!empty($_GET)) {
 				if (SessionController::check() || empty($_GET['action']) || !method_exists(__CLASS__, $_GET['action'])) {
 					header('Location: /');
 					die();
 				} else {
 					self::{$_GET['action']}($_GET);
 				}
+			} else if (SessionController::checkAdmin()) {
+				View::options(Option::get());
 			} else if (SessionController::check()) {
-				$usuario = Usuario::get(SessionController::usuarioId());
-				View::main($usuario);
+				View::main(Usuario::get(SessionController::usuarioId()), Option::get());
 			} else {
-				View::login();
+				View::login(Option::get());
 			}
 		} catch (Exception $ex) {
 			SessionController::logout();
-			View::error($ex->getMessage());
+			View::error($ex->getMessage(), Option::get());
 		}
 	}
 
@@ -65,11 +68,11 @@ class MainController {
 		if (!empty($_GET['id']) && !empty($_GET['key'])) {
 			$usuario = Usuario::get($_GET['id']);
 			if ($usuario->checkClave($_GET['key'])) {
-				View::recover($usuario, $_GET['key']);
+				View::recover($usuario, $_GET['key'], Option::get());
 				return;
 			}
 		}
-		View::error(Helper::error('key_check'));
+		View::error(Helper::error('key_check'), Option::get());
 	}
 
 	private static function confirm($get) {
@@ -81,7 +84,7 @@ class MainController {
 				die();
 			}
 		}
-		View::error(Helper::error('user_confirm'));
+		View::error(Helper::error('user_confirm'), Option::get());
 	}
 
 	// ------------------------
@@ -89,10 +92,10 @@ class MainController {
 	// ------------------------
 	private static function login($post, $files) {
 		if (empty($post['email']) || empty($post['password'])) {
-			$response = ['type' => 'error', 'message' => Helper::error('empty_')];
+			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
 		} else {
 			$usuario = Usuario::get($post['email'], $post['password']);
-			SessionController::logged($usuario);
+			SessionController::logged($usuario, $usuario->admin());
 			$response = ['redirect' => '/'];
 		}
 		return $response;
@@ -109,9 +112,16 @@ class MainController {
 		} else if ($post['password'] !== $post['password_rep']) {
 			$response = ['type' => 'error', 'message' => Helper::error('pass_diff')];
 		} else {
-			$usuario = Usuario::new($post['email'], $post['nombre'], $post['password'], $files['avatar']);
-			MailController::send("Confirm your account", View::emailConfirm($usuario), $usuario->email());
-			$response = ['type' => 'success', 'message' => 'Enviado un e-mail de confirmación de cuenta'];
+			if (Option::get('mail_confirm')) {
+				$usuario = Usuario::new($post['email'], $post['nombre'], $post['password'], $files['avatar']);
+				$email = View::emailConfirm($usuario, Helper::currentUrl());
+				MailController::send("Confirm your account", $email, $usuario->email());
+				$response = ['type' => 'success', 'message' => 'Enviado un e-mail de confirmación de cuenta'];
+			} else {
+				$usuario = Usuario::new($post['email'], $post['nombre'], $post['password'], $files['avatar'], 1);
+				SessionController::logged($usuario, $usuario->admin());
+				$response = ['redirect' => '/'];
+			}
 		}
 		return $response;
 	}
@@ -122,7 +132,8 @@ class MainController {
 		} else if (!($usuario = Usuario::get($post['email']))) {
 			$response = ['type' => 'error', 'message' => Helper::error('user_wrong')];
 		} else {
-			MailController::send("Reset your password", View::emailReset($usuario), $usuario->email());
+			$email = View::emailConfirm($usuario, Helper::currentUrl());
+			MailController::send("Reset your password", $email, $usuario->email());
 			$response = ['type' => 'success', 'message' => 'Se ha enviado e-mail de recuperación'];
 		}
 		return $response;
@@ -290,6 +301,31 @@ class MainController {
 				$usuario->readChat($chat->id());
 				$response = ['update' => 1, 'chat_id' => $chat->id()];
 			}
+		}
+		return $response;
+	}
+
+	// ------------------------
+	// Funciones de configuración
+	// ------------------------
+	private static function updateOptions($post, $files) {
+		if (empty($post['options'])) {
+			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
+		} else if (!SessionController::checkAdmin()) {
+			$response = ['type' => 'error', 'message' => Helper::error('permission')];
+		} else {
+			foreach ($post['options'] as $key => $value)
+				Option::update($key, $value);
+			$response = ['redirect' => '/'];
+		}
+		return $response;
+	}
+
+	private static function installApp($post, $files) {
+		if (Database::connect() || Install::run($post)) {
+			$response = ['redirect' => '/'];
+		} else {
+			$response = ['type' => 'error', 'message' => Helper::error('installation')];
 		}
 		return $response;
 	}

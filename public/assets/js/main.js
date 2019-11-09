@@ -65,6 +65,9 @@ function showAlert(type, message) {
 	alert_msg.show();
 }
 
+// ----------
+// LOAD
+// ----------
 function loadChat(chat_id) {
 	if (chats.find('.a-chat.active.chat-'+chat_id).length > 0) return;
 	chats.find('.a-chat.active').removeClass('active');
@@ -95,16 +98,21 @@ function loadMessages(chat_id = 0, last_readed = 0, last_msg = 0, messages_list 
 	$('#send-message-form input[name="mensaje"]').prop('disabled', current_chat ? false : true);
 	$('#send-message-form input[type="submit"]').prop('disabled', current_chat ? false : true);
 	if (messages_list && messages_list.length > 0) {
+		let propio, nuevo;
+		messages_list.reverse();
 		for (let msg of messages_list) {
-			let propio = msg.usuario_id == current_user;
-			let nuevo = parseInt(msg.id) > last_readed;
-			messages.prepend(cloneMessage(msg.contenido, msg.fecha, msg.usuario_nombre, propio, nuevo));
+			propio = msg.usuario_id == current_user;
+			nuevo = parseInt(msg.id) > last_readed;
+			cloneMessage(msg, propio, nuevo);
 		}
 		last_readed_id = parseInt(last_msg);
 		messages.scrollTop(messages[0].scrollHeight);
 	}
 }
 
+// ----------
+// UPDATE
+// ----------
 function update() {
 	if (!check) return;
 	check = false;
@@ -132,13 +140,13 @@ function update() {
 }
 
 function updateMessages(messages_list, usuario_id) {
-	var propio = false;
+	let propio;
 	messages_list.reverse();
 	for (let msg of messages_list){
 		propio = msg.usuario_id == usuario_id;
 		if (propio) messages.find('.a-message.nuevo').removeClass('nuevo');
 		last_readed_id = msg.id;
-		messages.append(cloneMessage(msg.contenido, msg.fecha, msg.usuario_nombre, propio, !propio ));
+		cloneMessage(msg, propio, !propio);
 	}
 	messages.scrollTop(messages[0].scrollHeight);
 }
@@ -184,16 +192,20 @@ function updateUserdata(userdata) {
 	$('#menu .avatar img').attr('src','/avatar.php?id='+userdata.id+'&'+(new Date().getTime()));
 }
 
-function cloneMessage(contenido, fecha, usuario, propio, nuevo = false) {
+// ----------
+// CLONE
+// ----------
+function cloneMessage(message, propio = false, nuevo = false) {
 	let mensaje_dom = empty_msg.clone();
-	mensaje_dom.find('.contenido').text(contenido);
-	mensaje_dom.find('.fecha').text(fecha);
-	mensaje_dom.find('.autor').text(usuario);
+	mensaje_dom.attr('id', 'message-'+message.id);
+	mensaje_dom.find('.contenido').text(message.contenido);
+	mensaje_dom.find('.fecha').text(message.fecha);
+	mensaje_dom.find('.autor').text(message.usuario_nombre);
 	if (propio) mensaje_dom.addClass('propio');
 	else if (nuevo) mensaje_dom.addClass('nuevo');
 	mensaje_dom.removeClass('empty-message').addClass('a-message');
 	mensaje_dom.show();
-	return mensaje_dom;
+	messages.append(mensaje_dom);
 }
 
 function cloneChat(id, nombre, unread) {

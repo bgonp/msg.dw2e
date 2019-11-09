@@ -10,17 +10,18 @@ class Helper {
 
 	public static function validNombre($nombre) {
 		return true;
-		$pattern = "/^[a-zA-Z\s].{3,32}$/";
-		return preg_match( $pattern, $nombre );
+		$pattern = '/'.Option::get('regex_name').'/';
+		return preg_match($pattern, $nombre);
 	}
 
 	public static function validPassword($password) {
-		$pattern = "/^(?=.*[0-9]+)(?=.*[A-Z]+)(?=.*[a-z]+).{6,16}$/";
-		return preg_match( $pattern, $password );
+		$pattern = '/'.Option::get('regex_password').'/';
+		return preg_match($pattern, $password);
 	}
 
 	public static function validEmail($email) {
-		return filter_var($email, FILTER_VALIDATE_EMAIL);
+		$pattern = '/'.Option::get('regex_email').'/';
+		return $pattern ? preg_match($pattern, $email) : filter_var($email, FILTER_VALIDATE_EMAIL);
 	}
 
 	public static function validTexto($texto) {
@@ -28,7 +29,7 @@ class Helper {
 	}
 
 	public static function uploadImagen($imagen) {
-		if ($imagen['error'] || $imagen['size'] > 512 * 1024 )
+		if ($imagen['error'] || $imagen['size'] > Option::get('image_maxweight') * 1024 )
 			return false;
 
 		$extension = strtolower(pathinfo($imagen['name'], PATHINFO_EXTENSION));
@@ -60,6 +61,12 @@ class Helper {
     	$result = '';
     	for ($i = 0; $i < $length; $i++) $result .= $chars[rand(0, $len)];
     	return $result;
+	}
+
+	public static function currentUrl() {
+		$url = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+		$url .= '://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+		return dirname($url);
 	}
 
 	public static function error($error) {

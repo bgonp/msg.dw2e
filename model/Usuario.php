@@ -8,6 +8,7 @@ class Usuario extends Database {
 	private $password;
 	private $avatar;
 	private $confirmado;
+	private $admin;
 	private $clave;
 	private $caducidad;
 	private $chats;
@@ -16,13 +17,14 @@ class Usuario extends Database {
 	private $pendientes;
 	private $pendientes_last;
 
-	private function __construct($id, $email, $nombre, $password, $avatar, $confirmado = 0, $clave = "", $caducidad = 0) {
+	private function __construct($id, $email, $nombre, $password, $avatar, $confirmado = 0, $admin = 0, $clave = "", $caducidad = 0) {
 		$this->id = $id;
 		$this->email = $email;
 		$this->nombre = $nombre;
 		$this->password = $password;
 		$this->avatar = $avatar;
 		$this->confirmado = $confirmado;
+		$this->admin = $admin;
 		$this->clave = $clave;
 		$this->caducidad = $caducidad > 0 ? strtotime($caducidad) : 0;
 	}
@@ -47,6 +49,7 @@ class Usuario extends Database {
 			$user['password'],
 			$user['avatar'],
 			$user['confirmado'],
+			$user['admin'],
 			$user['clave'],
 			$user['caducidad']
 		);
@@ -54,16 +57,16 @@ class Usuario extends Database {
 		return $usuario;
 	}
 
-	public static function new($email, $nombre, $password, $avatar = ['error'=>1]) {
+	public static function new($email, $nombre, $password, $avatar = 0, $confirmado = 0, $admin = 0) {
 		if (!Helper::validEmail($email) || !($email = self::escape($email))) throw new Exception("E-mail no válido");
 		if (!Helper::validNombre($nombre) || !($nombre = self::escape($nombre))) throw new Exception("Nombre no válido");
 		if (!Helper::validPassword($password)) throw new Exception("Contraseña no válida");
-		if ($avatar['error']) $avatar = '';
+		if (!$avatar || $avatar['error']) $avatar = '';
 		else if (!($avatar = Helper::uploadImagen($avatar))) throw new Exception("Avatar no válido");
 		$password = self::hash($password);
 		$sql = "
-			INSERT INTO usuario (email, nombre, password, avatar)
-			VALUES ('$email', '$nombre', '$password', '$avatar')";
+			INSERT INTO usuario (email, nombre, password, avatar, confirmado, admin)
+			VALUES ('$email', '$nombre', '$password', '$avatar', $confirmado, $admin)";
 		self::query($sql);
 		if( !($id = self::insertId()) ) throw new Exception("No se creó usuario, quizá el e-mail ya esta en uso");
 		return new Usuario($id, $email, $nombre, $password, $avatar);
@@ -89,7 +92,7 @@ class Usuario extends Database {
 
 	public function email($email = null) {
 		if (is_null($email)) return $this->email;
-		if ( !Helper::validEmail($email) || !($email = self::escape($email)) ) return false;
+		if (!Helper::validEmail($email) || !($email = self::escape($email))) return false;
 		$this->email = $email;
 		return true;
 	}
@@ -102,7 +105,7 @@ class Usuario extends Database {
 	}
 
 	public function password($password) {
-		if ( !Helper::validPassword($password) || !($password = self::hash($password))) return false;
+		if (!Helper::validPassword($password) || !($password = self::hash($password))) return false;
 		$this->password = $password;
 		return true;
 	}
@@ -119,6 +122,10 @@ class Usuario extends Database {
 		if (is_null($confirmado)) return $this->confirmado;
 		$this->confirmado = $confirmado ? 1 : 0;
 		return true;
+	}
+
+	public function admin() {
+		return $this->admin;
 	}
 
 	public function chats($chat_id = null) {
@@ -240,7 +247,8 @@ class Usuario extends Database {
 				   u.password,
 				   u.avatar
 			FROM usuario u
-			WHERE id IN (
+			AND u.admin = 0
+			AND id IN (
 				SELECT IF(c.usuario_1_id = {$this->id}, c.usuario_2_id, c.usuario_1_id) usuario_id
 				FROM contacto c
 				WHERE c.estado = {$estado}{$and}

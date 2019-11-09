@@ -4,16 +4,17 @@ abstract class Database {
 
 	private static $conn = false;
 
-	private static function connect(){
+	public static function connect(){
 		if (self::$conn === false) {
-			$conf = json_decode(file_get_contents(CONFIG_DIR.'database.json'));
+			$conf = json_decode(@file_get_contents(CONFIG_DIR.'database.json'));
+			if (!$conf) return false;
 			$conn = new mysqli($conf->host, $conf->user, $conf->pass, $conf->name);
 			if ($conn->connect_errno)
 				throw new Exception("Fallo al conectar a base de datos");
 			else
 				self::$conn = $conn;
 		}
-
+		return true;
 	}
 
 	public static function query($sql) {
