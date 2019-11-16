@@ -5,5 +5,17 @@
 		<input type="hidden" name="chat_id" value="{{ID}}">
 		<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
 	</form>
-	<ul class="members-list"></ul>
+	<ul class="members-list">
+		<li class="empty-member" style="display: none"><strong class="name"></strong> (<span class="email"></span>)</li>
+		<li class="add-member">
+			<form action="ajax.php" method="post" class="add-member-form">
+				<input type="hidden" name="action" value="addMember">
+				<input type="hidden" name="chat_id" value="">
+				<select class="friends-list" name="contact_id">
+					<option value="0">Add a friend...</option>
+				</select>
+				<button type="submit" class="btn btn-add-member"><i class="fa fa-plus"></i></button>
+			</form>
+		</li>
+	</ul>
 </li>

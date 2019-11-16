@@ -2,8 +2,8 @@ var update_interval = 5000, busy = false;
 var current_user, last_received, last_contact_upd, current_chat = 0, last_read = 0;
 
 var tabs_buttons, tabs_contents, alert_msg, loading;
-var chats, friends, requests, messages, members_txt, members_img;
-var empty_chat, empty_friend, empty_request, empty_message;
+var chats, active_chat, friends, requests, messages, members_txt, members_img;
+var empty_chat, empty_friend, empty_request, empty_message, empty_member_txt, empty_member_img;
 
 $(document).ready(function() {
 
@@ -19,7 +19,7 @@ $(document).ready(function() {
 	requests = $('#requests .requests-list');
 	messages = $('#messages .messages-list');
 	members_img = $('#messages .members-list');
-	members_txt = chats.find('.members-list');
+	empty_member_img = members_img.find('.empty-member');
 
 	// Forms
 	formsListener($('#content form[action="ajax.php"]'));
@@ -145,20 +145,19 @@ function updateMessages(messages_list) {
 
 function updateFriends(friends_list) {
 	friends.find('.a-friend').remove();
-	if (putFriend(friends_list)) {
+	if (putFriend(friends_list))
 		tabs_buttons.filter('.friends:not(.active)').addClass('new');
-	}
 }
 
 function updateRequests(requests_list) {
 	requests.find('.a-request').remove();
-	if (putRequest(requests_list)) {
+	if (putRequest(requests_list))
 		tabs_buttons.filter('.requests:not(.active)').addClass('new');
-	}
 }
 
 function updateMembers(members_list) {
-	// TODO
+	if (active_chat)
+		putMember(members_list);
 }
 
 // ------------------
@@ -200,7 +199,7 @@ function putMessage(messages_list) {
 	if (!message.usuario_id) message_dom.addClass('aviso');
 	else if (message.usuario_id == current_user) message_dom.addClass('propio');
 	else if (parseInt(message.id) > last_read) message_dom.addClass('nuevo');
-	//last_read = parseInt(message.id);
+	//last_read = parseInt(message.id); // TODO REVISAR
 	message_dom.show();
 	messages.append(message_dom);
 	return putMessage(messages_list) || parseInt(message.id);
@@ -208,7 +207,7 @@ function putMessage(messages_list) {
 
 function putFriend(friends_list) {
 	if (friends_list.length == 0) return false;
-	let friend = friends_list.pop(); // shift?
+	let friend = friends_list.pop();
 	let friend_dom = empty_friend.clone();
 	friend_dom.find('.avatar img').attr('src','avatar.php?id='+friend.id);
 	friend_dom.find('.datos .nombre').text(friend.nombre);
@@ -223,7 +222,7 @@ function putFriend(friends_list) {
 
 function putRequest(requests_list) {
 	if (requests_list.length == 0) return false;
-	let request = requests_list.pop(); // shift?
+	let request = requests_list.pop();
 	let request_dom = empty_request.clone();
 	request_dom.find('.datos .nombre').text(request.nombre);
 	request_dom.find('.datos .email').text(request.email);
@@ -235,29 +234,51 @@ function putRequest(requests_list) {
 	return putRequest(requests_list) || true;
 }
 
+function putMember(members_list) {
+	if (members_list.length == 0) return false;
+	let member = members_list.pop();
+	let member_txt_dom = empty_member_txt.clone();
+	let member_img_dom = empty_member_img.clone();
+	member_txt_dom.find('.name').text(member.nombre);
+	member_txt_dom.find('.email').text(member.email);
+	member_img_dom.find('.avatar').attr('src','avatar.php?id='+member.id);
+	member_txt_dom.removeClass('empty-member').addClass('a-member');
+	member_img_dom.removeClass('empty-member').addClass('a-member');
+	member_txt_dom.show();
+	member_img_dom.show();
+	members_txt.append(member_txt_dom);
+	members_img.append(member_img_dom);
+	return putMember(members_list) || true;
+}
+
 // ------------------
 // LOAD CHAT
 // ------------------
 function loadChat(chat_id) {
-	unloadChat();
+	if (active_chat && active_chat.length > 0) unloadChat();
 	// while (busy); // TODO
 	busy = true;
 	$.post("ajax.php", { action: "loadChat", chat_id: chat_id }, function(response) {
+		active_chat = chats.find('.a-chat.chat-'+chat_id);
+		members_txt = active_chat.find('.members-list');
+		empty_member_txt = members_txt.find('.empty-member');
 		current_chat = parseInt(response.id);
 		last_read = parseInt(response.last_read);
-		chats.find('.a-chat.chat-'+current_chat).addClass('active');
+		active_chat.addClass('active');
 		$('#send-message-form input[name="chat_id"]').val(current_chat);
 		$('#send-message-form input[name="mensaje"]').prop('disabled', false);
 		$('#send-message-form input[type="submit"]').prop('disabled', false);
 		processResponse(response);
+		formsListener(active_chat.find('form[action="ajax.php"]'));
 		busy = false;
 	});
 }
 
 function unloadChat() {
+	$('.a-message, .a-member').remove();
+	active_chat.removeClass('active');
 	current_chat = 0;
-	messages.find('.a-message').remove();
-	chats.find('.a-chat.active').removeClass('active');
+	active_chat = null;
 	$('#send-message-form input[name="chat_id"]').val(0);
 	$('#send-message-form input[name="mensaje"]').prop('disabled', true);
 	$('#send-message-form input[type="submit"]').prop('disabled', true);
