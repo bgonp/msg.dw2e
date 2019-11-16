@@ -5,13 +5,15 @@ class Option extends Database {
 	private $id;
 	private $key;
 	private $type;
+	private $name;
 	private $value;
 	private static $list;
 
-	private function __construct($id, $key, $type, $value) {
+	private function __construct($id, $key, $type, $name, $value) {
 		$this->id = $id;
 		$this->key = $key;
 		$this->type = $type;
+		$this->name = $name;
 		$this->value = $value;
 	}
 
@@ -27,6 +29,10 @@ class Option extends Database {
 
 	public function type() {
 		return $this->type;
+	}
+
+	public function name() {
+		return $this->name;
 	}
 
 	public function value() {
@@ -48,7 +54,7 @@ class Option extends Database {
 		$sql = "SELECT * FROM option";
 		$list = self::query($sql);
 		while ($opt = $list->fetch_object())
-			self::$list[$opt->key] = new Option($opt->id, $opt->key, $opt->type, $opt->value);
+			self::$list[$opt->key] = new Option($opt->id, $opt->key, $opt->type, $opt->name, $opt->value);
 	}
 
 	private function save() {

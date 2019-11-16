@@ -5,29 +5,36 @@ class MainController {
 	private const UNLOGGED_ACTIONS = ['login', 'register', 'resetSend', 'recover', 'resetPassword', 'installApp'];
 
 	public static function ajax() {
-		if (!empty($_POST['action']) && method_exists(__CLASS__, $_POST['action'])){
-			try {
-				$req_login = !in_array($_POST['action'], self::UNLOGGED_ACTIONS);
-				if ($req_login xor SessionController::check())
-					$response = ['redirect' => '/'];
-				else
-					$response = self::{$_POST['action']}($_POST, $_FILES);
-			} catch (Exception $ex) {
-				$response = ['type' => 'error', 'message' => $ex->getMessage()];
+		if ($_SERVER["REQUEST_METHOD"] === 'POST') {
+			header('Content-Type: application/json');
+			if (!empty($_POST['action']) && method_exists(__CLASS__, $_POST['action'])){
+				try {
+					$req_login = !in_array($_POST['action'], self::UNLOGGED_ACTIONS);
+					if ($req_login xor SessionController::check())
+						$response = ['redirect' => Helper::currentUrl()];
+					else
+						$response = self::{$_POST['action']}($_POST, $_FILES);
+				} catch (Exception $ex) {
+					$response = ['type' => 'error', 'message' => $ex->getMessage()];
+				}
+			} else {
+				$response = ['type' => 'error', 'message' => Helper::error('invalid_action')];
 			}
+			echo json_encode($response);
 		} else {
-			$response = ['type' => 'error', 'message' => Helper::error('invalid_action')];
+			header('Location: '.Helper::currentUrl());
+			die();
 		}
-		echo json_encode($response);
 	}
 
 	public static function main() {
 		try {
 			if (!Database::connect()) {
+				SessionController::logout();
 				View::install(['color_main' => '#1b377a', 'color_bg' => '#f0f5ff', 'color_border' => '#939db5']);
 			} else if (!empty($_GET)) {
 				if (SessionController::check() || empty($_GET['action']) || !method_exists(__CLASS__, $_GET['action'])) {
-					header('Location: /');
+					header('Location: '.Helper::currentUrl());
 					die();
 				} else {
 					self::{$_GET['action']}($_GET);
@@ -43,22 +50,6 @@ class MainController {
 			SessionController::logout();
 			View::error($ex->getMessage(), Option::get());
 		}
-	}
-
-	// ------------------------
-	// Funciones de update
-	// ------------------------
-	private static function update($post, $files) {
-		$usuario = Usuario::get(SessionController::usuarioId());
-		$chat = $usuario->chats($post['chat_id']);
-		$response = [
-			'usuario_id' => SessionController::usuarioId(),
-			'messages' => $chat ? $chat->newMensajes($post['last_readed']) : [],
-			'chats' => $usuario->newChats(),
-			'friends' => $usuario->newFriends($post['last_friend']),
-			'requests' => $usuario->newRequests($post['last_request'])
-		];
-		return $response;
 	}
 
 	// ------------------------
@@ -80,11 +71,30 @@ class MainController {
 			$usuario = Usuario::get($_GET['id']);
 			if ($usuario->checkClave($_GET['key'])) {
 				$usuario->confirm();
-				header('Location: /');
+				header('Location: '.Helper::currentUrl());
 				die();
 			}
 		}
 		View::error(Helper::error('user_confirm'), Option::get());
+	}
+
+	// ------------------------
+	// Funciones de update
+	// ------------------------
+	private static function update($post, $files) {
+		$usuario = Usuario::get(SessionController::usuarioId());
+		$response = ['usuario_id' => $usuario->id()];
+		if (!empty($post['chat_id']))
+			if ($chat = $usuario->chats($post['chat_id']))
+				$response['messages'] = $chat->newMessages($post['last_read']);
+		if (isset($post['last_received']))
+			$response['chats'] = $usuario->newChats($post['last_received']);
+		if (isset($post['last_contact_upd'])) {
+			$response['friends'] = $usuario->newFriends($post['last_contact_upd']);
+			$response['requests'] = $usuario->newRequests($post['last_contact_upd']);
+			$response['last_contact_upd'] = $usuario->lastContactUpd();
+		}
+		return $response;
 	}
 
 	// ------------------------
@@ -96,14 +106,14 @@ class MainController {
 		} else {
 			$usuario = Usuario::get($post['email'], $post['password']);
 			SessionController::logged($usuario, $usuario->admin());
-			$response = ['redirect' => '/'];
+			$response = ['redirect' => Helper::currentUrl()];
 		}
 		return $response;
 	}
 
 	private static function logout($post, $files) {
 		SessionController::logout();
-		return ['redirect' => '/'];
+		return ['redirect' => Helper::currentUrl()];
 	}
 
 	private static function register($post, $files) {
@@ -112,15 +122,19 @@ class MainController {
 		} else if ($post['password'] !== $post['password_rep']) {
 			$response = ['type' => 'error', 'message' => Helper::error('pass_diff')];
 		} else {
-			if (Option::get('mail_confirm')) {
+			if (Option::get('email_confirm')) {
 				$usuario = Usuario::new($post['email'], $post['nombre'], $post['password'], $files['avatar']);
-				$email = View::emailConfirm($usuario, Helper::currentUrl());
-				MailController::send("Confirm your account", $email, $usuario->email());
-				$response = ['type' => 'success', 'message' => 'Enviado un e-mail de confirmación de cuenta'];
+				$email = View::emailConfirm($usuario);
+				if (MailController::send("Confirm your account", $email, $usuario->email())) {
+					$response = ['type' => 'success', 'message' => 'Enviado un e-mail de confirmación de cuenta'];
+				} else {
+					$usuario->delete();
+					$response = ['type' => 'error', 'message' => Helper::error('email_error')];
+				}
 			} else {
 				$usuario = Usuario::new($post['email'], $post['nombre'], $post['password'], $files['avatar'], 1);
 				SessionController::logged($usuario, $usuario->admin());
-				$response = ['redirect' => '/'];
+				$response = ['redirect' => Helper::currentUrl()];
 			}
 		}
 		return $response;
@@ -132,7 +146,7 @@ class MainController {
 		} else if (!($usuario = Usuario::get($post['email']))) {
 			$response = ['type' => 'error', 'message' => Helper::error('user_wrong')];
 		} else {
-			$email = View::emailConfirm($usuario, Helper::currentUrl());
+			$email = View::emailConfirm($usuario);
 			MailController::send("Reset your password", $email, $usuario->email());
 			$response = ['type' => 'success', 'message' => 'Se ha enviado e-mail de recuperación'];
 		}
@@ -150,7 +164,7 @@ class MainController {
 			$response = ['type' => 'error', 'message' => Helper::error('pass_wrong')];
 		} else {
 			$usuario->removeClave();
-			$response = ['redirect' => '/'];
+			$response = ['redirect' => Helper::currentUrl()];
 		}
 		return $response;
 	}
@@ -162,19 +176,27 @@ class MainController {
 			$response = ['type' => 'error', 'message' => Helper::error('pass_diff')];
 		} else {
 			$usuario = Usuario::get(SessionController::usuarioId());
-			$edited = false;
+			$edited = $new_email = false;
+			$note = '';
 			if ($post['email'] != $usuario->email())
-				$edited = $edited || $usuario->email($post['email']);
+				$new_email = $edited = $usuario->email($post['email']);
 			if ($post['name'] != $usuario->nombre())
-				$edited = $edited || $usuario->nombre($post['name']);
+				$edited = $usuario->nombre($post['name']) || $edited;
 			if (!empty($post['password']))
-				$edited = $edited || $usuario->password($post['password']);
+				$edited = $usuario->password($post['password']) || $edited;
 			if (!$files['avatar']['error'])
-				$edited = $edited || $usuario->avatar($files['avatar']);
-			if ($edited) {
-				$usuario->save();
-				$response = ['type' => 'success', 'message' => 'Perfil actualizado', 'userdata' => $usuario->toArray(0)];
+				$edited = $usuario->avatar($files['avatar']) || $edited;
+			if ($new_email && Option::get('email_confirm')) {
+				$email = View::emailConfirm($usuario);
+				if (MailController::send("Confirm your new e-mail", $email, $usuario->email())) {
+					$usuario->confirmado(0);
+					$note = '. You have to confirm your new e-mail in order to login again.';
+				}
 			}
+			if ($edited && $usuario->save())
+				$response = ['type' => 'success', 'message' => 'Perfil actualizado'.$note, 'userdata' => $usuario->toArray(0)];
+			else
+				$response = ['type' => 'error', 'message' => Helper::error('profile_save')];
 		}
 		return $response;
 	}
@@ -185,25 +207,41 @@ class MainController {
 	private static function requestFriend($post, $files) {
 		$usuario = Usuario::get(SessionController::usuarioId());
 		$usuario->addContacto($post['email']);
-		return ['type' => 'success', 'message' => 'Solicitud de amistad enviada'];
+		$response = ['type' => 'success', 'message' => 'Solicitud de amistad enviada'];
+		$response['friends'] = $usuario->newFriends($post['last_contact_upd']);
+		$response['requests'] = $usuario->newRequests($post['last_contact_upd']);
+		$response['last_contact_upd'] = $usuario->lastContactUpd();
+		return $response;
 	}
 
 	private static function acceptFriend($post, $files) {
 		$usuario = Usuario::get(SessionController::usuarioId());
-		$usuario->updateContacto($post['request_id'], Helper::ACEPTADO);
-		return ['type' => 'success', 'message' => 'Solicitud de amistad aceptada', 'update' => 1];
+		$usuario->updateContacto($post['contact_id'], Helper::ACEPTADO);
+		$response = ['type' => 'success', 'message' => 'Solicitud de amistad aceptada'];
+		$response['friends'] = $usuario->newFriends($post['last_contact_upd']);
+		$response['requests'] = $usuario->newRequests($post['last_contact_upd']);
+		$response['last_contact_upd'] = $usuario->lastContactUpd();
+		return $response;
 	}
 
 	private static function rejectFriend($post, $files) {
 		$usuario = Usuario::get(SessionController::usuarioId());
-		$usuario->updateContacto($post['request_id'], Helper::RECHAZADO);
-		return ['type' => 'success', 'message' => 'Solicitud de amistad rechazada'];
+		$usuario->updateContacto($post['contact_id'], Helper::RECHAZADO);
+		$response = ['type' => 'success', 'message' => 'Solicitud de amistad rechazada'];
+		$response['friends'] = $usuario->newFriends($post['last_contact_upd']);
+		$response['requests'] = $usuario->newRequests($post['last_contact_upd']);
+		$response['last_contact_upd'] = $usuario->lastContactUpd();
+		return $response;
 	}
 
 	private static function blockFriend($post, $files) {
 		$usuario = Usuario::get(SessionController::usuarioId());
-		$usuario->updateContacto($post['friend_id'], Helper::BLOQUEADO);
-		return ['type' => 'success', 'message' => 'Contacto bloqueado'];
+		$usuario->updateContacto($post['contact_id'], Helper::BLOQUEADO);
+		$response = ['type' => 'success', 'message' => 'Contacto bloqueado'];
+		$response['friends'] = $usuario->newFriends($post['last_contact_upd']);
+		$response['requests'] = $usuario->newRequests($post['last_contact_upd']);
+		$response['last_contact_upd'] = $usuario->lastContactUpd();
+		return $response;
 	}
 
 	// ------------------------
@@ -225,7 +263,7 @@ class MainController {
 			$todos = true;
 			foreach ($post['members'] as $member)
 				if (!$chat->addUsuario($member)) $todos = false;
-			$response = ['update' => 1, 'focus' => 'chats'];
+			$response = ['focus' => 'chats', 'chats' => $usuario->newChats($post['last_received'])];
 			if (!$todos) {
 				$response['type'] = 'error';
 				$response['message'] = Helper::error('chat_add');
@@ -257,9 +295,8 @@ class MainController {
 			if (!($chat = $usuario->chats($post['chat_id']))) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_wrong')];
 			} else {
-				$usuario->readChat($chat->id());
 				$response = $chat->toArray();
-				$response['usuario_id'] = SessionController::usuarioId();
+				$usuario->readChat($chat->id());
 			}
 		}
 		return $response;
@@ -277,7 +314,10 @@ class MainController {
 			} else if (!$chat->addUsuario($friend)) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_add')];
 			} else {
-				$response = ['update' => 1, 'type' => 'success', 'message' => 'Amigo añadido al chat'];
+				$members = [];
+				foreach ($chat->usuarios() as $member)
+					$members[] = $member->toArray(0);
+				$response = ['type' => 'success', 'message' => 'Amigo añadido al chat', 'members' => $members];
 			}
 		}
 		return $response;
@@ -299,7 +339,7 @@ class MainController {
 				$response = ['type' => 'error', 'message' => Helper::error('msg_add')];
 			} else {
 				$usuario->readChat($chat->id());
-				$response = ['update' => 1, 'chat_id' => $chat->id()];
+				$response = ['messages' => $chat->newMessages($post['last_read'])];
 			}
 		}
 		return $response;
@@ -316,14 +356,14 @@ class MainController {
 		} else {
 			foreach ($post['options'] as $key => $value)
 				Option::update($key, $value);
-			$response = ['redirect' => '/'];
+			$response = ['redirect' => Helper::currentUrl()];
 		}
 		return $response;
 	}
 
 	private static function installApp($post, $files) {
 		if (Database::connect() || Install::run($post)) {
-			$response = ['redirect' => '/'];
+			$response = ['redirect' => Helper::currentUrl()];
 		} else {
 			$response = ['type' => 'error', 'message' => Helper::error('installation')];
 		}

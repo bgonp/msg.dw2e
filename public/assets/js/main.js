@@ -1,4 +1,4 @@
-var forms, messages, chat_members, chats, friends, requests;
+var forms, messages, chat_members, chats, friends, requests, add_member;
 var empty_msg, empty_chat, empty_friend, empty_request, empty_chats_member, empty_msgs_member;
 var tabs_buttons, tabs_contents, alert_msg, loading;
 
@@ -24,6 +24,9 @@ $(document).ready(function() {
 	empty_friend = $('#friends .empty-friend');
 	requests = $('#requests .requests-list');
 	empty_request = $('#requests .empty-request');
+	add_member = $('#chats .add-member');
+	add_member_select = add_member.find('select.friends-list');
+	add_member_empty = add_member_select.find('option[value="0"]');
 
 	formsClicables(forms);
 
@@ -75,9 +78,9 @@ function loadChat(chat_id) {
 	$.post("ajax.php", { action: "loadChat", chat_id: chat_id }, function(data) {
 		data = processData(data);
 		if (data.id) {
+			let members = current_chat_dom.find('.members-list');
 			loadMessages(data.id, data.last_readed, data.last_msg, data.messages);
 			if (data.users && data.users.length > 0) {
-				let members = current_chat_dom.find('.members-list');
 				members.find('.a-member').remove();
 				chat_members.find('.a-member').remove();
 				data.users.reverse();
@@ -86,6 +89,9 @@ function loadChat(chat_id) {
 					chat_members.prepend(cloneMsgsMember(member.id, member.nombre));
 				}
 			}
+			formsClicables(add_member);
+			add_member.find('input[name="chat_id"]').val(chat_id);
+			members.append(add_member);
 			current_chat_dom.addClass('active');
 		}
 	});
@@ -167,7 +173,8 @@ function updateFriends(friends_list) {
 	friends_list.reverse();
 	for (let friend of friends_list) {
 		if (friend.fecha_upd > last_friend) last_friend = friend.fecha_upd;
-		friends.prepend(cloneFriend(friend.id, friend.nombre, friend.email));
+		cloneFriend(friend.id, friend.nombre, friend.email);
+		cloneAddMember(friend.id, friend.nombre, friend.email);
 		updated = true;
 	}
 	if (updated) tabs_buttons.filter('.friends:not(.active)').addClass('new');
@@ -189,7 +196,7 @@ function updateUserdata(userdata) {
 	$('#menu .edit-profile input[name="name"]').val(userdata.nombre);
 	$('#menu .edit-profile input[name="email"]').val(userdata.email);
 	$('#menu .edit-profile input[type="password"]').val('');
-	$('#menu .avatar img').attr('src','/avatar.php?id='+userdata.id+'&'+(new Date().getTime()));
+	$('#menu .avatar img').attr('src','avatar.php?id='+userdata.id+'&'+(new Date().getTime()));
 }
 
 // ----------
@@ -226,14 +233,21 @@ function cloneChat(id, nombre, unread) {
 
 function cloneFriend(id, nombre, email) {
 	let friend_dom = empty_friend.clone();
-	friend_dom.find('.avatar img').attr('src','/avatar.php?id='+id);
+	friend_dom.find('.avatar img').attr('src','avatar.php?id='+id);
 	friend_dom.find('.datos .nombre').text(nombre);
 	friend_dom.find('.datos .email').text(email);
 	friend_dom.find('input[name="members[]"], input[name="friend_id"]').val(id);
 	friend_dom.removeClass('empty-chat').addClass('a-friend');
 	friend_dom.show();
 	formsClicables(friend_dom.find('form[action="ajax.php"]'));
-	return friend_dom;
+	friends.prepend(friend_dom);
+}
+
+function cloneAddMember(id, nombre, email) {
+	let friend_dom = add_member_empty.clone();
+	friend_dom.text(nombre+' ('+email+')');
+	friend_dom.val(id);
+	add_member_empty.after(friend_dom);
 }
 
 function cloneRequest(id, nombre, email) {
@@ -258,7 +272,7 @@ function cloneChatsMember(nombre, email) {
 
 function cloneMsgsMember(id, nombre) {
 	let member_dom = empty_msgs_member.clone();
-	member_dom.find('.avatar').attr('title', nombre).attr('src','/avatar.php?id='+id);
+	member_dom.find('.avatar').attr('title', nombre).attr('src','avatar.php?id='+id);
 	member_dom.removeClass('empty-member').addClass('a-member');
 	member_dom.show();
 	return member_dom;
@@ -307,7 +321,6 @@ function formsClicables(forms) {
 
 function processData(data) {
 	console.log(data); // A BORRAR
-	data = JSON.parse(data);
 	if (data.redirect)
 		location.href = data.redirect;
 	if (data.update)

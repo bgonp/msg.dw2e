@@ -47,13 +47,13 @@ class Mensaje extends Database {
 	}
 
 	public static function new($usuario_id, $chat_id, $contenido) {
-		$usuario_id = intval($usuario_id);
+		$usuario_id = $usuario_id == 0 ? 'NULL' : intval($usuario_id);
 		$chat_id = intval($chat_id);
 		$contenido = self::escape($contenido);
-		if (empty($usuario_id) || empty($chat_id) || empty($contenido)) throw new Exception("No se creó mensaje");
+		if (empty($chat_id) || empty($contenido)) throw new Exception("A No se creó mensaje");
 		$sql = "INSERT INTO mensaje (usuario_id, chat_id, contenido) VALUES ($usuario_id, $chat_id, '$contenido')";
 		self::query($sql);
-		if( !($id = self::insertId()) ) throw new Exception("No se creó mensaje");
+		if( !($id = self::insertId()) ) throw new Exception("B No se creó mensaje");
 		return Mensaje::get($id);
 	}
 

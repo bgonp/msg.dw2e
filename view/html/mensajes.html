@@ -1,7 +1,7 @@
 <div id="messages">
 	<ul class="members-list">
 		<li class="empty-member" style="display: none">
-			<img class="avatar"></img>
+			<img src="" class="avatar"></img>
 		</li>
 	</ul>
 	<ul class="messages-list">
@@ -14,6 +14,7 @@
 	<form action="ajax.php" method="post" id="send-message-form" class="empty-on-submit">
 		<input type="hidden" name="action" value="sendMessage">
 		<input type="hidden" name="chat_id" value="0">
+		<input type="hidden" name="last_read" value="0">
 		<input type="text" name="mensaje" placeholder="Write your message..." disabled><input type="submit" class="btn btn-send" value="Send" disabled>
 	</form>
 </div>

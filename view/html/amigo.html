@@ -1,5 +1,5 @@
 <li class="a-friend deletable">
-	<div class="avatar"><img src="/avatar.php?id={{ID}}"></div>
+	<div class="avatar"><img src="avatar.php?id={{ID}}"></div>
 	<div class="datos">
 		<div class="nombre">{{NOMBRE}}</div>
 		<div class="email">{{EMAIL}}</div>
@@ -12,7 +12,7 @@
 		</label>
 		<form action="ajax.php" method="post" class="confirmable delete-parent">
 			<input type="hidden" name="action" value="blockFriend">
-			<input type="hidden" name="friend_id" value="{{ID}}">
+			<input type="hidden" name="contact_id" value="{{ID}}">
 			<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
 		</form>
 	</div>

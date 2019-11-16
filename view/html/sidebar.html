@@ -16,12 +16,15 @@
 				</form>
 				<ul class="members-list">
 					<li class="empty-member" style="display: none"><strong class="name"></strong> (<span class="email"></span>)</li>
-					<li class="add-member" style="display: none">
+					<li class="add-member">
 						<form action="ajax.php" method="post" class="add-member-form">
 							<input type="hidden" name="action" value="addMember">
 							<input type="hidden" name="chat_id" value="">
-							<input type="text" name="friend_id" value="" placeholder="Add member by ID...">
-							<button type="submit"><i class="fa fa-plus"></i></button>
+							<select class="friends-list" name="contact_id">
+								<option value="0">Add a friend...</option>
+								{{ADDFRIENDS}}
+							</select>
+							<button type="submit" class="btn btn-add-member"><i class="fa fa-plus"></i></button>
 						</form>
 					</li>
 				</ul>
@@ -54,7 +57,7 @@
 				</label>
 				<form action="ajax.php" method="post" class="confirmable delete-parent">
 					<input type="hidden" name="action" value="blockFriend">
-					<input type="hidden" name="friend_id" value="">
+					<input type="hidden" name="contact_id" value="">
 					<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
 				</form>
 			</div>
@@ -70,12 +73,12 @@
 			<div class="buttons">
 				<form action="ajax.php" method="post" class="delete-parent">
 					<input type="hidden" name="action" value="acceptFriend">
-					<input type="hidden" name="request_id" value="">
+					<input type="hidden" name="contact_id" value="">
 					<input type="submit" class="btn btn-accept" value="Accept">
 				</form>
 				<form action="ajax.php" method="post" class="confirmable delete-parent">
 					<input type="hidden" name="action" value="rejectFriend">
-					<input type="hidden" name="request_id" value="">
+					<input type="hidden" name="contact_id" value="">
 					<input type="submit" class="btn btn-decline" value="Decline">
 				</form>
 			</div>

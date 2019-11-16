@@ -70,7 +70,7 @@ hr {
 	border: none;
 	border-bottom: 1px solid;
 }
-input, .btn {
+input, select, .btn {
 	background: #FFFFFF;
 	box-shadow: none;
 	padding: 5px 10px;
@@ -216,8 +216,20 @@ input[type="submit"], .btn {
 	font-size: 1.5rem;
 	font-weight: 700;
 }
+#options .options-list {
+	margin-right: -3.33%;
+}
 #options .a-option {
 	text-align: left;
+	margin-right: 3.33%;
+}
+#options .a-option.type-color {
+	display: inline-block;
+	width: 30%;
+}
+#options .a-option.type-color: {
+	display: inline-block;
+	width: 30%;
 }
 #options input {
 	display: block;
@@ -520,7 +532,23 @@ input[type="submit"], .btn {
 #chats .a-chat .members-list .a-member .name {
 	display: block;
 }
+#chats .a-chat .members-list .add-member {
+	margin-top: 15px;
+	font-size: 0;
+}
+#chats .a-chat .members-list .friends-list {
+	display: inline-block;
+	width: 88%;
+	height: 33px;
+	margin-right: 2%;
+	vertical-align: middle;
+}
 #chats .a-chat .members-list .btn-add-member {
+	display: inline-block;
+	color: #FFFFFF;
+	width: 10%;
+	height: 33px;
+	vertical-align: middle;
 }
 
 /*
@@ -737,8 +765,23 @@ input[type="submit"], .btn {
 	margin: 20px 20px 20px auto;
 	text-align: right;
 }
-#messages .messages-list .a-message::before,
-#messages .messages-list .a-message::after,
+#messages .messages-list .a-message.aviso {
+	padding: 10px 0 9px;
+	margin: 20px auto;
+	width: 100%;
+	max-width: 100%;
+	border-left: none;
+	border-right: none;
+	border-radius: 0;
+	font-style: italic;
+	text-align: center;
+}
+#messages .messages-list .a-message.aviso .autor,
+#messages .messages-list .a-message.aviso .fecha {
+	display: none;
+}
+#messages .messages-list .a-message:not(.aviso)::before,
+#messages .messages-list .a-message:not(.aviso)::after,
 #messages .messages-list .a-message.propio::before,
 #messages .messages-list .a-message.propio::after {
 	content: '';

@@ -6,12 +6,12 @@
 	<div class="buttons">
 		<form action="ajax.php" method="post" class="delete-parent">
 			<input type="hidden" name="action" value="acceptFriend">
-			<input type="hidden" name="request_id" value="{{ID}}">
+			<input type="hidden" name="contact_id" value="{{ID}}">
 			<input type="submit" class="btn btn-accept" value="Accept">
 		</form>
 		<form action="ajax.php" method="post" class="confirmable delete-parent">
 			<input type="hidden" name="action" value="rejectFriend">
-			<input type="hidden" name="request_id" value="{{ID}}">
+			<input type="hidden" name="contact_id" value="{{ID}}">
 			<input type="submit" class="btn btn-decline" value="Decline">
 		</form>
 	</div>

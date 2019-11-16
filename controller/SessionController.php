@@ -7,7 +7,7 @@ class SessionController {
 	private static $admin = false;
 
 	public static function check() {
-		if (!self::$checked) {
+		if (!self::$checked && session_status() === PHP_SESSION_NONE) {
 			self::$checked = true;
 			session_start();
 			self::$logged = !empty($_SESSION['logged']);
@@ -32,9 +32,11 @@ class SessionController {
 	}
 
 	public static function logout() {
-		$_SESSION = [];
-		setcookie(session_name(), "", time() - 3600);
-		session_destroy();
+		if (session_status() === PHP_SESSION_ACTIVE) {
+			$_SESSION = [];
+			setcookie(session_name(), "", time() - 3600);
+			session_destroy();
+		}
 	}
 
 }

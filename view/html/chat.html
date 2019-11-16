@@ -1,16 +1,9 @@
-<li class="a-chat chat-{{ID}}{{CLASE}} deletable">
+<li class="a-chat chat-{{ID}} lastmsg-{{LASTMSG}}{{CLASE}} deletable">
 	<a href="#" class="chat-link" data-id="{{ID}}">{{NOMBRE}}</a>
 	<form action="ajax.php" method="post" class="confirmable delete-parent unload-chat">
 		<input type="hidden" name="action" value="leaveChat">
 		<input type="hidden" name="chat_id" value="{{ID}}">
 		<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
 	</form>
-	<ul class="members-list"><li class="add-member" style="display: none">
-		<form action="ajax.php" method="post" class="add-member-form">
-			<input type="hidden" name="action" value="addMember">
-			<input type="hidden" name="chat_id" value="{{ID}}">
-			<input type="text" name="friend_id" value="" placeholder="Add member by ID...">
-			<button type="submit"><i class="fa fa-plus"></i></button>
-		</form>
-	</li></ul>
+	<ul class="members-list"></ul>
 </li>

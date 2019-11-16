@@ -5,13 +5,14 @@ abstract class View {
 	// ------------------------
 	// Pages
 	// ------------------------
-	public static function main($usuario, $options) {
-		$contenido = self::menu($usuario);
-		$contenido .= self::sidebar($usuario->chats(), $usuario->amigos(), $usuario->pendientes());
+	public static function main($user, $options) {
+		$contenido = self::menu($user);
+		$contenido .= self::sidebar($user->chats(), $user->amigos(), $user->pendientes());
 		$contenido .= self::mensajes();
 		$contenido .= self::alert();
 		$contenido .= self::loading();
-		$contenido .= self::vars($usuario->id(), $usuario->amigos_last(), $usuario->pendientes_last());
+		$contenido .= self::vars($user->id(), $user->lastReceived(), $user->lastContactUpd());
+	//private static function vars($user_id, $last_msg, $last_contact_upd) {
 		echo self::page($contenido, 'main', $options);
 	}
 
@@ -22,8 +23,8 @@ abstract class View {
 		echo self::page($contenido, 'login', $options);
 	}
 
-	public static function recover($usuario, $clave, $options) {
-		$contenido = self::recoverForm($usuario, $clave);
+	public static function recover($user, $clave, $options) {
+		$contenido = self::recoverForm($user, $clave);
 		$contenido .= self::alert();
 		$contenido .= self::loading();
 		echo self::page($contenido, 'recover', $options);
@@ -51,30 +52,30 @@ abstract class View {
 	// ------------------------
 	// E-mails
 	// ------------------------
-	public static function emailConfirm($usuario, $domain) {
+	public static function emailConfirm($user) {
 		$replace = [
-			'{{ID}}' => $usuario->id(),
-			'{{NOMBRE}}' => $usuario->nombre(),
-			'{{CLAVE}}' => $usuario->getNewClave(),
-			'{{DOMAIN}}' => $domain
+			'{{ID}}' => $user->id(),
+			'{{NOMBRE}}' => $user->nombre(),
+			'{{CLAVE}}' => $user->getNewClave(),
+			'{{DOMAIN}}' => Helper::currentUrl()
 		];
 		$contenido = strtr(file_get_contents(HTML_DIR.'email/confirm.html'), $replace);
 		return self::email($contenido,'Confirm your account');
 	}
 
-	public static function emailReset($usuario, $domain) {
+	public static function emailReset($user) {
 		$replace = [
-			'{{ID}}' => $usuario->id(),
-			'{{NOMBRE}}' => $usuario->nombre(),
-			'{{CLAVE}}' => $usuario->getNewClave(),
-			'{{DOMAIN}}' => $domain
+			'{{ID}}' => $user->id(),
+			'{{NOMBRE}}' => $user->nombre(),
+			'{{CLAVE}}' => $user->getNewClave(),
+			'{{DOMAIN}}' => Helper::currentUrl()
 		];
 		$contenido = strtr(file_get_contents(HTML_DIR.'email/recover.html'), $replace);
 		return self::email($contenido,'Reset your password');
 	}
 
 	// ------------------------
-	// Private functions
+	// Page parts functions
 	// ------------------------
 	private static function email($contenido, $titulo) {
 		$replace = [
@@ -106,9 +107,9 @@ abstract class View {
 		return file_get_contents(HTML_DIR.'install.html');
 	}
 
-	private static function recoverForm($usuario ,$clave) {
+	private static function recoverForm($user ,$clave) {
 		$replace = [
-			'{{ID}}' => $usuario->id(),
+			'{{ID}}' => $user->id(),
 			'{{CLAVE}}' => $clave
 		];
 		return strtr(file_get_contents(HTML_DIR.'recover.html'), $replace);
@@ -118,11 +119,11 @@ abstract class View {
 		return file_get_contents(HTML_DIR.'login.html');
 	}
 	
-	private static function menu($usuario) {
+	private static function menu($user) {
 		$replace = [
-			'{{ID}}' => $usuario->id(),
-			'{{EMAIL}}' => $usuario->email(),
-			'{{NOMBRE}}' => $usuario->nombre()
+			'{{ID}}' => $user->id(),
+			'{{EMAIL}}' => $user->email(),
+			'{{NOMBRE}}' => $user->nombre()
 		];
 		return strtr(file_get_contents(HTML_DIR.'menu.html'), $replace);
 	}
@@ -131,14 +132,19 @@ abstract class View {
 		$replace = [
 			'{{CHATS}}' => "",
 			'{{AMIGOS}}' => "",
+			'{{ADDFRIENDS}}' => "",
 			'{{PENDIENTES}}' => ""
 		];
-		foreach ($chats as $chat)
+		foreach ($chats as $chat) {
 			$replace['{{CHATS}}'] .= self::chat($chat);
-		foreach ($amigos as $amigo)
+		}
+		foreach ($amigos as $amigo) {
 			$replace['{{AMIGOS}}'] .= self::amigo($amigo);
-		foreach ($pendientes as $pendiente)
+			$replace['{{ADDFRIENDS}}'] .= self::amigoSelect($amigo);
+		}
+		foreach ($pendientes as $pendiente) {
 			$replace['{{PENDIENTES}}'] .= self::pendiente($pendiente);
+		}
 		return strtr(file_get_contents(HTML_DIR.'sidebar.html'), $replace);
 	}
 	
@@ -146,6 +152,7 @@ abstract class View {
 		$replace = [
 			'{{ID}}' => $chat->id(),
 			'{{NOMBRE}}' => $chat->nombre(),
+			'{{LASTMSG}}' => $chat->last_msg(),
 			'{{CLASE}}' => $chat->unread() ? ' unread' : ''
 		];
 		return strtr(file_get_contents(HTML_DIR.'chat.html'), $replace);
@@ -158,6 +165,15 @@ abstract class View {
 			'{{EMAIL}}' => $amigo->email()
 		];
 		return strtr(file_get_contents(HTML_DIR.'amigo.html'), $replace);
+	}
+	
+	private static function amigoSelect($amigo) {
+		$replace = [
+			'{{ID}}' => $amigo->id(),
+			'{{NAME}}' => $amigo->nombre(),
+			'{{EMAIL}}' => $amigo->email()
+		];
+		return strtr(file_get_contents(HTML_DIR.'amigoselect.html'), $replace);
 	}
 	
 	private static function pendiente($pendiente) {
@@ -181,11 +197,11 @@ abstract class View {
 		return file_get_contents(HTML_DIR.'loading.html');
 	}
 
-	private static function vars($usuario_id, $amigo, $pendiente) {
+	private static function vars($user_id, $last_msg, $last_contact_upd) {
 		$replace = [
-			'{{ID}}' => $usuario_id,
-			'{{AMIGO}}' => $amigo,
-			'{{PENDIENTE}}' => $pendiente
+			'{{ID}}' => $user_id,
+			'{{LASTMESSAGE}}' => $last_msg,
+			'{{LASTCONTACT}}' => $last_contact_upd
 		];
 		return strtr(file_get_contents(HTML_DIR.'vars.html'), $replace);
 	}
@@ -208,6 +224,7 @@ abstract class View {
 		$replace = [
 			'{{KEY}}' => $option->key(),
 			'{{TYPE}}' => $option->type(),
+			'{{NAME}}' => $option->name(),
 			'{{VALUE}}' => $option->value()
 		];
 		return strtr(file_get_contents(HTML_DIR.'option.html'), $replace);

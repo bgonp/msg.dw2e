@@ -13,9 +13,7 @@ class Usuario extends Database {
 	private $caducidad;
 	private $chats;
 	private $amigos;
-	private $amigos_last;
 	private $pendientes;
-	private $pendientes_last;
 
 	private function __construct($id, $email, $nombre, $password, $avatar, $confirmado = 0, $admin = 0, $clave = "", $caducidad = 0) {
 		$this->id = $id;
@@ -135,15 +133,14 @@ class Usuario extends Database {
 					   c.fecha,
 					   c.nombre,
 					   COUNT(m.id) n_mensajes,
-					   COUNT(p.usuario_id) n_usuarios,
-					   p.last_readed,
+					   p.last_read,
 					   MAX(m.id) last_msg
 				FROM chat c
 				LEFT JOIN mensaje m ON c.id = m.chat_id
 				LEFT JOIN participa p ON c.id = p.chat_id
 				WHERE p.usuario_id = {$this->id}
 				GROUP BY c.id
-				ORDER BY IF(MAX(m.id) > p.last_readed, 1, 0) DESC, last_msg DESC";
+				ORDER BY IF(MAX(m.id) > p.last_read, 1, 0) DESC, last_msg DESC";
 			$result = self::query($sql);
 			$this->chats = Chat::list($result);
 		}
@@ -154,27 +151,28 @@ class Usuario extends Database {
 	public function readChat($chat_id) {
 		$chat_id = intval($chat_id);
 		$sql = "
-			UPDATE participa p SET p.last_readed = (
+			UPDATE participa p SET p.last_read = (
 				SELECT MAX(m.id) FROM mensaje m WHERE m.chat_id = {$chat_id}
 			) WHERE p.usuario_id = {$this->id} AND p.chat_id = {$chat_id};";
 		return self::query($sql) !== false;
 	}
 
-	public function newChats() {
+	public function newChats($last_received) {
+		$last_received = intval($last_received);
 		$sql = "
 			SELECT c.id,
 				   c.fecha,
 				   c.nombre,
 				   COUNT(m.id) n_mensajes,
-				   COUNT(p.usuario_id) n_usuarios,
-				   p.last_readed,
+				   p.last_read,
 				   MAX(m.id) last_msg
 			FROM chat c
 			LEFT JOIN mensaje m ON c.id = m.chat_id
 			LEFT JOIN participa p ON c.id = p.chat_id
 			WHERE p.usuario_id = {$this->id}
-			AND (m.id IS NULL OR m.id > p.last_readed OR p.last_readed IS NULL)
+			AND (m.id > p.last_read OR p.last_read IS NULL)
 			GROUP BY c.id
+			HAVING last_msg > $last_received
 			ORDER BY last_msg DESC";
 		$result = self::query($sql);
 		return $result->fetch_all(MYSQLI_ASSOC);
@@ -187,12 +185,6 @@ class Usuario extends Database {
 		return $this->amigos[intval($amigo_id)] ?? false;
 	}
 
-	public function amigos_last(){
-		if (is_null($this->amigos_last))
-			$this->amigos_last = $this->lastContacto(Helper::ACEPTADO);
-		return $this->amigos_last;
-	}
-
 	public function newFriends($last) {
 		return $this->newContactos($last, Helper::ACEPTADO);
 	}
@@ -200,14 +192,8 @@ class Usuario extends Database {
 	public function pendientes($pendiente_id = null) {
 		if (!is_array($this->pendientes))
 			$this->pendientes = self::contactos($pendiente_id, Helper::PENDIENTE);
-		if (is_null($pendiente_id)) return $this->pendientes;
+		if (is_null($pendiente_id))	return $this->pendientes;
 		return $this->pendientes[intval($pendiente_id)] ?? false;
-	}
-
-	public function pendientes_last(){
-		if (is_null($this->pendientes_last))
-			$this->pendientes_last = $this->lastContacto(Helper::PENDIENTE);
-		return $this->pendientes_last;
 	}
 
 	public function newRequests($last) {
@@ -247,7 +233,7 @@ class Usuario extends Database {
 				   u.password,
 				   u.avatar
 			FROM usuario u
-			AND u.admin = 0
+			WHERE u.admin = 0
 			AND id IN (
 				SELECT IF(c.usuario_1_id = {$this->id}, c.usuario_2_id, c.usuario_1_id) usuario_id
 				FROM contacto c
@@ -281,14 +267,19 @@ class Usuario extends Database {
 		return $result->fetch_all(MYSQLI_ASSOC);
 	}
 
-	private function lastContacto($estado) {
+	public function lastContactUpd() {
 		$sql = "
-			SELECT MAX(c.fecha_upd) fecha_upd
+			SELECT MAX(fecha_upd) last_contact_upd
 			FROM contacto c
-			WHERE (c.usuario_1_id = {$this->id} OR c.usuario_2_id = {$this->id})
-			AND c.estado = {$estado}";
-		$result = self::query($sql);
-		return $result->num_rows > 0 ? $result->fetch_assoc()['fecha_upd'] : 0;
+			WHERE c.usuario_1_id = {$this->id} OR c.usuario_2_id = {$this->id}";
+		return self::query($sql)->fetch_assoc()['last_contact_upd'];
+	}
+
+	public function lastReceived() {
+		$last = 0;
+		foreach ($this->chats() as $chat)
+			if ($chat->last_msg() > $last)$last = $chat->last_msg();
+		return $last;
 	}
 
 	public function addContacto($id_o_email) {
@@ -341,13 +332,12 @@ class Usuario extends Database {
 			clave = '{$this->clave}',
 			caducidad = {$caducidad}
 			WHERE id = {$this->id}";
-		if (self::query($sql) === false) return false;
-		return true;
+		return self::query($sql) !== false;
 	}
 
 	public function delete() {
-		$this->email = $this->nombre = $this->password = '';
-		return $this->save();
+		$sql = "DELETE FROM usuario WHERE id = {$this->id}";
+		return self::query($sql) !== false;
 	}
 
 	public function toArray($depth = 1) {

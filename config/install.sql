@@ -16,7 +16,7 @@ CREATE TABLE `contacto` (
 CREATE TABLE `mensaje` (
   `id` int(10) UNSIGNED NOT NULL,
   `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `usuario_id` int(10) UNSIGNED NOT NULL,
+  `usuario_id` int(10) UNSIGNED,
   `chat_id` int(10) UNSIGNED NOT NULL,
   `contenido` varchar(1023) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -25,7 +25,7 @@ CREATE TABLE `participa` (
   `chat_id` int(10) UNSIGNED NOT NULL,
   `usuario_id` int(10) UNSIGNED NOT NULL,
   `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_readed` int(10) UNSIGNED DEFAULT NULL
+  `last_read` int(10) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `usuario` (
@@ -45,18 +45,24 @@ CREATE TABLE `option` (
   `id` int(10) UNSIGNED NOT NULL,
   `key` varchar(127) NOT NULL,
   `type` varchar(127) NOT NULL,
+  `name` varchar(127) NOT NULL,
   `value` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `option` (`id`, `key`, `type`, `value`) VALUES
-(1, 'regex_password', 'text', '^(?=.*[0-9]+)(?=.*[A-Z]+)(?=.*[a-z]+).{6,16}$'),
-(2, 'regex_name', 'text', '^[a-zA-Z\\s].{3,32}$'),
-(3, 'regex_email', 'text', '^[^@]+@[^@]+\\.[a-zA-Z]{2,}$'),
-(4, 'mail_confirm', 'number', '1'),
-(5, 'color_main', 'color', '#1b377a'),
-(6, 'color_bg', 'color', '#f0f5ff'),
-(7, 'color_border', 'color', '#939db5'),
-(8, 'image_maxweight', 'number', '512');
+INSERT INTO `option` (`id`, `key`, `type`, `name`, `value`) VALUES
+(1, 'regex_password', 'text', 'Password conditions', '^(?=.*[0-9]+)(?=.*[A-Z]+)(?=.*[a-z]+).{6,16}$'),
+(2, 'regex_name', 'text', 'Names conditions', '^[a-zA-Z\\s].{3,32}$'),
+(3, 'regex_email', 'text', 'E-mail conditions', '^[^@]+@[^@]+\\.[a-zA-Z]{2,}$'),
+(4, 'color_main', 'color', 'Main color', '#1b377a'),
+(5, 'color_bg', 'color', 'Background color', '#f0f5ff'),
+(6, 'color_border', 'color', 'Border color', '#939db5'),
+(7, 'image_maxweight', 'number', 'Max file weight (KB)', '512'),
+(8, 'email_confirm', 'number', 'E-mail confirmation required', '0'),
+(9, 'email_host', 'text', 'E-mail host', ''),
+(10, 'email_user', 'text', 'E-mail user', ''),
+(11, 'email_pass', 'text', 'E-mail password', ''),
+(12, 'email_from', 'text', 'E-mail from address', ''),
+(13, 'email_name', 'text', 'E-mail from name', '');
 
 ALTER TABLE `chat`
   ADD PRIMARY KEY (`id`);
@@ -74,7 +80,7 @@ ALTER TABLE `mensaje`
 ALTER TABLE `participa`
   ADD PRIMARY KEY (`chat_id`,`usuario_id`),
   ADD KEY `FK_participa_usuario` (`usuario_id`),
-  ADD KEY `FK_participa_mensaje` (`last_readed`);
+  ADD KEY `FK_participa_mensaje` (`last_read`);
 
 ALTER TABLE `usuario`
   ADD PRIMARY KEY (`id`),
@@ -93,7 +99,7 @@ ALTER TABLE `usuario`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 ALTER TABLE `option`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 ALTER TABLE `contacto`
   ADD CONSTRAINT `FK_contacto_usuario_1` FOREIGN KEY (`usuario_1_id`) REFERENCES `usuario` (`id`),
@@ -106,5 +112,5 @@ ALTER TABLE `mensaje`
 
 ALTER TABLE `participa`
   ADD CONSTRAINT `FK_participa_chat` FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`),
-  ADD CONSTRAINT `FK_participa_mensaje` FOREIGN KEY (`last_readed`) REFERENCES `mensaje` (`id`),
+  ADD CONSTRAINT `FK_participa_mensaje` FOREIGN KEY (`last_read`) REFERENCES `mensaje` (`id`),
   ADD CONSTRAINT `FK_participa_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`);
