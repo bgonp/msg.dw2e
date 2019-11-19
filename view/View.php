@@ -12,7 +12,6 @@ abstract class View {
 		$contenido .= self::alert();
 		$contenido .= self::loading();
 		$contenido .= self::vars($user->id(), $user->lastReceived(), $user->lastContactUpd());
-	//private static function vars($user_id, $last_msg, $last_contact_upd) {
 		echo self::page($contenido, 'main', $options);
 	}
 
@@ -96,9 +95,9 @@ abstract class View {
 
 	private static function colors($main, $background, $border) {
 		$replace = [
-			'{{MAIN}}' => is_string($main) ? $main : $main->value(),
-			'{{BACKGROUND}}' => is_string($background) ? $background : $background->value(),
-			'{{BORDER}}' => is_string($border) ? $border : $border->value()
+			'{{MAIN}}' => is_object($main) ? $main->value() : $main,
+			'{{BACKGROUND}}' => is_object($background) ? $background->value() : $background,
+			'{{BORDER}}' => is_object($border) ? $border->value() : $border
 		];
 		return strtr(file_get_contents(HTML_DIR.'colors.html'), $replace);
 	}

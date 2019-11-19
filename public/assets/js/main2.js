@@ -1,8 +1,8 @@
-var update_interval = 5000, busy = false;
+var update_interval = 500, busy = false;
 var current_user, last_received, last_contact_upd, current_chat = 0, last_read = 0;
 
 var tabs_buttons, tabs_contents, alert_msg, loading;
-var chats, active_chat, friends, requests, messages, members_txt, members_img;
+var chats, active_chat, candidates, friends, requests, messages, members_txt, members_img;
 var empty_chat, empty_friend, empty_request, empty_message, empty_member_txt, empty_member_img;
 
 $(document).ready(function() {
@@ -86,7 +86,7 @@ function processResponse(response) {
 		location.href = response.redirect;
 	if (response.usuario_id && response.usuario_id != current_user)
 		current_user = response.usuario_id;
-	if (response.last_contact_upd != last_contact_upd)
+	if (response.last_contact_upd && response.last_contact_upd != last_contact_upd)
 		last_contact_upd = response.last_contact_upd;
 	if (response.focus)
 		tabs_buttons.filter('.'+response.focus).click();
@@ -94,15 +94,17 @@ function processResponse(response) {
 		showAlert(response.type, response.message);
 	if (response.userdata)
 		updateUserdata(response.userdata);
-	if (response.chats && response.chats.length > 0)
+	if (response.chats)
 		updateChats(response.chats);
-	if (response.messages && response.messages.length > 0)
+	if (response.messages)
 		updateMessages(response.messages);
-	if (response.friends && response.friends.length > 0)
+	if (response.candidates)
+		updateCandidates(response.candidates);
+	if (response.friends)
 		updateFriends(response.friends);
-	if (response.requests && response.requests.length > 0)
+	if (response.requests)
 		updateRequests(response.requests);
-	if (response.members && response.members.length > 0)
+	if (response.members)
 		updateMembers(response.members);
 }
 
@@ -156,8 +158,18 @@ function updateRequests(requests_list) {
 }
 
 function updateMembers(members_list) {
-	if (active_chat)
+	if (active_chat) {
+		$('.a-member').remove();
 		putMember(members_list);
+	}
+}
+
+function updateCandidates(candidates_list) {
+	if (active_chat) {
+		candidates = active_chat.find('.candidates-list');
+		candidates.find('.a-candidate').remove();
+		putCandidate(candidates_list);
+	}
 }
 
 // ------------------
@@ -166,22 +178,25 @@ function updateMembers(members_list) {
 function putChat(chats_list) {
 	if (chats_list.length == 0) return false;
 	let chat = chats_list.pop();
-	let elem = $('#chats .chat-'+chat.id);
+	let chat_dom = $('#chats .chat-'+chat.id);
 	let updated = false;
 	if (parseInt(chat.last_msg) > last_received) last_received = parseInt(chat.last_msg);
-	if (!elem.hasClass('lastmsg-'+chat.last_msg)) {
-		if (elem.length == 0) {
-			elem = empty_chat.clone();
-			elem.find('input[name="chat_id"]').val(chat.id);
-			elem.find('.chat-link').data('id', chat.id);
-			chatsListener(elem.find('.chat-link'));
-			formsListener(elem.find('form[action="ajax.php"]'));
-			elem.show();
+	if (!chat_dom.hasClass('lastmsg-'+chat.last_msg)) {
+		let clases = 'a-chat deletable chat-'+chat.id+' lastmsg-'+chat.last_msg;
+		if (chat_dom.length == 0) {
+			chat_dom = empty_chat.clone();
+			chat_dom.find('input[name="chat_id"]').val(chat.id);
+			chat_dom.find('.chat-link').data('id', chat.id);
+			chatsListener(chat_dom.find('.chat-link'));
+			formsListener(chat_dom.find('form[action="ajax.php"]'));
+			chat_dom.show();
+		} else if (chat_dom.hasClass('active')) {
+			clases += ' active';
 		}
-		elem.removeClass().addClass('a-chat deletable chat-'+chat.id+' lastmsg-'+chat.last_msg);
-		elem.find('.chat-link').text(chat.nombre);
-		if (current_chat != chat.id) elem.addClass('unread');
-		chats.prepend(elem);
+		chat_dom.removeClass().addClass(clases);
+		chat_dom.find('.chat-link').text(chat.nombre);
+		if (current_chat != chat.id) chat_dom.addClass('unread');
+		chats.prepend(chat_dom);
 		updated = true;
 	}
 	return putChat(chats_list) || updated;
@@ -199,7 +214,6 @@ function putMessage(messages_list) {
 	if (!message.usuario_id) message_dom.addClass('aviso');
 	else if (message.usuario_id == current_user) message_dom.addClass('propio');
 	else if (parseInt(message.id) > last_read) message_dom.addClass('nuevo');
-	//last_read = parseInt(message.id); // TODO REVISAR
 	message_dom.show();
 	messages.append(message_dom);
 	return putMessage(messages_list) || parseInt(message.id);
@@ -236,27 +250,38 @@ function putRequest(requests_list) {
 
 function putMember(members_list) {
 	if (members_list.length == 0) return false;
-	let member = members_list.pop();
+	let member = members_list.shift();
 	let member_txt_dom = empty_member_txt.clone();
 	let member_img_dom = empty_member_img.clone();
 	member_txt_dom.find('.name').text(member.nombre);
 	member_txt_dom.find('.email').text(member.email);
-	member_img_dom.find('.avatar').attr('src','avatar.php?id='+member.id);
+	member_img_dom.find('.avatar').attr('src','avatar.php?id='+member.id).attr('title',member.nombre);
 	member_txt_dom.removeClass('empty-member').addClass('a-member');
 	member_img_dom.removeClass('empty-member').addClass('a-member');
 	member_txt_dom.show();
 	member_img_dom.show();
-	members_txt.append(member_txt_dom);
-	members_img.append(member_img_dom);
+	members_txt.prepend(member_txt_dom);
+	members_img.prepend(member_img_dom);
 	return putMember(members_list) || true;
+}
+
+function putCandidate(candidates_list) {
+	if (candidates_list.length == 0) return false;
+	let candidate = candidates_list.pop();
+	let candidate_dom = $('<option value="'+candidate.id+'">'+candidate.nombre+'</option>');
+	candidates.append(candidate_dom.addClass('a-candidate'));
+	return putCandidate(candidates_list) || true;
 }
 
 // ------------------
 // LOAD CHAT
 // ------------------
 function loadChat(chat_id) {
+	if (busy) {
+		setTimeout(function() {loadChat(chat_id);}, 50);
+		return;
+	}
 	if (active_chat && active_chat.length > 0) unloadChat();
-	// while (busy); // TODO
 	busy = true;
 	$.post("ajax.php", { action: "loadChat", chat_id: chat_id }, function(response) {
 		active_chat = chats.find('.a-chat.chat-'+chat_id);
@@ -269,7 +294,6 @@ function loadChat(chat_id) {
 		$('#send-message-form input[name="mensaje"]').prop('disabled', false);
 		$('#send-message-form input[type="submit"]').prop('disabled', false);
 		processResponse(response);
-		formsListener(active_chat.find('form[action="ajax.php"]'));
 		busy = false;
 	});
 }
@@ -299,38 +323,44 @@ function chatsListener(chats) {
 function formsListener(forms) {
 	forms.submit(function(event) {
 		var form = $(this);
-		var show_loading = setTimeout(function(){ loading.show(); }, 250);
 		event.preventDefault();
-		// while (busy); // TODO
-		busy = true;
-		if (!$(this).hasClass('confirmable') || confirm('Are you sure?')) {
-			let url = $(this).attr('action');
-			let type = $(this).attr('method');
-			let formData = new FormData(this);
-			if (formData.get('last_received') == '0') formData.set('last_received', last_received);
-			if (formData.get('last_read') == '0') formData.set('last_read', last_read);
-			if (formData.get('last_contact_upd') == '0') formData.set('last_contact_upd', last_contact_upd);
-			$.ajax({
-				url: url,
-				type: type,
-				data: formData,
-		        contentType: false,
-		        processData: false,
-				success: function(response) {
-					clearTimeout(show_loading);
-					loading.hide();
-					processResponse(response);
-					if (response.type != 'error'){
-						if (form.hasClass('unload-chat'))
-							unloadChat();
-						if (form.hasClass('delete-parent'))
-							form.closest('.deletable').remove();
-						if (form.hasClass('empty-on-submit'))
-							form[0].reset();
-					}
-					busy = false;
-				}
-			});
+		if (!form.hasClass('confirmable') || confirm('Are you sure?'))
+			formSubmit(form);
+	});
+}
+
+function formSubmit(form) {
+	if (busy) {
+		setTimeout(function() {formSubmit(form);}, 50);
+		return;
+	}
+	let show_loading = setTimeout(function(){ loading.show(); }, 250);
+	let url = form.attr('action');
+	let type = form.attr('method');
+	let formData = new FormData(form[0]);
+	busy = true;
+	if (formData.get('last_received') == '0') formData.set('last_received', last_received);
+	if (formData.get('last_read') == '0') formData.set('last_read', last_read);
+	if (formData.get('last_contact_upd') == '0') formData.set('last_contact_upd', last_contact_upd);
+	$.ajax({
+		url: url,
+		type: type,
+		data: formData,
+        contentType: false,
+        processData: false,
+		success: function(response) {
+			clearTimeout(show_loading);
+			loading.hide();
+			processResponse(response);
+			if (response.type != 'error'){
+				if (form.hasClass('unload-chat'))
+					unloadChat();
+				if (form.hasClass('delete-parent'))
+					form.closest('.deletable').remove();
+				if (form.hasClass('empty-on-submit'))
+					form[0].reset();
+			}
+			busy = false;
 		}
 	});
 }

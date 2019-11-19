@@ -148,6 +148,26 @@ class Chat extends Database {
 		return $this->usuarios[$usuario_id] ?? false;
 	}
 
+	public function candidates($usuario_id) {
+		$estado = Helper::ACEPTADO;
+		$sql = "
+			SELECT u.id,
+				   u.email,
+				   u.nombre,
+				   u.password,
+				   u.avatar
+			FROM usuario u
+			INNER JOIN contacto c
+			ON (u.id = c.usuario_1_id AND c.usuario_2_id = $usuario_id)
+			OR (u.id = c.usuario_2_id AND c.usuario_1_id = $usuario_id)
+			LEFT JOIN participa p
+			ON u.id = p.usuario_id AND p.chat_id = {$this->id}
+			WHERE p.usuario_id IS NULL
+			AND c.estado = $estado";
+		$result = self::query($sql);
+		return $result->fetch_all(MYSQLI_ASSOC);
+	}
+
 	public function save() {
 		$sql = "
 			UPDATE chat SET

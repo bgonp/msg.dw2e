@@ -84,15 +84,17 @@ class MainController {
 	private static function update($post, $files) {
 		$usuario = Usuario::get(SessionController::usuarioId());
 		$response = ['usuario_id' => $usuario->id()];
-		if (!empty($post['chat_id']))
-			if ($chat = $usuario->chats($post['chat_id']))
-				$response['messages'] = $chat->newMessages($post['last_read']);
-		if (isset($post['last_received']))
-			$response['chats'] = $usuario->newChats($post['last_received']);
-		if (isset($post['last_contact_upd'])) {
-			$response['friends'] = $usuario->newFriends($post['last_contact_upd']);
-			$response['requests'] = $usuario->newRequests($post['last_contact_upd']);
-			$response['last_contact_upd'] = $usuario->lastContactUpd();
+		if (!empty($post['chat_id']) && ($chat = $usuario->chats($post['chat_id'])))
+			if ($messages = $chat->newMessages($post['last_read']))
+				$response['messages'] = $messages;
+		if (isset($post['last_received']) && ($chats = $usuario->newChats($post['last_received'])))
+			$response['chats'] = $chats;
+		if (isset($post['last_contact_upd']) && $post['last_contact_upd'] < ($update = $usuario->lastContactUpd())) {
+			if ($friends = $usuario->newFriends($post['last_contact_upd']))
+				$response['friends'] = $friends;
+			if ($requests = $usuario->newRequests($post['last_contact_upd']))
+				$response['requests'] = $requests;
+			$response['last_contact_upd'] = $update;
 		}
 		return $response;
 	}
@@ -296,6 +298,7 @@ class MainController {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_wrong')];
 			} else {
 				$response = $chat->toArray();
+				$response['candidates'] = $chat->candidates($usuario->id());
 				$usuario->readChat($chat->id());
 			}
 		}
@@ -303,13 +306,13 @@ class MainController {
 	}
 
 	private static function addMember($post, $files) {
-		if (empty($post['chat_id']) || empty($post['friend_id'])) {
+		if (empty($post['chat_id']) || empty($post['contact_id'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
 		} else {
 			$usuario = Usuario::get(SessionController::usuarioId());
 			if (!($chat = $usuario->chats($post['chat_id']))) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_wrong')];
-			} else if (!($friend = $usuario->amigos($post['friend_id']))) {
+			} else if (!($friend = $usuario->amigos($post['contact_id']))) {
 				$response = ['type' => 'error', 'message' => Helper::error('no_friend')];
 			} else if (!$chat->addUsuario($friend)) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_add')];

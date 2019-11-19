@@ -71,6 +71,7 @@ loadChat (chat_id)
 	last_read
 	messages
 	members
+	candidates
 
 addMember (chat_id, contact_id)
 	members
@@ -83,6 +84,3 @@ updateOptions (options[])
 
 installApp (email, password, password_rep, host, name, user, pass)
 	redirect
-
-
-

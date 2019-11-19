@@ -86,6 +86,7 @@ input, select, .btn {
 input[type="submit"], .btn {
 	color: #FFFFFF;
 	cursor: pointer;
+	padding: 5px 0;
 	text-align: center;
 }
 .custom-checkbox {
@@ -521,10 +522,11 @@ input[type="submit"], .btn {
 }
 #chats .a-chat .members-list {
 	display: none;
-	padding: 5px 14px 14px;
+	padding: 8px 14px 14px;
 }
 #chats .a-chat.active .members-list {
 	display: block;
+	border-top: 1px solid;
 }
 #chats .a-chat .members-list .a-member {
 	margin-top: 6px;
@@ -536,7 +538,7 @@ input[type="submit"], .btn {
 	margin-top: 15px;
 	font-size: 0;
 }
-#chats .a-chat .members-list .friends-list {
+#chats .a-chat .members-list .candidates-list {
 	display: inline-block;
 	width: 88%;
 	height: 33px;
