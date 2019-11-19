@@ -173,6 +173,9 @@ input[type="submit"], .btn {
 #login-form .btn {
 	color: #FFFFFF;
 }
+#login-form.email-0 .btn-reset {
+    display: none;
+}
 
 /*
 	RECOVER FORM

@@ -1,4 +1,4 @@
-<div id="login-form">
+<div id="login-form" class="{{CLASS}}">
 	<ul class="tabs">
 		<li><a href="#" class="tab active" data-target="login-form">Login</a>
 		<li><a href="#" class="tab" data-target="register-form">Register</a>
@@ -11,7 +11,7 @@
 					<input type="email" name="email" required></label>
 				<label class="form-elem"><span>Password</span>
 					<input type="password" name="password" required></label>
-				{{RECOVER}}
+				<a href="#" class="tab active btn-reset" data-target="recover-form">I don't remember my password</a>
 				<hr>
 				<input type="submit" class="btn btn-login" value="Login">
 			</form>

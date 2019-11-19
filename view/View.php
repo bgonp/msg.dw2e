@@ -116,13 +116,9 @@ abstract class View {
 
 	private static function loginForm() {
 		$replace = [
-			'{{RECOVER}}' => Option::get('email_confirm') ? self::recoverLink() : ''
+			'{{CLASS}}' => 'email-' . Option::get('email_confirm')
 		];
 		return strtr(file_get_contents(HTML_DIR.'login.html'), $replace);
-	}
-
-	private static function recoverLink() {
-		return file_get_contents(HTML_DIR.'recoverlink.html');
 	}
 	
 	private static function menu($user) {
