@@ -9,7 +9,6 @@ class Helper {
 	public const BLOQUEADO = 4;
 
 	public static function validNombre($nombre) {
-		return true;
 		$pattern = '/'.Option::get('regex_name').'/';
 		return preg_match($pattern, $nombre);
 	}

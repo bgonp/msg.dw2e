@@ -98,14 +98,14 @@ function processResponse(response) {
 		updateChats(response.chats);
 	if (response.messages)
 		updateMessages(response.messages);
-	if (response.candidates)
-		updateCandidates(response.candidates);
 	if (response.friends)
 		updateFriends(response.friends);
 	if (response.requests)
 		updateRequests(response.requests);
 	if (response.members)
 		updateMembers(response.members);
+	if (response.candidates)
+		updateCandidates(response.candidates);
 }
 
 // ------------------
@@ -268,7 +268,8 @@ function putMember(members_list) {
 function putCandidate(candidates_list) {
 	if (candidates_list.length == 0) return false;
 	let candidate = candidates_list.pop();
-	let candidate_dom = $('<option value="'+candidate.id+'">'+candidate.nombre+'</option>');
+	let nombre = candidate.nombre+' ('+candidate.email+')';
+	let candidate_dom = $('<option value="'+candidate.id+'">'+nombre+'</option>');
 	candidates.append(candidate_dom.addClass('a-candidate'));
 	return putCandidate(candidates_list) || true;
 }

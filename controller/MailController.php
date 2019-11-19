@@ -18,7 +18,7 @@ class MailController {
 		if (!self::$mailer) {
 			self::$mailer = new PHPMailer();
 			self::$mailer->isSMTP();
-			self::$mailer->SMTPDebug = 0;
+			self::$mailer->SMTPDebug = 2;
 			self::$mailer->SMTPAuth = true;
 			self::$mailer->SMTPSecure = 'tls';
 			self::$mailer->Port = 587;

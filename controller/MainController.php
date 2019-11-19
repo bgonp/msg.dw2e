@@ -85,8 +85,10 @@ class MainController {
 		$usuario = Usuario::get(SessionController::usuarioId());
 		$response = ['usuario_id' => $usuario->id()];
 		if (!empty($post['chat_id']) && ($chat = $usuario->chats($post['chat_id'])))
-			if ($messages = $chat->newMessages($post['last_read']))
+			if ($messages = $chat->newMessages($post['last_read'])) {
+				$usuario->readChat($chat->id());
 				$response['messages'] = $messages;
+			}
 		if (isset($post['last_received']) && ($chats = $usuario->newChats($post['last_received'])))
 			$response['chats'] = $chats;
 		if (isset($post['last_contact_upd']) && $post['last_contact_upd'] < ($update = $usuario->lastContactUpd())) {
@@ -143,7 +145,9 @@ class MainController {
 	}
 
 	private static function resetSend($post, $files) {
-		if (empty($post['email'])) {
+		if (!Option::get('email_confirm')) {
+			$response = ['type' => 'error', 'message' => Helper::error('conf_error')];
+		} if (empty($post['email'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
 		} else if (!($usuario = Usuario::get($post['email']))) {
 			$response = ['type' => 'error', 'message' => Helper::error('user_wrong')];

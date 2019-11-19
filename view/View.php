@@ -115,7 +115,14 @@ abstract class View {
 	}
 
 	private static function loginForm() {
-		return file_get_contents(HTML_DIR.'login.html');
+		$replace = [
+			'{{RECOVER}}' => Option::get('email_confirm') ? self::recoverLink() : ''
+		];
+		return strtr(file_get_contents(HTML_DIR.'login.html'), $replace);
+	}
+
+	private static function recoverLink() {
+		return file_get_contents(HTML_DIR.'recoverlink.html');
 	}
 	
 	private static function menu($user) {
@@ -131,7 +138,6 @@ abstract class View {
 		$replace = [
 			'{{CHATS}}' => "",
 			'{{AMIGOS}}' => "",
-			'{{ADDFRIENDS}}' => "",
 			'{{PENDIENTES}}' => ""
 		];
 		foreach ($chats as $chat) {
@@ -139,7 +145,6 @@ abstract class View {
 		}
 		foreach ($amigos as $amigo) {
 			$replace['{{AMIGOS}}'] .= self::amigo($amigo);
-			$replace['{{ADDFRIENDS}}'] .= self::amigoSelect($amigo);
 		}
 		foreach ($pendientes as $pendiente) {
 			$replace['{{PENDIENTES}}'] .= self::pendiente($pendiente);
@@ -164,15 +169,6 @@ abstract class View {
 			'{{EMAIL}}' => $amigo->email()
 		];
 		return strtr(file_get_contents(HTML_DIR.'amigo.html'), $replace);
-	}
-	
-	private static function amigoSelect($amigo) {
-		$replace = [
-			'{{ID}}' => $amigo->id(),
-			'{{NAME}}' => $amigo->nombre(),
-			'{{EMAIL}}' => $amigo->email()
-		];
-		return strtr(file_get_contents(HTML_DIR.'amigoselect.html'), $replace);
 	}
 	
 	private static function pendiente($pendiente) {

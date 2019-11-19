@@ -164,6 +164,7 @@ class Chat extends Database {
 			ON u.id = p.usuario_id AND p.chat_id = {$this->id}
 			WHERE p.usuario_id IS NULL
 			AND c.estado = $estado";
+			// echo json_encode(['sql'=>$sql]); die(); // TODO
 		$result = self::query($sql);
 		return $result->fetch_all(MYSQLI_ASSOC);
 	}
