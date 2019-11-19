@@ -1,5 +1,14 @@
 {
     "require": {
-        "phpmailer/phpmailer": "^6.1"
+        "phpmailer/phpmailer": "^6.1",
+        "components/jquery": "^3.4",
+        "fortawesome/font-awesome": "4.7.0"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "cp ./vendor/components/jquery/jquery.min.js ./public/assets/js/",
+            "cp ./vendor/fortawesome/font-awesome/css/font-awesome.css ./public/assets/css/",
+            "mkdir -p ./public/assets/fonts && cp ./vendor/fortawesome/font-awesome/fonts/fontawesome-webfont.* ./public/assets/fonts/"
+        ]
     }
 }
