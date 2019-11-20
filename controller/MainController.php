@@ -152,9 +152,11 @@ class MainController {
 		} else if (!($usuario = Usuario::get($post['email']))) {
 			$response = ['type' => 'error', 'message' => Helper::error('user_wrong')];
 		} else {
-			$email = View::emailConfirm($usuario);
-			MailController::send("Reset your password", $email, $usuario->email());
-			$response = ['type' => 'success', 'message' => 'Se ha enviado e-mail de recuperación'];
+			$email = View::emailReset($usuario);
+			if (MailController::send("Reset your password", $email, $usuario->email()))
+				$response = ['type' => 'success', 'message' => 'Se ha enviado e-mail de recuperación'];
+			else
+				$response = ['type' => 'error', 'message' => Helper::error('email_error')];
 		}
 		return $response;
 	}

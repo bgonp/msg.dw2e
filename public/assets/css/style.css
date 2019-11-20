@@ -69,6 +69,10 @@ hr {
 	margin: 16px;
 	border: none;
 	border-bottom: 1px solid;
+	border-color: var(--border);
+}
+input, select {
+	color: var(--main);
 }
 input, select, .btn {
 	background: #FFFFFF;
@@ -82,12 +86,18 @@ input, select, .btn {
 	line-height: 1.3rem;
 	text-shadow: none;
 	box-sizing: border-box;
+	border-color: var(--border);
 }
 input[type="submit"], .btn {
 	color: #FFFFFF;
 	cursor: pointer;
 	padding: 5px 0;
 	text-align: center;
+	background-color: var(--main);
+	border-color: var(--main);
+}
+input[disabled] {
+	background-color: var(--background);
 }
 .custom-checkbox {
 	display: inline-block;
@@ -113,6 +123,7 @@ input[type="submit"], .btn {
 	margin: 0 auto;
 	box-shadow: 0 0 30px rgba(0,0,0,0.4);
 	overflow: hidden;
+	background-color: var(--background);
 }
 #content.login,
 #content.recover,
@@ -130,11 +141,13 @@ input[type="submit"], .btn {
 	margin: 0 auto;
 	box-shadow: 0 0 30px rgba(0,0,0,0.4);
 	border-radius: 3px;
+	background-color: var(--background);
 }
 #login-form h2 {
 	font-size: 1.5rem;
 	text-align: center;
 	margin-bottom: 20px;
+	color: var(--main);
 }
 #login-form .tabs > li {
 	position: relative;
@@ -149,6 +162,8 @@ input[type="submit"], .btn {
 	border-right: 1px solid;
 	border-bottom: 1px solid;
 	margin-bottom: -1px;
+	color: var(--main);
+	border-color: var(--border);
 }
 #login-form .tabs > li:last-child .tab {
 	border-right: none;
@@ -163,6 +178,7 @@ input[type="submit"], .btn {
 #login-form .form-elem {
 	display: block;
 	margin-bottom: 10px;
+	color: var(--main);
 }
 #login-form input,
 #login-form .btn {
@@ -172,6 +188,10 @@ input[type="submit"], .btn {
 }
 #login-form .btn {
 	color: #FFFFFF;
+	border-color: var(--main);
+}
+#login-form .btn-reset {
+	color: var(--main);
 }
 #login-form.email-0 .btn-reset {
     display: none;
@@ -187,14 +207,17 @@ input[type="submit"], .btn {
 	margin: 0 auto;
 	box-shadow: 0 0 30px rgba(0,0,0,0.4);
 	border-radius: 3px;
+	background-color: var(--background);
 }
 #recover-form h2 {
 	font-size: 1.5rem;
 	text-align: center;
+	color: var(--main);
 }
 #recover-form .form-elem {
 	display: block;
 	margin-bottom: 10px;
+	color: var(--main);
 }
 #recover-form input,
 #recover-form .btn {
@@ -214,6 +237,8 @@ input[type="submit"], .btn {
 	text-align: center;
 	box-shadow: 0 0 30px rgba(0,0,0,0.4);
 	border-radius: 3px;
+	color: var(--main);
+	background-color: var(--background);
 }
 #options h2 {
 	margin-bottom: 20px;
@@ -256,6 +281,8 @@ input[type="submit"], .btn {
 	text-align: center;
 	box-shadow: 0 0 30px rgba(0,0,0,0.4);
 	border-radius: 3px;
+	color: var(--main);
+	background-color: var(--background);
 }
 #error h2 {
 	margin-bottom: 20px;
@@ -283,6 +310,7 @@ input[type="submit"], .btn {
 	padding: 25px 50px;
 	border-radius: 3px;
 	box-shadow: 0 0 30px rgba(0,0,0,0.2);
+	background: #FFFFFF;
 }
 #alert-msg .close {
 	position: absolute;
@@ -295,13 +323,14 @@ input[type="submit"], .btn {
 	text-align: center;
 	color: #FFFFFF;
 	border-radius: 50%;
+	background-color: var(--main);
 }
 
 /*
 	LOADING
 */
 #loading {
-	position: absolute;
+	position: fixed;
 	top: 0;
 	right: 0;
 	bottom: 0;
@@ -339,6 +368,7 @@ input[type="submit"], .btn {
 	color: #FFFFFF;
 	text-align: right;
 	box-shadow: 0 0 30px rgba(0,0,0,0.2);
+	background-color: var(--main);
 }
 #menu .saludo {
 	display: block;
@@ -404,17 +434,19 @@ input[type="submit"], .btn {
 	top: 0;
 	left: 50%;
 	margin-left: -8px;
-	border-top: 8px solid;
+	border-top: 8px solid var(--main);
 	border-left: 8px solid transparent!important;
 	border-right: 8px solid transparent!important;
 }
 #menu .edit-profile h2 {
 	text-align: center;
 	font-size: 1.5rem;
+	color: var(--main);
 }
 #menu .edit-profile .form-elem {
 	display: block;
 	margin-bottom: 10px;
+	color: var(--main);
 }
 #menu .edit-profile input,
 #menu .edit-profile .btn {
@@ -424,6 +456,7 @@ input[type="submit"], .btn {
 }
 #menu .edit-profile .btn-upload {
 	color: #FFFFFF;
+	border-color: var(--main);
 }
 
 /*
@@ -436,6 +469,7 @@ input[type="submit"], .btn {
 	left: 0;
 	width: 40%;
 	border-right: 1px solid;
+	border-color: var(--border);
 }
 #sidebar .tabs {
 	position: relative;
@@ -455,6 +489,8 @@ input[type="submit"], .btn {
 	text-align: center;
 	border-right: 1px solid;
 	border-bottom: 1px solid;
+	color: var(--main);
+	border-color: var(--border);
 }
 #sidebar .tabs > li:last-child .tab {
 	border-right: none;
@@ -470,7 +506,7 @@ input[type="submit"], .btn {
 	top: 0;
 	right: 0;
 	border-top: 20px solid;
-	border-left: 20px solid transparent!important;
+	border-left: 20px solid var(--main)!important;
 }
 #sidebar .tab-content {
 	position: absolute;
@@ -493,11 +529,17 @@ input[type="submit"], .btn {
 	margin: 0 0 10px;
 	border-radius: 3px;
 	overflow: hidden;
+	border-color: var(--border);
 }
 #chats .a-chat a {
 	display: block;
 	padding: 14px 35px 14px 14px;
 	transition: background .1s ease;
+	color: var(--main);
+}
+#chats .a-chat a:hover,
+#chats .a-chat.active {
+	background-color: var(--background);
 }
 #chats .a-chat.active a,
 #chats .a-chat.unread a {
@@ -508,8 +550,8 @@ input[type="submit"], .btn {
 	position: absolute;
 	top: 0;
 	right: 0;
-	border-top: 25px solid;
-	border-left: 25px solid transparent!important;
+	border-top: 25px solid var(--main);
+	border-left: 25px solid transparent;
 }
 #chats .a-chat .btn-block {
 	position: absolute;
@@ -522,14 +564,17 @@ input[type="submit"], .btn {
 	background: none;
 	border-radius: 0;
 	cursor: pointer;
+	color: var(--main);
 }
 #chats .a-chat .members-list {
 	display: none;
 	padding: 8px 14px 14px;
+	color: var(--main);
 }
 #chats .a-chat.active .members-list {
 	display: block;
 	border-top: 1px solid;
+	border-color: var(--border);
 }
 #chats .a-chat .members-list .a-member {
 	margin-top: 6px;
@@ -547,6 +592,7 @@ input[type="submit"], .btn {
 	height: 33px;
 	margin-right: 2%;
 	vertical-align: middle;
+	border-color: var(--border);
 }
 #chats .a-chat .members-list .btn-add-member {
 	display: inline-block;
@@ -554,6 +600,7 @@ input[type="submit"], .btn {
 	width: 10%;
 	height: 33px;
 	vertical-align: middle;
+	border-color: var(--main);
 }
 
 /*
@@ -583,6 +630,8 @@ input[type="submit"], .btn {
 	border-bottom-left-radius: 0;
 	border-left: none;
 	float: right;
+	background-color: var(--main);
+	border-color: var(--border);
 }
 #friends .friends-list {
 	position: absolute;
@@ -603,6 +652,8 @@ input[type="submit"], .btn {
 	font-size: 0;
 	transition: background .1s ease;
 	overflow: hidden;
+	color: var(--main);
+	border-color: var(--border);
 }
 #friends .a-friend .select {
 	display: inline-block;
@@ -646,6 +697,7 @@ input[type="submit"], .btn {
 	background: none;
 	border-radius: 0;
 	cursor: pointer;
+	color: var(--main);
 }
 #friends .a-friend .custom-checkbox {
 	position: absolute;
@@ -659,6 +711,7 @@ input[type="submit"], .btn {
 	right: 0;
 	left: 0;
 	padding: 20px;
+	background-color: var(--main);
 }
 #friends #create-chat-form input[type="text"] {
 	display: inline-block;
@@ -674,6 +727,9 @@ input[type="submit"], .btn {
 	border-bottom-left-radius: 0;
 	border-left: none;
 	float: right;
+	color: var(--main);
+	background-color: var(--background);
+	border-color: var(--border);
 }
 
 /*
@@ -689,6 +745,11 @@ input[type="submit"], .btn {
 	font-size: 0;
 	transition: background .1s ease;
 	overflow: hidden;
+	color: var(--main);
+	border-color: var(--border);
+}
+#requests .a-request:hover {
+	background-color: var(--background);
 }
 #requests .a-request .datos {
 	display: inline-block;
@@ -734,6 +795,7 @@ input[type="submit"], .btn {
 	text-align: right;
 	border-bottom: 1px solid;
 	overflow: hidden;
+	border-color: var(--border);
 }
 #messages .members-list .a-member {
 	display: inline-block;
@@ -765,6 +827,7 @@ input[type="submit"], .btn {
 	padding: 12px 20px;
 	border: 1px solid #E8E8E8;
 	border-radius: 3px;
+	color: var(--main);
 }
 #messages .messages-list .a-message.propio {
 	margin: 20px 20px 20px auto;
@@ -836,6 +899,7 @@ input[type="submit"], .btn {
 	border-left: none;
 	border-top-right-radius: 3px;
 	border-bottom-right-radius: 3px;
+	background-color: var(--main);
 }
 #messages #send-message-form {
 	position: absolute;
@@ -843,6 +907,7 @@ input[type="submit"], .btn {
 	bottom: 0;
 	left: 0;
 	padding: 20px;
+	background-color: var(--main);
 }
 #messages #send-message-form input[name="mensaje"] {
 	display: inline-block;
@@ -858,4 +923,7 @@ input[type="submit"], .btn {
 	border-bottom-left-radius: 0;
 	border-left: none;
 	float: right;
+	color: var(--main);
+	background-color: var(--background);
+	border-color: var(--border);
 }

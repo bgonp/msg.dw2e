@@ -1,4 +1,4 @@
-var update_interval = 500, busy = false;
+var update_interval = 500, replied = false, busy = false;
 var current_user, last_received, last_contact_upd, current_chat = 0, last_read = 0;
 
 var tabs_buttons, tabs_contents, alert_msg, loading;
@@ -213,7 +213,7 @@ function putMessage(messages_list) {
 	message_dom.removeClass('empty-message').addClass('a-message');
 	if (!message.usuario_id) message_dom.addClass('aviso');
 	else if (message.usuario_id == current_user) message_dom.addClass('propio');
-	else if (parseInt(message.id) > last_read) message_dom.addClass('nuevo');
+	else if (!replied && parseInt(message.id) > last_read) message_dom.addClass('nuevo');
 	message_dom.show();
 	messages.append(message_dom);
 	return putMessage(messages_list) || parseInt(message.id);
@@ -295,13 +295,13 @@ function loadChat(chat_id) {
 		$('#send-message-form input[name="mensaje"]').prop('disabled', false);
 		$('#send-message-form input[type="submit"]').prop('disabled', false);
 		processResponse(response);
-		busy = false;
+		replied = busy = false;
 	});
 }
 
 function unloadChat() {
 	$('.a-message, .a-member').remove();
-	active_chat.removeClass('active');
+	if (active_chat) active_chat.removeClass('active');
 	current_chat = 0;
 	active_chat = null;
 	$('#send-message-form input[name="chat_id"]').val(0);
@@ -360,6 +360,10 @@ function formSubmit(form) {
 					form.closest('.deletable').remove();
 				if (form.hasClass('empty-on-submit'))
 					form[0].reset();
+				if (formData.get('action') == 'sendMessage') {
+					replied = true;
+					$('.a-message.nuevo').removeClass('nuevo');
+				}
 			}
 			busy = false;
 		}
