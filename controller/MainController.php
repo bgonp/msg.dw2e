@@ -88,6 +88,11 @@ class MainController {
 			if ($messages = $chat->newMessages($post['last_read'])) {
 				$usuario->readChat($chat->id());
 				$response['messages'] = $messages;
+				if ($chat->newMembers()) {
+					$response['members'] = [];
+					foreach ($chat->usuarios() as $member)
+						$response['members'][] = $member->toArray(0);
+				}
 			}
 		if (isset($post['last_received']) && ($chats = $usuario->newChats($post['last_received'])))
 			$response['chats'] = $chats;
@@ -323,10 +328,7 @@ class MainController {
 			} else if (!$chat->addUsuario($friend)) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_add')];
 			} else {
-				$members = [];
-				foreach ($chat->usuarios() as $member)
-					$members[] = $member->toArray(0);
-				$response = ['type' => 'success', 'message' => 'Amigo añadido al chat', 'members' => $members];
+				$response = ['type' => 'success', 'message' => 'Amigo añadido al chat'];
 			}
 		}
 		return $response;

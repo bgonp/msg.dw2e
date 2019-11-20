@@ -9,6 +9,7 @@ class Chat extends Database {
 	private $usuarios;
 	private $last_msg;
 	private $last_read;
+	private $new_members;
 
 	private function __construct($id, $fecha, $nombre, $last_msg = 0, $last_read = 0){
 		$this->id = $id;
@@ -16,6 +17,7 @@ class Chat extends Database {
 		$this->nombre = $nombre;
 		$this->last_msg = $last_msg ?? 0;
 		$this->last_read = $last_read ?? 0;
+		$this->new_members = false;
 	}
 
 	public static function get($id) {
@@ -193,7 +195,17 @@ class Chat extends Database {
 			ORDER BY m.id DESC
 			LIMIT 100";
 		$result = self::query($sql);
-		return $result->fetch_all(MYSQLI_ASSOC);
+		$messages = [];
+		while ($message = $result->fetch_assoc()) {
+			if (!$message['usuario_id'])
+				$this->new_members = true;
+			$messages[] = $message;
+		}
+		return $messages;
+	}
+
+	public function newMembers() {
+		return $this->new_members;
 	}
 
 	public function toArray($depth = 1){
