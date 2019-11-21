@@ -81,7 +81,7 @@ function showAlert(type, message) {
 // PROCESS RESPONSE
 // ------------------
 function processResponse(response) {
-	console.log(response); // A BORRAR
+	// console.log(response); // TODO - A BORRAR
 	if (response.redirect)
 		location.href = response.redirect;
 	if (response.usuario_id && response.usuario_id != current_user)
@@ -143,6 +143,7 @@ function updateChats(chats_list) {
 function updateMessages(messages_list) {
 	last_read = putMessage(messages_list);
 	messages.scrollTop(messages[0].scrollHeight);
+	setTimeout( function() { messages.scrollTop(messages[0].scrollHeight); }, 250);
 }
 
 function updateFriends(friends_list) {
@@ -211,8 +212,14 @@ function putMessage(messages_list) {
 	message_dom.find('.fecha').text(message.fecha);
 	message_dom.find('.autor').text(message.usuario_nombre);
 	message_dom.removeClass('empty-message').addClass('a-message');
-	if (message.attachment_id)
-		message_dom.find('.btn-file').show().attr('href','attachment.php?id='+message.attachment_id);
+	if (message.attachment_id) {
+		let btn_file = message_dom.find('.attachment');
+		btn_file.show().attr('href','attachment.php?id='+message.attachment_id);
+		if (message.mime_type.indexOf('image/') === 0) {
+			btn_file.addClass('type-image');
+			btn_file.find('.preview').attr('src','attachment.php?id='+message.attachment_id);
+		}
+	}
 	if (!message.usuario_id) message_dom.addClass('aviso');
 	else if (message.usuario_id == current_user) message_dom.addClass('propio');
 	else if (!replied && parseInt(message.id) > last_read) message_dom.addClass('nuevo');
@@ -252,7 +259,7 @@ function putRequest(requests_list) {
 
 function putMember(members_list) {
 	if (members_list.length == 0) return false;
-	let member = members_list.shift();
+	let member = members_list.pop();
 	let member_txt_dom = empty_member_txt.clone();
 	let member_img_dom = empty_member_img.clone();
 	member_txt_dom.find('.name').text(member.nombre);

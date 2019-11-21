@@ -7,16 +7,17 @@
 	<ul class="messages-list">
 		<li class="empty-message">
 			<div class="autor"></div>
+			<a class="attachment" style="display: none" download><i class="fa fa-paperclip"></i><img class="preview"/></a>
 			<p class="contenido"></p>
 			<div class="fecha"></div>
-			<a class="btn-file" style="display: none" download><i class="fa fa-paperclip"></i></a>
 		</li>
 	</ul>
 	<form action="ajax.php" method="post" id="send-message-form" class="empty-on-submit" enctype="multipart/form-data">
 		<input type="hidden" name="action" value="sendMessage">
 		<input type="hidden" name="chat_id" value="0">
 		<input type="hidden" name="last_read" value="0">
-		<input type="file" name="attachment">
+		<a href="#" class="btn-upload"><i class="fa fa-paperclip"></i></a>
+		<input type="file" name="attachment" style="display: none">
 		<input type="text" name="mensaje" placeholder="Write your message..." disabled><input type="submit" class="btn btn-send" value="Send" disabled>
 	</form>
 </div>

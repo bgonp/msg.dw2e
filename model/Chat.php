@@ -26,7 +26,7 @@ class Chat extends Database {
 			SELECT c.id,
 				   c.fecha,
 				   c.nombre,
-				   MAX(m.id) las_msg
+				   MAX(m.id) last_msg
 			FROM chat c
 			LEFT JOIN mensaje m ON c.id = m.chat_id
 			WHERE c.id = $id
@@ -118,10 +118,12 @@ class Chat extends Database {
 					   m.chat_id,
 					   m.attachment_id,
 					   m.contenido,
-					   IF(m.id > {$this->last_read}, 1, 0) unread
+					   a.mime_type
 				FROM mensaje m
 				LEFT JOIN usuario u
 				ON m.usuario_id = u.id
+				LEFT JOIN attachment a
+				ON m.attachment_id = a.id
 				WHERE m.chat_id = {$this->id}
 				ORDER BY m.id DESC
 				LIMIT 100";
@@ -166,7 +168,8 @@ class Chat extends Database {
 			LEFT JOIN participa p
 			ON u.id = p.usuario_id AND p.chat_id = {$this->id}
 			WHERE p.usuario_id IS NULL
-			AND c.estado = $estado";
+			AND c.estado = $estado
+			ORDER BY u.nombre ASC";
 		$result = self::query($sql);
 		return $result->fetch_all(MYSQLI_ASSOC);
 	}
@@ -188,10 +191,13 @@ class Chat extends Database {
 				   u.nombre usuario_nombre,
 				   m.chat_id,
 				   m.attachment_id,
-				   m.contenido
+				   m.contenido,
+				   a.mime_type
 			FROM mensaje m
 			LEFT JOIN usuario u
 			ON m.usuario_id = u.id
+			LEFT JOIN attachment a
+			ON m.attachment_id = a.id
 			WHERE m.chat_id = {$this->id}
 			AND m.id > $last_id
 			ORDER BY m.id DESC

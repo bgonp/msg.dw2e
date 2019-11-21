@@ -92,6 +92,7 @@ class MainController {
 					$response['members'] = [];
 					foreach ($chat->usuarios() as $member)
 						$response['members'][] = $member->toArray(0);
+					$response['candidates'] = $chat->candidates($usuario->id());
 				}
 			}
 		if (isset($post['last_received']) && ($chats = $usuario->newChats($post['last_received'])))

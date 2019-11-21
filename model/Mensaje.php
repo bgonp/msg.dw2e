@@ -9,9 +9,8 @@ class Mensaje extends Database {
 	private $chat_id;
 	private $attachment_id;
 	private $contenido;
-	private $unread;
 
-	private function __construct($id, $fecha, $usuario_id, $usuario_nombre, $chat_id, $attachment_id, $contenido, $unread = false) {
+	private function __construct($id, $fecha, $usuario_id, $usuario_nombre, $chat_id, $attachment_id, $contenido, $mime_type = null) {
 		$this->id = $id;
 		$this->fecha = $fecha;
 		$this->usuario_id = $usuario_id;
@@ -19,7 +18,7 @@ class Mensaje extends Database {
 		$this->chat_id = $chat_id;
 		$this->attachment_id = $attachment_id;
 		$this->contenido = $contenido;
-		$this->unread = $unread;
+		$this->mime_type = $mime_type;
 	}
 
 	public static function get($id) {
@@ -75,7 +74,7 @@ class Mensaje extends Database {
 					$msg['chat_id'],
 					$msg['attachment_id'],
 					$msg['contenido'],
-					$msg['unread']
+					$msg['mime_type']
 				);
 		return $mensajes;
 	}
@@ -115,10 +114,6 @@ class Mensaje extends Database {
 		return true;
 	}
 
-	public function unread() {
-		return $this->unread;
-	}
-
 	public function save() {
 		$sql = "UPDATE usuario SET email = '{$this->email}', nombre = '{$this->nombre}', password = '{$this->password}' WHERE id = {$this->id}";
 		if (self::query($sql) === false) return false;
@@ -133,7 +128,8 @@ class Mensaje extends Database {
 			'usuario_nombre' => $this->usuario_nombre,
 			'chat_id' => $this->chat_id,
 			'attachment_id' => $this->attachment_id,
-			'contenido' => $this->contenido
+			'contenido' => $this->contenido,
+			'mime_type' => $this->mime_type,
 		];
 		if ($depth > 0) {
 			$depth--;

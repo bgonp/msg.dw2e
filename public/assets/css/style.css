@@ -883,6 +883,35 @@ input[disabled] {
 	font-weight: 700;
 	margin-bottom: 8px;
 }
+#messages .messages-list .a-message .attachment {
+	display: block;
+}
+#messages .messages-list .a-message .attachment i {
+	position: absolute;
+	top: -0.8rem;
+	right: -0.8rem;
+	font-size: 1.3rem;
+	width: 2rem;
+	line-height: 2rem;
+	border-radius: 50%;
+	text-align: center;
+	display: inline-block;
+	color: #FFFFFF;
+	background: var(--main);
+}
+#messages .messages-list .a-message.propio .attachment i {
+	left: -0.8rem;
+	right: initial;
+}
+#messages .messages-list .a-message .attachment .preview {
+	max-width: 100%;
+	max-height: 300px;
+	margin: 10px auto;
+}
+#messages .messages-list .a-message .attachment:not(.type-image) .preview,
+#messages .messages-list .a-message .attachment.type-image i {
+	display: none;
+}
 #messages .messages-list .a-message .fecha {
 	font-size: 0.8rem;
 	font-weight: 700;
@@ -909,9 +938,19 @@ input[disabled] {
 	padding: 20px;
 	background-color: var(--main);
 }
+#messages #send-message-form .btn-upload {
+	position: absolute;
+	top: 50%;
+	right: 18.5%;
+	font-size: 1.6rem;
+	line-height: 1;
+	margin-top: -0.75rem;
+	color: var(--main);
+}
 #messages #send-message-form input[name="mensaje"] {
 	display: inline-block;
 	width: 85%;
+	padding-right: 2rem;
 	border-right: none;
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;

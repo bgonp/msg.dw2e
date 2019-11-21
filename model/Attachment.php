@@ -63,6 +63,10 @@ class Attachment extends Database {
 		return $this->filename;
 	}
 
+	public function isImage() {
+		return explode('/', $this->mime_type)[0] == 'image';
+	}
+
 	public function chat() {
 		if (is_null($this->chat))
 			$this->chat = Chat::get($this->chat_id);
