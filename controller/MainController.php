@@ -346,7 +346,7 @@ class MainController {
 			$usuario = Usuario::get(SessionController::usuarioId());
 			if (!($chat = $usuario->chats($post['chat_id']))) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_wrong')];
-			} else if ($chat->addMensaje($usuario->id(), $post['mensaje']) === false) {
+			} else if ($chat->addMensaje($usuario->id(), $post['mensaje'], $files['attachment'] ?? false) === false) {
 				$response = ['type' => 'error', 'message' => Helper::error('msg_add')];
 			} else {
 				$usuario->readChat($chat->id());

@@ -211,6 +211,8 @@ function putMessage(messages_list) {
 	message_dom.find('.fecha').text(message.fecha);
 	message_dom.find('.autor').text(message.usuario_nombre);
 	message_dom.removeClass('empty-message').addClass('a-message');
+	if (message.attachment_id)
+		message_dom.find('.btn-file').show().attr('href','attachment.php?id='+message.attachment_id);
 	if (!message.usuario_id) message_dom.addClass('aviso');
 	else if (message.usuario_id == current_user) message_dom.addClass('propio');
 	else if (!replied && parseInt(message.id) > last_read) message_dom.addClass('nuevo');

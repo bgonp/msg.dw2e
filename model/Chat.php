@@ -78,9 +78,9 @@ class Chat extends Database {
 		return true;
 	}
 
-	public function addMensaje($usuario_id, $mensaje) {
+	public function addMensaje($usuario_id, $mensaje, $file = false) {
 		if ($usuario_id > 0 && !$this->usuarios($usuario_id)) return false;
-		if (!($mensaje = Mensaje::new($usuario_id, $this->id, $mensaje))) return false;
+		if (!($mensaje = Mensaje::new($usuario_id, $this->id, $mensaje, $file))) return false;
 		$this->mensajes = null;
 		return $mensaje;
 	}
@@ -116,6 +116,7 @@ class Chat extends Database {
 					   m.usuario_id,
 					   u.nombre usuario_nombre,
 					   m.chat_id,
+					   m.attachment_id,
 					   m.contenido,
 					   IF(m.id > {$this->last_read}, 1, 0) unread
 				FROM mensaje m
@@ -186,6 +187,7 @@ class Chat extends Database {
 				   m.usuario_id,
 				   u.nombre usuario_nombre,
 				   m.chat_id,
+				   m.attachment_id,
 				   m.contenido
 			FROM mensaje m
 			LEFT JOIN usuario u

@@ -8,12 +8,12 @@ if (isset($_GET['id']) && SessionController::check()) {
 		$contacto = $_GET['id'] == $usuario->id() ? $usuario : $usuario->amigos($_GET['id']);
 		if ($contacto) {
 			$avatar = $contacto->avatar();
-			if (!empty($avatar) && file_exists(IMAGE_DIR.$avatar)){
+			if (!empty($avatar) && file_exists(AVATAR_DIR.$avatar)){
 				$imagen = $avatar;
 			}
 		}
 	}
 }
-$type = getimagesize(IMAGE_DIR.$imagen)['mime'];
+$type = getimagesize(AVATAR_DIR.$imagen)['mime'];
 header("Content-Type: $type");
-readfile(IMAGE_DIR.$imagen);
+readfile(AVATAR_DIR.$imagen);

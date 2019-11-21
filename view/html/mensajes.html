@@ -9,12 +9,14 @@
 			<div class="autor"></div>
 			<p class="contenido"></p>
 			<div class="fecha"></div>
+			<a class="btn-file" style="display: none" download><i class="fa fa-paperclip"></i></a>
 		</li>
 	</ul>
-	<form action="ajax.php" method="post" id="send-message-form" class="empty-on-submit">
+	<form action="ajax.php" method="post" id="send-message-form" class="empty-on-submit" enctype="multipart/form-data">
 		<input type="hidden" name="action" value="sendMessage">
 		<input type="hidden" name="chat_id" value="0">
 		<input type="hidden" name="last_read" value="0">
+		<input type="file" name="attachment">
 		<input type="text" name="mensaje" placeholder="Write your message..." disabled><input type="submit" class="btn btn-send" value="Send" disabled>
 	</form>
 </div>

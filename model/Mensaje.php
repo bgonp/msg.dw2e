@@ -7,15 +7,17 @@ class Mensaje extends Database {
 	private $usuario_id;
 	private $usuario_nombre;
 	private $chat_id;
+	private $attachment_id;
 	private $contenido;
 	private $unread;
 
-	private function __construct($id, $fecha, $usuario_id, $usuario_nombre, $chat_id, $contenido, $unread = false) {
+	private function __construct($id, $fecha, $usuario_id, $usuario_nombre, $chat_id, $attachment_id, $contenido, $unread = false) {
 		$this->id = $id;
 		$this->fecha = $fecha;
 		$this->usuario_id = $usuario_id;
 		$this->usuario_nombre = $usuario_nombre;
 		$this->chat_id = $chat_id;
+		$this->attachment_id = $attachment_id;
 		$this->contenido = $contenido;
 		$this->unread = $unread;
 	}
@@ -28,6 +30,7 @@ class Mensaje extends Database {
 				   m.usuario_id,
 				   u.nombre usuario_nombre,
 				   m.chat_id,
+				   m.attachment_id,
 				   m.contenido
 			FROM mensaje m
 			LEFT JOIN usuario u
@@ -42,16 +45,19 @@ class Mensaje extends Database {
 			$mensaje['usuario_id'],
 			$mensaje['usuario_nombre'],
 			$mensaje['chat_id'],
+			$mensaje['attachment_id'],
 			$mensaje['contenido']
 		);
 	}
 
-	public static function new($usuario_id, $chat_id, $contenido) {
+	public static function new($usuario_id, $chat_id, $contenido, $attachment = false) {
 		$usuario_id = $usuario_id == 0 ? 'NULL' : intval($usuario_id);
 		$chat_id = intval($chat_id);
+		$attachment_id = $attachment && !$attachment['error'] ? Attachment::new($attachment)->id() : 'NULL';
 		$contenido = self::escape($contenido);
 		if (empty($chat_id) || empty($contenido)) throw new Exception("A No se creó mensaje");
-		$sql = "INSERT INTO mensaje (usuario_id, chat_id, contenido) VALUES ($usuario_id, $chat_id, '$contenido')";
+		$sql = "INSERT INTO mensaje (usuario_id, chat_id, attachment_id, contenido)
+				VALUES ($usuario_id, $chat_id, $attachment_id, '$contenido')";
 		self::query($sql);
 		if( !($id = self::insertId()) ) throw new Exception("B No se creó mensaje");
 		return Mensaje::get($id);
@@ -67,6 +73,7 @@ class Mensaje extends Database {
 					$msg['usuario_id'],
 					$msg['usuario_nombre'],
 					$msg['chat_id'],
+					$msg['attachment_id'],
 					$msg['contenido'],
 					$msg['unread']
 				);
@@ -125,6 +132,7 @@ class Mensaje extends Database {
 			'usuario_id' => $this->usuario_id,
 			'usuario_nombre' => $this->usuario_nombre,
 			'chat_id' => $this->chat_id,
+			'attachment_id' => $this->attachment_id,
 			'contenido' => $this->contenido
 		];
 		if ($depth > 0) {

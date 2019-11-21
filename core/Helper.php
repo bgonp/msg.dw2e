@@ -41,17 +41,21 @@ class Helper {
 
 		do {
 			$filename = self::randomString(16).'.'.$extension;
-		} while (file_exists(IMAGE_DIR.$filename));
-		if (!move_uploaded_file($imagen['tmp_name'], IMAGE_DIR.$filename))
+		} while (file_exists(AVATAR_DIR.$filename));
+		if (!move_uploaded_file($imagen['tmp_name'], AVATAR_DIR.$filename))
 			return false;
 
 		return $filename;
 	}
 
+	public static function uploadAttachment($attachment) {
+		return move_uploaded_file($attachment['tmp_name'], ATTACHMENT_DIR.$attachment['name']);
+	}
+
 	public static function removeImagen($imagen) {
 		$pattern = "/^[a-zA-Z0-9]{16}\.(?:png|jpg|jpeg|gif)$/";
-		if (!preg_match($pattern, $imagen) || !file_exists(IMAGE_DIR.$imagen)) return false;
-		return unlink(IMAGE_DIR.$imagen);
+		if (!preg_match($pattern, $imagen) || !file_exists(AVATAR_DIR.$imagen)) return false;
+		return unlink(AVATAR_DIR.$imagen);
 	}
 
 	public static function randomString($length) {
