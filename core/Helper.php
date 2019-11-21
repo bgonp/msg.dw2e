@@ -52,7 +52,20 @@ class Helper {
 		if ($attachment['error'] || $attachment['size'] > Option::get('attachment_maxweight') * 1024 )
 			return false;
 
-		return move_uploaded_file($attachment['tmp_name'], ATTACHMENT_DIR.$attachment['name']);
+		while (file_exists(ATTACHMENT_DIR.$attachment['name']))
+			$attachment['name'] = 'cp_'.$attachment['name'];
+		if (!move_uploaded_file($attachment['tmp_name'], ATTACHMENT_DIR.$attachment['name']))
+			return false;
+
+		if (explode('/', $attachment['type'])[0] != 'image')
+			return true;
+
+		$imagesize = getimagesize(ATTACHMENT_DIR.$attachment['name']);
+		return [
+			'name' => $attachment['name'],
+			'width' => $imagesize[0],
+			'height' => $imagesize[1]
+		];
 	}
 
 	public static function removeImagen($imagen) {

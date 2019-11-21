@@ -143,7 +143,7 @@ function updateChats(chats_list) {
 function updateMessages(messages_list) {
 	last_read = putMessage(messages_list);
 	messages.scrollTop(messages[0].scrollHeight);
-	setTimeout( function() { messages.scrollTop(messages[0].scrollHeight); }, 250);
+	//setTimeout( function() { messages.scrollTop(messages[0].scrollHeight); }, 250);
 }
 
 function updateFriends(friends_list) {
@@ -216,8 +216,11 @@ function putMessage(messages_list) {
 		let btn_file = message_dom.find('.attachment');
 		btn_file.show().attr('href','attachment.php?id='+message.attachment_id);
 		if (message.mime_type.indexOf('image/') === 0) {
+			let preview = btn_file.find('.preview')
 			btn_file.addClass('type-image');
-			btn_file.find('.preview').attr('src','attachment.php?id='+message.attachment_id);
+			preview.attr('src','attachment.php?id='+message.attachment_id);
+			preview.attr('height', message.height);
+			preview.attr('width', message.width);
 		}
 	}
 	if (!message.usuario_id) message_dom.addClass('aviso');

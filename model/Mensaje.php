@@ -9,8 +9,11 @@ class Mensaje extends Database implements JsonSerializable {
 	private $chat_id;
 	private $attachment_id;
 	private $contenido;
+	private $mime_type;
+	private $height;
+	private $width;
 
-	private function __construct($id, $fecha, $usuario_id, $usuario_nombre, $chat_id, $attachment_id, $contenido, $mime_type = null) {
+	private function __construct($id, $fecha, $usuario_id, $usuario_nombre, $chat_id, $attachment_id, $contenido, $mime_type = null, $height = null, $width = null) {
 		$this->id = $id;
 		$this->fecha = $fecha;
 		$this->usuario_id = $usuario_id;
@@ -19,6 +22,8 @@ class Mensaje extends Database implements JsonSerializable {
 		$this->attachment_id = $attachment_id;
 		$this->contenido = $contenido;
 		$this->mime_type = $mime_type;
+		$this->height = $height;
+		$this->width = $width;
 	}
 
 	public static function get($id) {
@@ -54,11 +59,11 @@ class Mensaje extends Database implements JsonSerializable {
 		$chat_id = intval($chat_id);
 		$attachment_id = $attachment && !$attachment['error'] ? Attachment::new($attachment)->id() : 'NULL';
 		$contenido = self::escape($contenido);
-		if (empty($chat_id) || empty($contenido)) throw new Exception("A No se creó mensaje");
+		if (empty($chat_id) || empty($contenido)) throw new Exception("No se creó mensaje");
 		$sql = "INSERT INTO mensaje (usuario_id, chat_id, attachment_id, contenido)
 				VALUES ($usuario_id, $chat_id, $attachment_id, '$contenido')";
 		self::query($sql);
-		if( !($id = self::insertId()) ) throw new Exception("B No se creó mensaje");
+		if( !($id = self::insertId()) ) throw new Exception("No se creó mensaje");
 		return Mensaje::get($id);
 	}
 
@@ -74,7 +79,9 @@ class Mensaje extends Database implements JsonSerializable {
 					$msg['chat_id'],
 					$msg['attachment_id'],
 					$msg['contenido'],
-					$msg['mime_type']
+					$msg['mime_type'],
+					$msg['height'],
+					$msg['width']
 				);
 		return $mensajes;
 	}
@@ -124,7 +131,9 @@ class Mensaje extends Database implements JsonSerializable {
 			'chat_id' => $this->chat_id,
 			'attachment_id' => $this->attachment_id,
 			'contenido' => $this->contenido,
-			'mime_type' => $this->mime_type
+			'mime_type' => $this->mime_type,
+			'height' => $this->height,
+			'width' => $this->width
 		];
 	}
 

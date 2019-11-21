@@ -199,7 +199,8 @@ abstract class View {
 
 	private static function errorMessage($mensaje) {
 		$replace = [
-			'{{MENSAJE}}' => $mensaje
+			'{{MENSAJE}}' => $mensaje,
+			'{{URL}}' => Helper::currentUrl()
 		];
 		return strtr(file_get_contents(HTML_DIR.'error.html'), $replace);
 	}

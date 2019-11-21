@@ -118,7 +118,9 @@ class Chat extends Database implements JsonSerializable {
 					   m.chat_id,
 					   m.attachment_id,
 					   m.contenido,
-					   a.mime_type
+					   a.mime_type,
+					   a.height,
+					   a.width
 				FROM mensaje m
 				LEFT JOIN usuario u
 				ON m.usuario_id = u.id
@@ -192,7 +194,9 @@ class Chat extends Database implements JsonSerializable {
 				   m.chat_id,
 				   m.attachment_id,
 				   m.contenido,
-				   a.mime_type
+				   a.mime_type,
+				   a.height,
+				   a.width
 			FROM mensaje m
 			LEFT JOIN usuario u
 			ON m.usuario_id = u.id
