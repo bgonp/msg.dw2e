@@ -1,6 +1,6 @@
 <?php
 
-class Usuario extends Database {
+class Usuario extends Database implements JsonSerializable {
 
 	private $id;
 	private $email;
@@ -329,6 +329,7 @@ class Usuario extends Database {
 			password = '{$this->password}',
 			avatar = '{$this->avatar}',
 			confirmado = '{$this->confirmado}',
+			admin = '{$this->admin}',
 			clave = '{$this->clave}',
 			caducidad = {$caducidad}
 			WHERE id = {$this->id}";
@@ -340,25 +341,12 @@ class Usuario extends Database {
 		return self::query($sql) !== false;
 	}
 
-	public function toArray($depth = 1) {
-		$usuario = [
+	public function jsonSerialize() {
+		return [
 			'id' => $this->id,
 			'email' => $this->email,
 			'nombre' => $this->nombre
 		];
-		if ($depth > 0) {
-			$depth--;
-			$usuario['chats'] = [];
-			$usuario['amigos'] = [];
-			$usuario['pendientes'] = [];
-			foreach ($this->chats() as $chat)
-				$usuario['chats'][] = $chat->toArray($depth);
-			foreach ($this->amigos() as $amigo)
-				$usuario['amigos'][] = $amigo->toArray($depth);
-			foreach ($this->pendientes() as $pendiente)
-				$usuario['pendientes'][] = $pendiente->toArray($depth);
-		}
-		return $usuario;
 	}
 
 	private static function hash($password) {

@@ -13,6 +13,11 @@ class MailController {
 		self::$mailer->addAddress($to);
 		return boolval(self::$mailer->send());
 	}
+
+	public static function test() {
+		self::init();
+		return boolval(self::$mailer->smtpConnect());
+	}
 	
 	private static function init() {
 		if (!self::$mailer) {

@@ -49,7 +49,7 @@ class Helper {
 	}
 
 	public static function uploadAttachment($attachment) {
-		if ($attachment['error'] || $attachment['size'] > Option::get('image_maxweight') * 1024 )
+		if ($attachment['error'] || $attachment['size'] > Option::get('attachment_maxweight') * 1024 )
 			return false;
 
 		return move_uploaded_file($attachment['tmp_name'], ATTACHMENT_DIR.$attachment['name']);

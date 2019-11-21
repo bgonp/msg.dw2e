@@ -7,18 +7,18 @@ var empty_chat, empty_friend, empty_request, empty_message, empty_member_txt, em
 
 $(document).ready(function() {
 
-	// Empty elements
-	empty_chat = $('#chats .empty-chat');
-	empty_friend = $('#friends .empty-friend');
-	empty_request = $('#requests .empty-request');
-	empty_message = $('#messages .empty-message');
-
 	// Lists
 	chats = $('#chats .chats-list');
 	friends = $('#friends .friends-list');
 	requests = $('#requests .requests-list');
 	messages = $('#messages .messages-list');
 	members_img = $('#messages .members-list');
+
+	// Empty elements
+	empty_chat = $('#chats .empty-chat');
+	empty_friend = $('#friends .empty-friend');
+	empty_request = $('#requests .empty-request');
+	empty_message = $('#messages .empty-message');
 	empty_member_img = members_img.find('.empty-member');
 
 	// Forms
@@ -81,7 +81,7 @@ function showAlert(type, message) {
 // PROCESS RESPONSE
 // ------------------
 function processResponse(response) {
-	// console.log(response); // TODO - A BORRAR
+	console.log(response); // TODO - A BORRAR
 	if (response.redirect)
 		location.href = response.redirect;
 	if (response.usuario_id && response.usuario_id != current_user)
@@ -300,6 +300,7 @@ function loadChat(chat_id) {
 		current_chat = parseInt(response.id);
 		last_read = parseInt(response.last_read);
 		active_chat.addClass('active');
+		$('#messages .btn-upload').show();
 		$('#send-message-form input[name="chat_id"]').val(current_chat);
 		$('#send-message-form input[name="mensaje"]').prop('disabled', false);
 		$('#send-message-form input[type="submit"]').prop('disabled', false);
@@ -313,11 +314,11 @@ function unloadChat() {
 	if (active_chat) active_chat.removeClass('active');
 	current_chat = 0;
 	active_chat = null;
+	$('#messages .btn-upload').hide();
 	$('#send-message-form input[name="chat_id"]').val(0);
 	$('#send-message-form input[name="mensaje"]').prop('disabled', true);
 	$('#send-message-form input[type="submit"]').prop('disabled', true);
 }
-
 
 // ------------------
 // ADD LISTENERS

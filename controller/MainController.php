@@ -89,9 +89,7 @@ class MainController {
 				$usuario->readChat($chat->id());
 				$response['messages'] = $messages;
 				if ($chat->newMembers()) {
-					$response['members'] = [];
-					foreach ($chat->usuarios() as $member)
-						$response['members'][] = $member->toArray(0);
+					$response['members'] = array_values($chat->usuarios());
 					$response['candidates'] = $chat->candidates($usuario->id());
 				}
 			}
@@ -208,7 +206,7 @@ class MainController {
 				}
 			}
 			if ($edited && $usuario->save())
-				$response = ['type' => 'success', 'message' => 'Perfil actualizado'.$note, 'userdata' => $usuario->toArray(0)];
+				$response = ['type' => 'success', 'message' => 'Perfil actualizado'.$note, 'userdata' => $usuario];
 			else
 				$response = ['type' => 'error', 'message' => Helper::error('profile_save')];
 		}
@@ -309,7 +307,9 @@ class MainController {
 			if (!($chat = $usuario->chats($post['chat_id']))) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_wrong')];
 			} else {
-				$response = $chat->toArray();
+				$response = $chat->jsonSerialize();
+				$response['messages'] = array_values($chat->mensajes());
+				$response['members'] = array_values($chat->usuarios());
 				$response['candidates'] = $chat->candidates($usuario->id());
 				$usuario->readChat($chat->id());
 			}
@@ -368,7 +368,10 @@ class MainController {
 		} else {
 			foreach ($post['options'] as $key => $value)
 				Option::update($key, $value);
-			$response = ['redirect' => Helper::currentUrl()];
+			if (Option::get('email_confirm') && !MailController::test())
+				$response = ['type' => 'error', 'message' => Helper::error('email_config')];
+			else
+				$response = ['redirect' => Helper::currentUrl()];
 		}
 		return $response;
 	}

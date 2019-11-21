@@ -1,6 +1,6 @@
 <?php
 
-class Mensaje extends Database {
+class Mensaje extends Database implements JsonSerializable {
 
 	private $id;
 	private $fecha;
@@ -103,25 +103,20 @@ class Mensaje extends Database {
 		return $this->chat_id;
 	}
 
+	public function attachment_id() {
+		return $this->attachment_id;
+	}
+
+	public function contenido() {
+		return $this->contenido = $contenido;
+	}
+
 	public function chat() {
 		return Chat::get($this->chat_id);
 	}
 
-	public function contenido($contenido = null) {
-		if (is_null($contenido)) return $this->contenido;
-		if( !($contenido = self::escape($contenido)) ) return false;
-		$this->contenido = $contenido;
-		return true;
-	}
-
-	public function save() {
-		$sql = "UPDATE usuario SET email = '{$this->email}', nombre = '{$this->nombre}', password = '{$this->password}' WHERE id = {$this->id}";
-		if (self::query($sql) === false) return false;
-		return true;
-	}
-
-	public function toArray($depth = 1) {
-		$mensaje = [
+	public function jsonSerialize() {
+		return [
 			'id' => $this->id,
 			'fecha' => $this->fecha,
 			'usuario_id' => $this->usuario_id,
@@ -129,14 +124,8 @@ class Mensaje extends Database {
 			'chat_id' => $this->chat_id,
 			'attachment_id' => $this->attachment_id,
 			'contenido' => $this->contenido,
-			'mime_type' => $this->mime_type,
+			'mime_type' => $this->mime_type
 		];
-		if ($depth > 0) {
-			$depth--;
-			$mensaje['chat'] = $this->chat()->toArray($depth);
-			$mensaje['usuario'] = $this->usuario()->toArray($depth);
-		}
-		return $mensaje;
 	}
 
 }

@@ -293,7 +293,7 @@ input[disabled] {
 	ALERT MSG
 */
 #alert-msg {
-	position: absolute;
+	position: fixed;
 	top: 0;
 	right: 0;
 	bottom: 0;
@@ -897,6 +897,7 @@ input[disabled] {
 	text-align: center;
 	display: inline-block;
 	color: #FFFFFF;
+	z-index: 5;
 	background: var(--main);
 }
 #messages .messages-list .a-message.propio .attachment i {

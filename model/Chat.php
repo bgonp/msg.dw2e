@@ -1,6 +1,6 @@
 <?php
 
-class Chat extends Database {
+class Chat extends Database implements JsonSerializable {
 	
 	private $id;
 	private $fecha;
@@ -216,24 +216,14 @@ class Chat extends Database {
 		return $this->new_members;
 	}
 
-	public function toArray($depth = 1){
-		$chat = [
+	public function jsonSerialize() {
+		return [
 			'id' => $this->id,
 			'fecha' => $this->fecha,
 			'nombre' => $this->nombre,
 			'last_msg' => $this->last_msg,
 			'last_read' => $this->last_read
 		];
-		if ($depth > 0) {
-			$depth--;
-			$chat['messages'] = [];
-			$chat['members'] = [];
-			foreach ($this->mensajes() as $mensaje)
-				$chat['messages'][] = $mensaje->toArray($depth);
-			foreach ($this->usuarios() as $usuario)
-				$chat['members'][] = $usuario->toArray($depth);
-		}
-		return $chat;
 	}
 
 }
