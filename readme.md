@@ -11,7 +11,7 @@
 
 ## Description
 
-An instant messaging single page application to talk about topics in chat rooms with other people.
+An instant messaging single page application to talk about topics in chat rooms with other people. This project has been done as an assignment of Server Side Programming module.
 
 ## Features
 
@@ -21,7 +21,7 @@ An instant messaging single page application to talk about topics in chat rooms 
 - Request friendship to other users with their e-mails.
 - Create chat rooms and add some of your friends.
 - Send messages to chat rooms with other(s) user(s).
-- Messages can contain attachment file or images.
+- Messages can contain attachment files or images.
 - You can accept or decline friendship or block a friend.
 - You can send messages to non-friends users if your are in the same chat room (but you can't see their avatars).
 - You can modify your profile: name, e-mail, password and avatar.
