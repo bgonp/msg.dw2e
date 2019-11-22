@@ -57,7 +57,7 @@ class Mensaje extends Database implements JsonSerializable {
 	public static function new($usuario_id, $chat_id, $contenido, $attachment = false) {
 		$usuario_id = $usuario_id == 0 ? 'NULL' : intval($usuario_id);
 		$chat_id = intval($chat_id);
-		$attachment_id = $attachment && !$attachment['error'] ? Attachment::new($attachment)->id() : 'NULL';
+		$attachment_id = $attachment && $attachment['error'] != 4 ? Attachment::new($attachment)->id() : 'NULL';
 		$contenido = self::escape($contenido);
 		if (empty($chat_id) || empty($contenido)) throw new Exception("No se creó mensaje");
 		$sql = "INSERT INTO mensaje (usuario_id, chat_id, attachment_id, contenido)

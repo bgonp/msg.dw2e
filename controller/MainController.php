@@ -1,9 +1,6 @@
 <?php
-
 class MainController {
-
 	private const UNLOGGED_ACTIONS = ['login', 'register', 'resetSend', 'recover', 'resetPassword', 'installApp'];
-
 	public static function ajax() {
 		if ($_SERVER["REQUEST_METHOD"] === 'POST') {
 			header('Content-Type: application/json');
@@ -26,7 +23,6 @@ class MainController {
 			die();
 		}
 	}
-
 	public static function main() {
 		try {
 			if (!Database::connect()) {
@@ -51,7 +47,6 @@ class MainController {
 			View::error($ex->getMessage(), Option::get());
 		}
 	}
-
 	// ------------------------
 	// Funciones por get
 	// ------------------------
@@ -65,7 +60,6 @@ class MainController {
 		}
 		View::error(Helper::error('key_check'), Option::get());
 	}
-
 	private static function confirm($get) {
 		if (!empty($_GET['id']) && !empty($_GET['key'])) {
 			$usuario = Usuario::get($_GET['id']);
@@ -77,7 +71,6 @@ class MainController {
 		}
 		View::error(Helper::error('user_confirm'), Option::get());
 	}
-
 	// ------------------------
 	// Funciones de update
 	// ------------------------
@@ -104,7 +97,6 @@ class MainController {
 		}
 		return $response;
 	}
-
 	// ------------------------
 	// Funciones de usuario
 	// ------------------------
@@ -118,12 +110,10 @@ class MainController {
 		}
 		return $response;
 	}
-
 	private static function logout($post, $files) {
 		SessionController::logout();
 		return ['redirect' => Helper::currentUrl()];
 	}
-
 	private static function register($post, $files) {
 		if (empty($post['email']) || empty($post['nombre']) || empty($post['password']) || empty($post['password_rep'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
@@ -147,7 +137,6 @@ class MainController {
 		}
 		return $response;
 	}
-
 	private static function resetSend($post, $files) {
 		if (!Option::get('email_confirm')) {
 			$response = ['type' => 'error', 'message' => Helper::error('conf_error')];
@@ -164,7 +153,6 @@ class MainController {
 		}
 		return $response;
 	}
-
 	private static function resetPassword($post, $files) {
 		if ($post['password'] !== $post['password_rep']) {
 			$response = ['type' => 'error', 'message' => Helper::error('pass_diff')];
@@ -180,7 +168,6 @@ class MainController {
 		}
 		return $response;
 	}
-
 	private static function editProfile($post, $files) {
 		if (empty($post['email']) || empty($post['name']) || !isset($post['password']) || !isset($post['password_rep'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
@@ -196,7 +183,7 @@ class MainController {
 				$edited = $usuario->nombre($post['name']) || $edited;
 			if (!empty($post['password']))
 				$edited = $usuario->password($post['password']) || $edited;
-			if (!$files['avatar']['error'])
+			if ($files['avatar']['error'] != 4)
 				$edited = $usuario->avatar($files['avatar']) || $edited;
 			if ($new_email && Option::get('email_confirm')) {
 				$email = View::emailConfirm($usuario);
@@ -212,7 +199,6 @@ class MainController {
 		}
 		return $response;
 	}
-
 	// ------------------------
 	// Funciones de amigos
 	// ------------------------
@@ -225,7 +211,6 @@ class MainController {
 		$response['last_contact_upd'] = $usuario->lastContactUpd();
 		return $response;
 	}
-
 	private static function acceptFriend($post, $files) {
 		$usuario = Usuario::get(SessionController::usuarioId());
 		$usuario->updateContacto($post['contact_id'], Helper::ACEPTADO);
@@ -235,7 +220,6 @@ class MainController {
 		$response['last_contact_upd'] = $usuario->lastContactUpd();
 		return $response;
 	}
-
 	private static function rejectFriend($post, $files) {
 		$usuario = Usuario::get(SessionController::usuarioId());
 		$usuario->updateContacto($post['contact_id'], Helper::RECHAZADO);
@@ -245,7 +229,6 @@ class MainController {
 		$response['last_contact_upd'] = $usuario->lastContactUpd();
 		return $response;
 	}
-
 	private static function blockFriend($post, $files) {
 		$usuario = Usuario::get(SessionController::usuarioId());
 		$usuario->updateContacto($post['contact_id'], Helper::BLOQUEADO);
@@ -255,7 +238,6 @@ class MainController {
 		$response['last_contact_upd'] = $usuario->lastContactUpd();
 		return $response;
 	}
-
 	// ------------------------
 	// Funciones de chats
 	// ------------------------
@@ -283,7 +265,6 @@ class MainController {
 		}
 		return $response;
 	}
-
 	private static function leaveChat($post, $files) {
 		if (empty($post['chat_id'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
@@ -298,7 +279,6 @@ class MainController {
 		}
 		return $response;
 	}
-
 	private static function loadChat($post, $files) {
 		if (empty($post['chat_id'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
@@ -316,7 +296,6 @@ class MainController {
 		}
 		return $response;
 	}
-
 	private static function addMember($post, $files) {
 		if (empty($post['chat_id']) || empty($post['contact_id'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
@@ -334,7 +313,6 @@ class MainController {
 		}
 		return $response;
 	}
-
 	// ------------------------
 	// Funciones de mensajes
 	// ------------------------
@@ -356,7 +334,6 @@ class MainController {
 		}
 		return $response;
 	}
-
 	// ------------------------
 	// Funciones de configuración
 	// ------------------------
@@ -375,7 +352,6 @@ class MainController {
 		}
 		return $response;
 	}
-
 	private static function installApp($post, $files) {
 		if (Database::connect() || Install::run($post)) {
 			$response = ['redirect' => Helper::currentUrl()];
@@ -384,5 +360,4 @@ class MainController {
 		}
 		return $response;
 	}
-
 }

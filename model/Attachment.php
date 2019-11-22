@@ -50,7 +50,10 @@ class Attachment extends Database {
 			throw new Exception("No se pudo subir el archivo");
 		$sql = "INSERT INTO attachment (mime_type, height, width, filename)
 				VALUES ('$mime_type', {$fileinfo['height']}, {$fileinfo['width']}, '{$fileinfo['name']}')";
-		if (!self::query($sql) || !($id = self::insertId())) throw new Exception("No se creó el attachment");
+		if (!self::query($sql) || !($id = self::insertId())) {
+			Helper::removeAttachment($fileinfo['name']);
+			throw new Exception("No se creó el attachment");
+		}
 		return Attachment::get($id);		
 	}
 

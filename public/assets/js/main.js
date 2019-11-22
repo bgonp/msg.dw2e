@@ -216,11 +216,12 @@ function putMessage(messages_list) {
 		let btn_file = message_dom.find('.attachment');
 		btn_file.show().attr('href','attachment.php?id='+message.attachment_id);
 		if (message.mime_type.indexOf('image/') === 0) {
-			let preview = btn_file.find('.preview')
+			let ratio = message.height/message.width;
+			let width = ratio*message.width > 300 ? 300/ratio : message.width;
 			btn_file.addClass('type-image');
-			preview.attr('src','attachment.php?id='+message.attachment_id);
-			preview.attr('height', message.height);
-			preview.attr('width', message.width);
+			btn_file.css('width', width+'px');
+			btn_file.find('.preview').attr('src','attachment.php?id='+message.attachment_id);
+			btn_file.find('.reserve').css('padding-bottom', ratio*100+'%');
 		}
 	}
 	if (!message.usuario_id) message_dom.addClass('aviso');

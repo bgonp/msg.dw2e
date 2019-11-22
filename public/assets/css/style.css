@@ -885,6 +885,11 @@ input[disabled] {
 }
 #messages .messages-list .a-message .attachment {
 	display: block;
+	max-width: 100%;
+}
+#messages .messages-list .a-message .attachment.type-image {
+	position: relative;
+	margin: 10px auto;
 }
 #messages .messages-list .a-message .attachment i {
 	position: absolute;
@@ -905,9 +910,10 @@ input[disabled] {
 	right: initial;
 }
 #messages .messages-list .a-message .attachment .preview {
-	max-width: 100%;
-	max-height: 300px;
-	margin: 10px auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
 }
 #messages .messages-list .a-message .attachment:not(.type-image) .preview,
 #messages .messages-list .a-message .attachment.type-image i {

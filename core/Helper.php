@@ -48,18 +48,21 @@ class Helper {
 		return $filename;
 	}
 
+	public static function removeImagen($filename) {
+		$pattern = "/^[a-zA-Z0-9]{16}\.(?:png|jpg|jpeg|gif)$/";
+		if (!preg_match($pattern, $filename) || !file_exists(AVATAR_DIR.$filename)) return false;
+		return unlink(AVATAR_DIR.$filename);
+	}
+
 	public static function uploadAttachment($attachment) {
 		if ($attachment['error'] || $attachment['size'] > Option::get('attachment_maxweight') * 1024 )
 			return false;
-
 		while (file_exists(ATTACHMENT_DIR.$attachment['name']))
 			$attachment['name'] = 'cp_'.$attachment['name'];
 		if (!move_uploaded_file($attachment['tmp_name'], ATTACHMENT_DIR.$attachment['name']))
 			return false;
-
 		if (explode('/', $attachment['type'])[0] != 'image')
 			return true;
-
 		$imagesize = getimagesize(ATTACHMENT_DIR.$attachment['name']);
 		return [
 			'name' => $attachment['name'],
@@ -68,10 +71,9 @@ class Helper {
 		];
 	}
 
-	public static function removeImagen($imagen) {
-		$pattern = "/^[a-zA-Z0-9]{16}\.(?:png|jpg|jpeg|gif)$/";
-		if (!preg_match($pattern, $imagen) || !file_exists(AVATAR_DIR.$imagen)) return false;
-		return unlink(AVATAR_DIR.$imagen);
+	public static function removeAttachment($filename) {
+		if (!file_exists(ATTACHMENT_DIR.$filename)) return false;
+		return unlink(ATTACHMENT_DIR.$filename);
 	}
 
 	public static function randomString($length) {

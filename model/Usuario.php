@@ -59,7 +59,7 @@ class Usuario extends Database implements JsonSerializable {
 		if (!Helper::validEmail($email) || !($email = self::escape($email))) throw new Exception("E-mail no válido");
 		if (!Helper::validNombre($nombre) || !($nombre = self::escape($nombre))) throw new Exception("Nombre no válido");
 		if (!Helper::validPassword($password)) throw new Exception("Contraseña no válida");
-		if (!$avatar || $avatar['error']) $avatar = '';
+		if (!$avatar || $avatar['error'] == 4) $avatar = '';
 		else if (!($avatar = Helper::uploadImagen($avatar))) throw new Exception("Avatar no válido");
 		$password = self::hash($password);
 		$sql = "
