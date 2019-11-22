@@ -136,15 +136,13 @@ abstract class View {
 			'{{AMIGOS}}' => "",
 			'{{PENDIENTES}}' => ""
 		];
-		foreach ($chats as $chat) {
+		foreach ($chats as $chat)
 			$replace['{{CHATS}}'] .= self::chat($chat);
-		}
-		foreach ($amigos as $amigo) {
+		foreach ($amigos as $amigo)
 			$replace['{{AMIGOS}}'] .= self::amigo($amigo);
-		}
-		foreach ($pendientes as $pendiente) {
+		foreach ($pendientes as $pendiente)
 			$replace['{{PENDIENTES}}'] .= self::pendiente($pendiente);
-		}
+		$replace['{{NEWREQUESTS}}'] = $replace['{{PENDIENTES}}'] ? ' new' : '';
 		return strtr(file_get_contents(HTML_DIR.'sidebar.html'), $replace);
 	}
 	
