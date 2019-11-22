@@ -34,9 +34,9 @@ An instant messaging single page application to talk about topics in chat rooms 
 
 ## Installation
 
-- Create in your server a MySQL database with an user who can use it.
+- Create in your server a MySQL database with a user who can use it.
 - In the target folder clone this project `$ git clone https://github.com/bgonp/msg.dw2e.git .`
-- Ensure the folders `upload/attachment` and `upload/avatar` have write permissions.
+- Ensure the folders `config/` `upload/attachment/` and `upload/avatar/` have write permissions.
 - Install needed packages `$ composer install`
 - Visit the url where the app has been installed to see the installation menu.
 - Here you have to introduce your e-mail and password in order to create the admin user.
@@ -60,7 +60,7 @@ The admin user can modify some settings from the control panel:
 
 #### Register
 - Click on `Registration` tab.
-- Write here your name, e-mail and password (twice). Optionally, you can also upload an avatar.
+- Enter your name, e-mail and password (twice). Optionally, you can also upload an avatar.
 - If e-mail confirmation is enabled, you will receive an email with a button to confirm your account.
 - If not, you will be automaticly logged in.
 
