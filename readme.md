@@ -1,86 +1,50 @@
----
-GET
----
+# DW2E Instant Messaging System
 
-recover (id, key)
-confirm (id, key)
+## Description
 
-----
-POST
-----
+An instant messaging single page application to talk about topics in chat rooms with other people.
 
-update (chat_id, last_received, last_read, last_contact_upd)
-	redirect
-	usuario_id
-	focus
-	userdata
-	chats
-	messages
-	friends
-	requests
-	members
-	last_contact_upd
+## Features
 
-login (email, password)
-	redirect
+- Access the application with your e-mail and password.
+- If you don't have an account, you can create it. E-mail verification needed (disabled by default).
+- If you don't remember your password, you can reset it by e-mail (disabled by default).
+- Request friendship to other users with their e-mails.
+- Create chat rooms and add some of your friends.
+- Send messages to chat rooms with other(s) user(s).
+- Messages can contain attachment file or images.
+- You can accept or decline friendship or block a friend.
+- You can send messages to non-friends users if your are in the same chat room (but you can't see their avatars).
+- You can modify your profile: name, e-mail, password and avatar.
 
-logout ()
-	redirect
+## Settings
 
-register (email, nombre, password, password_rep, avatar)
-	redirect
+The admin user can modify some settings from the control panel:
 
-resetSend (email)
+- Password requisites with a regex for security reasons.
+- Name of users and chats requisites with a regex.
+- E-mail conditions with a regex to, for example, limit registration to a certain domain.
+- Colors of the app (main color, background and borders color).
+- Max file size of avatars and messages attachments
+- Enable e-mail confirmation at register and set e-mail credentials.
 
-resetPassword (id, key, password, password_rep)
-	redirect
+## Requeriments
 
-editProfile (email, name, password, password_rep, avatar)
-	userdata
+- PHP >= 7.2
+- Composer
+- MySQL
 
-requestFriend (email, last_contact_upd)
-	friends
-	requests
-	last_contact_upd
-	
-acceptFriend (contact_id, last_contact_upd)
-	friends
-	requests
-	last_contact_upd
+## Installation
 
-rejectFriend (contact_id)
-	friends
-	requests
-	last_contact_upd
+- Create in your server a MySQL database with an user who can use it.
+- In the target folder do `$ git clone https://github.com/bgonp/msg.dw2e.git .`
+- Ensure the folders `upload/attachment` and `upload/avatar` have write permissions.
+- Install needed packages `$ composer install`
+- Visit the url where the app has been installed and you can see the installation menu.
+- Here you have to introduce your e-mail and password in order to create the admin user.
+- In addition you need to introduce the information to access the database.
+- Once you saved this data, you can access the admin panel through your email and password.
+- In the admin panel you can configure more settings, like enable e-mail confirmation register.
+- **That's all**. Now people can sign up and use the app.
 
-blockFriend (contact_id)
-	friends
-	requests
-	last_contact_upd
-
-createChat (name, members[], last_received)
-	chats
-
-leaveChat (chat_id)
-
-loadChat (chat_id)
-	id
-	fecha
-	nombre
-	last_msg
-	last_read
-	messages
-	members
-	candidates
-
-addMember (chat_id, contact_id)
-	members
-
-sendMessage (chat_id, mensaje, last_read)
-	messages
-
-updateOptions (options[])
-	redirect
-
-installApp (email, password, password_rep, host, name, user, pass)
-	redirect
+## Usage
