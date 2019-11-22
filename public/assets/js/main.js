@@ -1,7 +1,7 @@
 var update_interval = 500, replied = false, busy = false;
 var current_user, last_received, last_contact_upd, current_chat = 0, last_read = 0;
 
-var tabs_buttons, tabs_contents, alert_msg, loading;
+var tabs_buttons, tabs_contents, alert_msg, loading, upload_attachment;
 var chats, active_chat, candidates, friends, requests, messages, members_txt, members_img;
 var empty_chat, empty_friend, empty_request, empty_message, empty_member_txt, empty_member_img;
 
@@ -65,6 +65,15 @@ $(document).ready(function() {
 		$(this).siblings('input[type="file"]').click();
 	});
 
+	// Upload attachment
+	upload_attachment = $('#messages input[type="file"]');
+	upload_attachment.change(function() {
+		if (upload_attachment.val())
+			upload_attachment.siblings('.btn-upload').removeClass('empty');
+		else
+			upload_attachment.siblings('.btn-upload').addClass('empty');
+	});
+
 });
 
 // ------------------
@@ -81,7 +90,7 @@ function showAlert(type, message) {
 // PROCESS RESPONSE
 // ------------------
 function processResponse(response) {
-	console.log(response); // TODO - A BORRAR
+	// console.log(response); // TODO - A BORRAR
 	if (response.redirect)
 		location.href = response.redirect;
 	if (response.usuario_id && response.usuario_id != current_user)
@@ -143,7 +152,6 @@ function updateChats(chats_list) {
 function updateMessages(messages_list) {
 	last_read = putMessage(messages_list);
 	messages.scrollTop(messages[0].scrollHeight);
-	//setTimeout( function() { messages.scrollTop(messages[0].scrollHeight); }, 250);
 }
 
 function updateFriends(friends_list) {
@@ -319,6 +327,7 @@ function unloadChat() {
 	current_chat = 0;
 	active_chat = null;
 	$('#messages .btn-upload').hide();
+	upload_attachment.val('').change();
 	$('#send-message-form input[name="chat_id"]').val(0);
 	$('#send-message-form input[name="mensaje"]').prop('disabled', true);
 	$('#send-message-form input[type="submit"]').prop('disabled', true);
@@ -376,6 +385,7 @@ function formSubmit(form) {
 					form[0].reset();
 				if (formData.get('action') == 'sendMessage') {
 					replied = true;
+					upload_attachment.change();
 					$('.a-message.nuevo').removeClass('nuevo');
 				}
 			}
