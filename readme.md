@@ -1,6 +1,12 @@
 # DW2E Instant Messaging System
 
-[TOC]
+### Table of contents
+[Description](#Description)
+[Features](#Features)
+[Requeriments](#Requeriments)
+[Installation](#Installation)
+[Settings](#Settings)
+[Usage](#Usage)
 
 ## Description
 
