@@ -1,5 +1,7 @@
 # DW2E Instant Messaging System
 
+[TOC]
+
 ## Description
 
 An instant messaging single page application to talk about topics in chat rooms with other people.
@@ -17,6 +19,25 @@ An instant messaging single page application to talk about topics in chat rooms 
 - You can send messages to non-friends users if your are in the same chat room (but you can't see their avatars).
 - You can modify your profile: name, e-mail, password and avatar.
 
+## Requeriments
+
+- PHP >= 7.2
+- Composer
+- MySQL
+
+## Installation
+
+- Create in your server a MySQL database with an user who can use it.
+- In the target folder clone this project `$ git clone https://github.com/bgonp/msg.dw2e.git .`
+- Ensure the folders `upload/attachment` and `upload/avatar` have write permissions.
+- Install needed packages `$ composer install`
+- Visit the url where the app has been installed to see the installation menu.
+- Here you have to introduce your e-mail and password in order to create the admin user.
+- In addition you need to introduce the information to access the database.
+- Once you saved this data, you can access the admin panel through your email and password.
+- In the admin panel you can configure more settings (see [settings](#Settings) section).
+- **That's all**. Now people can sign up and use the app.
+
 ## Settings
 
 The admin user can modify some settings from the control panel:
@@ -27,24 +48,5 @@ The admin user can modify some settings from the control panel:
 - Colors of the app (main color, background and borders color).
 - Max file size of avatars and messages attachments
 - Enable e-mail confirmation at register and set e-mail credentials.
-
-## Requeriments
-
-- PHP >= 7.2
-- Composer
-- MySQL
-
-## Installation
-
-- Create in your server a MySQL database with an user who can use it.
-- In the target folder do `$ git clone https://github.com/bgonp/msg.dw2e.git .`
-- Ensure the folders `upload/attachment` and `upload/avatar` have write permissions.
-- Install needed packages `$ composer install`
-- Visit the url where the app has been installed and you can see the installation menu.
-- Here you have to introduce your e-mail and password in order to create the admin user.
-- In addition you need to introduce the information to access the database.
-- Once you saved this data, you can access the admin panel through your email and password.
-- In the admin panel you can configure more settings, like enable e-mail confirmation register.
-- **That's all**. Now people can sign up and use the app.
 
 ## Usage
