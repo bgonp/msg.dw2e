@@ -1,12 +1,13 @@
 # DW2E Instant Messaging System
 
 ### Table of contents
-[Description](#Description)
-[Features](#Features)
-[Requeriments](#Requeriments)
-[Installation](#Installation)
-[Settings](#Settings)
-[Usage](#Usage)
+- [Description](#Description)
+- [Features](#Features)
+- [Requeriments](#Requeriments)
+- [Installation](#Installation)
+- [Settings](#Settings)
+- [Usage](#Usage)
+
 
 ## Description
 
@@ -56,3 +57,40 @@ The admin user can modify some settings from the control panel:
 - Enable e-mail confirmation at register and set e-mail credentials.
 
 ## Usage
+
+#### Register
+- Click on `Registration` tab.
+- Write here your name, e-mail and password (twice). Optionally, you can also upload an avatar.
+- If e-mail confirmation is enabled, you will receive an email with a button to confirm your account.
+- If not, you will be automaticly logged in.
+
+#### Login
+- Simply write your e-mail and password in the `Login` box.
+- If you don't remember your password you can request a new one by clicking on the link below password box. This functionality will be available only if e-mail confirm option is enabled (see [settings](#Settings) section).
+
+#### Logout
+- Simply click on `Logout` button in the upper menu and confirm.
+
+#### Profile
+- In the upper menu, you can click on `My profile` button to edit your personal info.
+- If you change your e-mail and e-mail confirm option is enabled, you will have to re-confirm your account. Otherwise you won't be able to login again once you logout.
+
+#### Friends
+- In the left sidebar, click  on `Friends` tab button to see your friends list.
+- Here you can request friendship with someone by introducing your friend's e-mail and clicking on `Add` button.
+- In the left sidebar, click on `Requests` tab button to see your received friendship requests.
+- If someone requests your friendship here you can `Accept` or `Decline` it.
+- Once you accept a request or someone accept your request, you can see this friend in the friends-list.
+- If you want to block a friend, click on the forbidden icon at the bottom-right corner of your friend box. A blocked friend won't be able to send you friendship requests or create chat rooms with you. But you will continue receiving their message in any chat room already created with both of you.
+
+#### Chats
+- If you want to create a chat room you first must select one or more friends in your friends list by clicking on the checkbox of each one. Then you have to introduce in the inbox below the new chat room name and click on `New chat` button.
+- You will be redirected to chats list and here you can see the new chat room. Click on it and you can start writing here.
+- If you want to add a friend to the current chat room, select him it in the `Add a friend...` box and click on the `+` icon.
+- If you want to leave a chat room, click on the forbidden icon at the right of the chat room and confirm.
+
+#### Messages
+- Once you are in a chat room you can see at the left who are in this room and will be able to see all the messages here. Also, you can see their avatars in the upper side of the messages section (if someone in the room is not your friend, you won't see his avatar, but you can see his messages and viceversa).
+- To write a message simply write it in the text box below and click on `Send` button. Max 1000 characters.
+- Addionally, you can attach a file to your message by clicking on the paperclip button. If this file is an image you will see a preview of it once you send the message. If it isn't an image, you will see an icon in your message to download the file.
+- You can't upload a file if you don't write anything in the message box. A message text will be always needed.
