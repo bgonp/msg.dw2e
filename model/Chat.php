@@ -3,18 +3,18 @@
 class Chat extends Database implements JsonSerializable {
 	
 	private $id;
-	private $fecha;
-	private $nombre;
-	private $mensajes;
-	private $usuarios;
+	private $date;
+	private $name;
+	private $messages;
+	private $users;
 	private $last_msg;
 	private $last_read;
 	private $new_members;
 
-	private function __construct($id, $fecha, $nombre, $last_msg = 0, $last_read = 0){
+	private function __construct($id, $date, $name, $last_msg = 0, $last_read = 0){
 		$this->id = $id;
-		$this->fecha = $fecha;
-		$this->nombre = $nombre;
+		$this->date = $date;
+		$this->name = $name;
 		$this->last_msg = $last_msg ?? 0;
 		$this->last_read = $last_read ?? 0;
 		$this->new_members = false;
@@ -24,22 +24,22 @@ class Chat extends Database implements JsonSerializable {
 		if (!($id = intval($id))) throw new Exception("ID de chat inválido");
 		$sql = "
 			SELECT c.id,
-				   c.fecha,
-				   c.nombre,
+				   c.date,
+				   c.name,
 				   MAX(m.id) last_msg
 			FROM chat c
-			LEFT JOIN mensaje m ON c.id = m.chat_id
+			LEFT JOIN message m ON c.id = m.chat_id
 			WHERE c.id = $id
 			GROUP BY c.id";
 		$chat_db = self::query($sql);
 		if (!$chat_db || $chat_db->num_rows == 0) throw new Exception("No existe chat");
 		$chat = $chat_db->fetch_assoc();
-		return new Chat($chat['id'], $chat['fecha'], $chat['nombre'], $chat['last_msg']);
+		return new Chat($chat['id'], $chat['date'], $chat['name'], $chat['last_msg']);
 	}
 
-	public static function new($nombre = "") {
-		if (!Helper::validNombre($nombre) || !($nombre = self::escape($nombre))) throw new Exception("Nombre no válido");
-		$sql = "INSERT INTO chat (nombre) VALUES ('$nombre')";
+	public static function new($name = "") {
+		if (!Helper::validName($name) || !($name = self::escape($name))) throw new Exception("Name no válido");
+		$sql = "INSERT INTO chat (name) VALUES ('$name')";
 		self::query($sql);
 		if (!($id = self::insertId())) throw new Exception("No se creó chat");
 		return Chat::get($id);
@@ -51,52 +51,52 @@ class Chat extends Database implements JsonSerializable {
 			while ($chat = $result_set->fetch_assoc())
 				$chats[$chat['id']] = new Chat(
 					$chat['id'],
-					$chat['fecha'],
-					$chat['nombre'],
+					$chat['date'],
+					$chat['name'],
 					$chat['last_msg'],
 					$chat['last_read']
 				);
 		return $chats;
 	}
 
-	public function addUsuario($usuario) {
-		if (is_numeric($usuario)) $usuario = Usuario::get($usuario);
-		if (!is_object($usuario) || get_class($usuario) != 'Usuario') return false;
-		$sql = "INSERT INTO participa (chat_id, usuario_id) VALUES ({$this->id}, {$usuario->id()})";
+	public function addUser($user) {
+		if (is_numeric($user)) $user = User::get($user);
+		if (!is_object($user) || get_class($user) != 'User') return false;
+		$sql = "INSERT INTO participate (chat_id, user_id) VALUES ({$this->id}, {$user->id()})";
 		if (!self::query($sql)) return false;
-		$this->addMensaje(0, $usuario->nombre().' joins the chat');
-		$this->usuarios = null;
+		$this->addMessage(0, $user->name().' joins the chat');
+		$this->users = null;
 		return true;
 	}
 
-	public function removeUsuario($usuario) {
-		if (!is_object($usuario) || get_class($usuario) != 'Usuario') return false;
-		$sql = "DELETE FROM participa WHERE chat_id = {$this->id} AND usuario_id = {$usuario->id()}";
+	public function removeUser($user) {
+		if (!is_object($user) || get_class($user) != 'User') return false;
+		$sql = "DELETE FROM participate WHERE chat_id = {$this->id} AND user_id = {$user->id()}";
 		if (!self::query($sql)) return false;
-		$this->addMensaje(0, $usuario->nombre().' leaves the chat');
-		$this->usuarios = null;
+		$this->addMessage(0, $user->name().' leaves the chat');
+		$this->users = null;
 		return true;
 	}
 
-	public function addMensaje($usuario_id, $mensaje, $file = false) {
-		if ($usuario_id > 0 && !$this->usuarios($usuario_id)) return false;
-		if (!($mensaje = Mensaje::new($usuario_id, $this->id, $mensaje, $file))) return false;
-		$this->mensajes = null;
-		return $mensaje;
+	public function addMessage($user_id, $message, $file = false) {
+		if ($user_id > 0 && !$this->users($user_id)) return false;
+		if (!($message = Message::new($user_id, $this->id, $message, $file))) return false;
+		$this->messages = null;
+		return $message;
 	}
 
 	public function id(){
 		return $this->id;
 	}
 
-	public function fecha(){
-		return $this->fecha;
+	public function date(){
+		return $this->date;
 	}
 
-	public function nombre($nombre = null){
-		if (is_null($nombre)) return $this->nombre;
-		if (!Helper::validNombre($nombre) || !($nombre = self::escape($nombre))) return false;
-		$this->nombre = $nombre;
+	public function name($name = null){
+		if (is_null($name)) return $this->name;
+		if (!Helper::validName($name) || !($name = self::escape($name))) return false;
+		$this->name = $name;
 		return true;
 	}
 
@@ -108,70 +108,70 @@ class Chat extends Database implements JsonSerializable {
 		return $this->last_msg > $this->last_read;
 	}
 
-	public function mensajes(){
-		if (!is_array($this->mensajes)){
+	public function messages(){
+		if (!is_array($this->messages)){
 			$sql = "
 				SELECT m.id,
-					   DATE_FORMAT(m.fecha, '%H:%i %d/%m/%Y') fecha,
-					   m.usuario_id,
-					   u.nombre usuario_nombre,
+					   DATE_FORMAT(m.date, '%H:%i %d/%m/%Y') date,
+					   m.user_id,
+					   u.name user_name,
 					   m.chat_id,
 					   m.attachment_id,
-					   m.contenido,
+					   m.content,
 					   a.mime_type,
 					   a.height,
 					   a.width
-				FROM mensaje m
-				LEFT JOIN usuario u
-				ON m.usuario_id = u.id
+				FROM message m
+				LEFT JOIN user u
+				ON m.user_id = u.id
 				LEFT JOIN attachment a
 				ON m.attachment_id = a.id
 				WHERE m.chat_id = {$this->id}
 				ORDER BY m.id DESC
 				LIMIT 100";
 			$result = self::query($sql);
-			$this->mensajes = Mensaje::list($result);
+			$this->messages = Message::list($result);
 		}
-		return $this->mensajes;
+		return $this->messages;
 	}
 
-	public function usuarios( $usuario_id = null){
-		if (!is_array($this->usuarios)){
+	public function users( $user_id = null){
+		if (!is_array($this->users)){
 			$sql = "
 				SELECT u.id,
 					   u.email,
-					   u.nombre,
+					   u.name,
 					   u.password,
 					   u.avatar
-				FROM usuario u
-				LEFT JOIN participa p
-				ON u.id = p.usuario_id
+				FROM user u
+				LEFT JOIN participate p
+				ON u.id = p.user_id
 				WHERE p.chat_id = {$this->id}
-				ORDER BY u.nombre ASC";
+				ORDER BY u.name ASC";
 			$result = self::query($sql);
-			$this->usuarios = Usuario::list($result);
+			$this->users = User::list($result);
 		}
-		if (is_null($usuario_id)) return $this->usuarios;
-		return $this->usuarios[$usuario_id] ?? false;
+		if (is_null($user_id)) return $this->users;
+		return $this->users[$user_id] ?? false;
 	}
 
-	public function candidates($usuario_id) {
-		$estado = Helper::ACEPTADO;
+	public function candidates($user_id) {
+		$state = Helper::ACCEPTED;
 		$sql = "
 			SELECT u.id,
 				   u.email,
-				   u.nombre,
+				   u.name,
 				   u.password,
 				   u.avatar
-			FROM usuario u
-			INNER JOIN contacto c
-			ON (u.id = c.usuario_1_id AND c.usuario_2_id = $usuario_id)
-			OR (u.id = c.usuario_2_id AND c.usuario_1_id = $usuario_id)
-			LEFT JOIN participa p
-			ON u.id = p.usuario_id AND p.chat_id = {$this->id}
-			WHERE p.usuario_id IS NULL
-			AND c.estado = $estado
-			ORDER BY u.nombre ASC";
+			FROM user u
+			INNER JOIN contact c
+			ON (u.id = c.user_1_id AND c.user_2_id = $user_id)
+			OR (u.id = c.user_2_id AND c.user_1_id = $user_id)
+			LEFT JOIN participate p
+			ON u.id = p.user_id AND p.chat_id = {$this->id}
+			WHERE p.user_id IS NULL
+			AND c.state = $state
+			ORDER BY u.name ASC";
 		$result = self::query($sql);
 		return $result->fetch_all(MYSQLI_ASSOC);
 	}
@@ -179,7 +179,7 @@ class Chat extends Database implements JsonSerializable {
 	public function save() {
 		$sql = "
 			UPDATE chat SET
-			nombre = '{$this->nombre}'
+			name = '{$this->name}'
 			WHERE id = {$this->id}";
 		if (self::query($sql) === false) return false;
 		return true;
@@ -188,18 +188,18 @@ class Chat extends Database implements JsonSerializable {
 	public function newMessages($last_id) {
 		$sql = "
 			SELECT m.id,
-				   DATE_FORMAT(m.fecha, '%H:%i %d/%m/%Y') fecha,
-				   m.usuario_id,
-				   u.nombre usuario_nombre,
+				   DATE_FORMAT(m.date, '%H:%i %d/%m/%Y') 'date',
+				   m.user_id,
+				   u.name user_name,
 				   m.chat_id,
 				   m.attachment_id,
-				   m.contenido,
+				   m.content,
 				   a.mime_type,
 				   a.height,
 				   a.width
-			FROM mensaje m
-			LEFT JOIN usuario u
-			ON m.usuario_id = u.id
+			FROM message m
+			LEFT JOIN user u
+			ON m.user_id = u.id
 			LEFT JOIN attachment a
 			ON m.attachment_id = a.id
 			WHERE m.chat_id = {$this->id}
@@ -209,7 +209,7 @@ class Chat extends Database implements JsonSerializable {
 		$result = self::query($sql);
 		$messages = [];
 		while ($message = $result->fetch_assoc()) {
-			if (!$message['usuario_id'])
+			if (!$message['user_id'])
 				$this->new_members = true;
 			$messages[] = $message;
 		}
@@ -223,8 +223,8 @@ class Chat extends Database implements JsonSerializable {
 	public function jsonSerialize() {
 		return [
 			'id' => $this->id,
-			'fecha' => $this->fecha,
-			'nombre' => $this->nombre,
+			'date' => $this->date,
+			'name' => $this->name,
 			'last_msg' => $this->last_msg,
 			'last_read' => $this->last_read
 		];

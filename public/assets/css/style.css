@@ -678,7 +678,7 @@ input[disabled] {
 	padding: 0 0 0 10px;
 	vertical-align: middle;
 }
-#friends .a-friend .nombre {
+#friends .a-friend .name {
 	font-weight: 700;
 	margin: 0 0 5px;
 }
@@ -759,7 +759,7 @@ input[disabled] {
 	width: calc(100% - 78px);
 	vertical-align: middle;
 }
-#requests .a-request .nombre {
+#requests .a-request .name {
 	font-weight: 700;
 	margin: 0 0 5px;
 }
@@ -847,7 +847,7 @@ input[disabled] {
 	text-align: center;
 }
 #messages .messages-list .a-message.aviso .autor,
-#messages .messages-list .a-message.aviso .fecha {
+#messages .messages-list .a-message.aviso .date {
 	display: none;
 }
 #messages .messages-list .a-message:not(.aviso)::before,
@@ -921,12 +921,12 @@ input[disabled] {
 #messages .messages-list .a-message .attachment.type-image i {
 	display: none;
 }
-#messages .messages-list .a-message .fecha {
+#messages .messages-list .a-message .date {
 	font-size: 0.8rem;
 	font-weight: 700;
 	margin-top: 8px;
 }
-#messages .messages-list .a-message.nuevo .fecha::after {
+#messages .messages-list .a-message.nuevo .date::after {
 	content: '';
 	position: absolute;
 	top: -1px;
@@ -959,7 +959,7 @@ input[disabled] {
 #messages #send-message-form .btn-upload.empty {
 	color: var(--border);
 }
-#messages #send-message-form input[name="mensaje"] {
+#messages #send-message-form input[name="message"] {
 	display: inline-block;
 	width: 85%;
 	padding-right: 2rem;

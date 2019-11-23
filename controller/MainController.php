@@ -38,7 +38,7 @@ class MainController {
 			} else if (SessionController::checkAdmin()) {
 				View::options(Option::get());
 			} else if (SessionController::check()) {
-				View::main(Usuario::get(SessionController::usuarioId()), Option::get());
+				View::main(User::get(SessionController::userId()), Option::get());
 			} else {
 				View::login(Option::get());
 			}
@@ -52,9 +52,9 @@ class MainController {
 	// ------------------------
 	private static function recover($get) {
 		if (!empty($_GET['id']) && !empty($_GET['key'])) {
-			$usuario = Usuario::get($_GET['id']);
-			if ($usuario->checkClave($_GET['key'])) {
-				View::recover($usuario, $_GET['key'], Option::get());
+			$user = User::get($_GET['id']);
+			if ($user->checkCode($_GET['key'])) {
+				View::recover($user, $_GET['key'], Option::get());
 				return;
 			}
 		}
@@ -62,9 +62,9 @@ class MainController {
 	}
 	private static function confirm($get) {
 		if (!empty($_GET['id']) && !empty($_GET['key'])) {
-			$usuario = Usuario::get($_GET['id']);
-			if ($usuario->checkClave($_GET['key'])) {
-				$usuario->confirm();
+			$user = User::get($_GET['id']);
+			if ($user->checkCode($_GET['key'])) {
+				$user->confirm();
 				header('Location: '.Helper::currentUrl());
 				die();
 			}
@@ -75,37 +75,37 @@ class MainController {
 	// Funciones de update
 	// ------------------------
 	private static function update($post, $files) {
-		$usuario = Usuario::get(SessionController::usuarioId());
-		$response = ['usuario_id' => $usuario->id()];
-		if (!empty($post['chat_id']) && ($chat = $usuario->chats($post['chat_id'])))
+		$user = User::get(SessionController::userId());
+		$response = ['user_id' => $user->id()];
+		if (!empty($post['chat_id']) && ($chat = $user->chats($post['chat_id'])))
 			if ($messages = $chat->newMessages($post['last_read'])) {
-				$usuario->readChat($chat->id());
+				$user->readChat($chat->id());
 				$response['messages'] = $messages;
 				if ($chat->newMembers()) {
-					$response['members'] = array_values($chat->usuarios());
-					$response['candidates'] = $chat->candidates($usuario->id());
+					$response['members'] = array_values($chat->users());
+					$response['candidates'] = $chat->candidates($user->id());
 				}
 			}
-		if (isset($post['last_received']) && ($chats = $usuario->newChats($post['last_received'])))
+		if (isset($post['last_received']) && ($chats = $user->newChats($post['last_received'])))
 			$response['chats'] = $chats;
-		if (isset($post['last_contact_upd']) && $post['last_contact_upd'] < ($update = $usuario->lastContactUpd())) {
-			if ($friends = $usuario->newFriends($post['last_contact_upd']))
+		if (isset($post['last_contact_upd']) && $post['last_contact_upd'] < ($update = $user->lastContactUpd())) {
+			if ($friends = $user->newFriends($post['last_contact_upd']))
 				$response['friends'] = $friends;
-			if ($requests = $usuario->newRequests($post['last_contact_upd']))
+			if ($requests = $user->newRequests($post['last_contact_upd']))
 				$response['requests'] = $requests;
 			$response['last_contact_upd'] = $update;
 		}
 		return $response;
 	}
 	// ------------------------
-	// Funciones de usuario
+	// Funciones de user
 	// ------------------------
 	private static function login($post, $files) {
 		if (empty($post['email']) || empty($post['password'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
 		} else {
-			$usuario = Usuario::get($post['email'], $post['password']);
-			SessionController::logged($usuario, $usuario->admin());
+			$user = User::get($post['email'], $post['password']);
+			SessionController::logged($user, $user->admin());
 			$response = ['redirect' => Helper::currentUrl()];
 		}
 		return $response;
@@ -115,23 +115,23 @@ class MainController {
 		return ['redirect' => Helper::currentUrl()];
 	}
 	private static function register($post, $files) {
-		if (empty($post['email']) || empty($post['nombre']) || empty($post['password']) || empty($post['password_rep'])) {
+		if (empty($post['email']) || empty($post['name']) || empty($post['password']) || empty($post['password_rep'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
 		} else if ($post['password'] !== $post['password_rep']) {
 			$response = ['type' => 'error', 'message' => Helper::error('pass_diff')];
 		} else {
 			if (Option::get('email_confirm')) {
-				$usuario = Usuario::new($post['email'], $post['nombre'], $post['password'], $files['avatar']);
-				$email = View::emailConfirm($usuario);
-				if (MailController::send("Confirm your account", $email, $usuario->email())) {
+				$user = User::new($post['email'], $post['name'], $post['password'], $files['avatar']);
+				$email = View::emailConfirm($user);
+				if (MailController::send("Confirm your account", $email, $user->email())) {
 					$response = ['type' => 'success', 'message' => 'Enviado un e-mail de confirmación de cuenta'];
 				} else {
-					$usuario->delete();
+					$user->delete();
 					$response = ['type' => 'error', 'message' => Helper::error('email_error')];
 				}
 			} else {
-				$usuario = Usuario::new($post['email'], $post['nombre'], $post['password'], $files['avatar'], 1);
-				SessionController::logged($usuario, $usuario->admin());
+				$user = User::new($post['email'], $post['name'], $post['password'], $files['avatar'], 1);
+				SessionController::logged($user, $user->admin());
 				$response = ['redirect' => Helper::currentUrl()];
 			}
 		}
@@ -142,11 +142,11 @@ class MainController {
 			$response = ['type' => 'error', 'message' => Helper::error('conf_error')];
 		} if (empty($post['email'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
-		} else if (!($usuario = Usuario::get($post['email']))) {
+		} else if (!($user = User::get($post['email']))) {
 			$response = ['type' => 'error', 'message' => Helper::error('user_wrong')];
 		} else {
-			$email = View::emailReset($usuario);
-			if (MailController::send("Reset your password", $email, $usuario->email()))
+			$email = View::emailReset($user);
+			if (MailController::send("Reset your password", $email, $user->email()))
 				$response = ['type' => 'success', 'message' => 'Se ha enviado e-mail de recuperación'];
 			else
 				$response = ['type' => 'error', 'message' => Helper::error('email_error')];
@@ -156,14 +156,14 @@ class MainController {
 	private static function resetPassword($post, $files) {
 		if ($post['password'] !== $post['password_rep']) {
 			$response = ['type' => 'error', 'message' => Helper::error('pass_diff')];
-		} else if (!($usuario = Usuario::get($post['id']))) {
+		} else if (!($user = User::get($post['id']))) {
 			$response = ['type' => 'error', 'message' => Helper::error('user_wrong')];
-		} else if (!$usuario->checkClave($post['key'])) {
+		} else if (!$user->checkCode($post['key'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('key_check')];
-		} else if (!$usuario->password($post['password'])) {
+		} else if (!$user->password($post['password'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('pass_wrong')];
 		} else {
-			$usuario->removeClave();
+			$user->removeCode();
 			$response = ['redirect' => Helper::currentUrl()];
 		}
 		return $response;
@@ -174,68 +174,68 @@ class MainController {
 		} else if (!empty($post['password']) && $post['password'] !== $post['password_rep']) {
 			$response = ['type' => 'error', 'message' => Helper::error('pass_diff')];
 		} else {
-			$usuario = Usuario::get(SessionController::usuarioId());
+			$user = User::get(SessionController::userId());
 			$edited = $new_email = false;
 			$note = '';
-			if ($post['email'] != $usuario->email())
-				$new_email = $edited = $usuario->email($post['email']);
-			if ($post['name'] != $usuario->nombre())
-				$edited = $usuario->nombre($post['name']) || $edited;
+			if ($post['email'] != $user->email())
+				$new_email = $edited = $user->email($post['email']);
+			if ($post['name'] != $user->name())
+				$edited = $user->name($post['name']) || $edited;
 			if (!empty($post['password']))
-				$edited = $usuario->password($post['password']) || $edited;
+				$edited = $user->password($post['password']) || $edited;
 			if ($files['avatar']['error'] != 4)
-				$edited = $usuario->avatar($files['avatar']) || $edited;
+				$edited = $user->avatar($files['avatar']) || $edited;
 			if ($new_email && Option::get('email_confirm')) {
-				$email = View::emailConfirm($usuario);
-				if (MailController::send("Confirm your new e-mail", $email, $usuario->email())) {
-					$usuario->confirmado(0);
+				$email = View::emailConfirm($user);
+				if (MailController::send("Confirm your new e-mail", $email, $user->email())) {
+					$user->confirmed(0);
 					$note = '. You have to confirm your new e-mail in order to login again.';
 				}
 			}
-			if ($edited && $usuario->save())
-				$response = ['type' => 'success', 'message' => 'Perfil actualizado'.$note, 'userdata' => $usuario];
+			if ($edited && $user->save())
+				$response = ['type' => 'success', 'message' => 'Perfil actualizado'.$note, 'userdata' => $user];
 			else
 				$response = ['type' => 'error', 'message' => Helper::error('profile_save')];
 		}
 		return $response;
 	}
 	// ------------------------
-	// Funciones de amigos
+	// Funciones de friends
 	// ------------------------
 	private static function requestFriend($post, $files) {
-		$usuario = Usuario::get(SessionController::usuarioId());
-		$usuario->addContacto($post['email']);
+		$user = User::get(SessionController::userId());
+		$user->addContact($post['email']);
 		$response = ['type' => 'success', 'message' => 'Solicitud de amistad enviada'];
-		$response['friends'] = $usuario->newFriends($post['last_contact_upd']);
-		$response['requests'] = $usuario->newRequests($post['last_contact_upd']);
-		$response['last_contact_upd'] = $usuario->lastContactUpd();
+		$response['friends'] = $user->newFriends($post['last_contact_upd']);
+		$response['requests'] = $user->newRequests($post['last_contact_upd']);
+		$response['last_contact_upd'] = $user->lastContactUpd();
 		return $response;
 	}
 	private static function acceptFriend($post, $files) {
-		$usuario = Usuario::get(SessionController::usuarioId());
-		$usuario->updateContacto($post['contact_id'], Helper::ACEPTADO);
+		$user = User::get(SessionController::userId());
+		$user->updateContact($post['contact_id'], Helper::ACCEPTED);
 		$response = ['type' => 'success', 'message' => 'Solicitud de amistad aceptada'];
-		$response['friends'] = $usuario->newFriends($post['last_contact_upd']);
-		$response['requests'] = $usuario->newRequests($post['last_contact_upd']);
-		$response['last_contact_upd'] = $usuario->lastContactUpd();
+		$response['friends'] = $user->newFriends($post['last_contact_upd']);
+		$response['requests'] = $user->newRequests($post['last_contact_upd']);
+		$response['last_contact_upd'] = $user->lastContactUpd();
 		return $response;
 	}
 	private static function rejectFriend($post, $files) {
-		$usuario = Usuario::get(SessionController::usuarioId());
-		$usuario->updateContacto($post['contact_id'], Helper::RECHAZADO);
+		$user = User::get(SessionController::userId());
+		$user->updateContact($post['contact_id'], Helper::DECLINED);
 		$response = ['type' => 'success', 'message' => 'Solicitud de amistad rechazada'];
-		$response['friends'] = $usuario->newFriends($post['last_contact_upd']);
-		$response['requests'] = $usuario->newRequests($post['last_contact_upd']);
-		$response['last_contact_upd'] = $usuario->lastContactUpd();
+		$response['friends'] = $user->newFriends($post['last_contact_upd']);
+		$response['requests'] = $user->newRequests($post['last_contact_upd']);
+		$response['last_contact_upd'] = $user->lastContactUpd();
 		return $response;
 	}
 	private static function blockFriend($post, $files) {
-		$usuario = Usuario::get(SessionController::usuarioId());
-		$usuario->updateContacto($post['contact_id'], Helper::BLOQUEADO);
-		$response = ['type' => 'success', 'message' => 'Contacto bloqueado'];
-		$response['friends'] = $usuario->newFriends($post['last_contact_upd']);
-		$response['requests'] = $usuario->newRequests($post['last_contact_upd']);
-		$response['last_contact_upd'] = $usuario->lastContactUpd();
+		$user = User::get(SessionController::userId());
+		$user->updateContact($post['contact_id'], Helper::BLOCKED);
+		$response = ['type' => 'success', 'message' => 'Contact bloqueado'];
+		$response['friends'] = $user->newFriends($post['last_contact_upd']);
+		$response['requests'] = $user->newRequests($post['last_contact_upd']);
+		$response['last_contact_upd'] = $user->lastContactUpd();
 		return $response;
 	}
 	// ------------------------
@@ -247,17 +247,17 @@ class MainController {
 		} else if (!isset($post['members']) || !is_array($post['members'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('chat_member')];
 		} else {
-			$usuario = Usuario::get(SessionController::usuarioId());
-			$amigos = [];
-			foreach ($post['members'] as $amigo)
-				if (!$usuario->amigos($amigo))
+			$user = User::get(SessionController::userId());
+			$friends = [];
+			foreach ($post['members'] as $friend)
+				if (!$user->friends($friend))
 					return ['type' => 'error', 'message' => Helper::error('no_friend')];
 			$chat = Chat::new($post['name']);
-			$chat->addUsuario($usuario);
+			$chat->addUser($user);
 			$todos = true;
 			foreach ($post['members'] as $member)
-				if (!$chat->addUsuario($member)) $todos = false;
-			$response = ['focus' => 'chats', 'chats' => $usuario->newChats($post['last_received'])];
+				if (!$chat->addUser($member)) $todos = false;
+			$response = ['focus' => 'chats', 'chats' => $user->newChats($post['last_received'])];
 			if (!$todos) {
 				$response['type'] = 'error';
 				$response['message'] = Helper::error('chat_add');
@@ -269,11 +269,11 @@ class MainController {
 		if (empty($post['chat_id'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
 		} else {
-			$usuario = Usuario::get(SessionController::usuarioId());
-			if (!($chat = $usuario->chats($post['chat_id']))) {
+			$user = User::get(SessionController::userId());
+			if (!($chat = $user->chats($post['chat_id']))) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_wrong')];
 			} else {
-				$chat->removeUsuario($usuario);
+				$chat->removeUser($user);
 				$response = ['type' => 'success', 'message' => 'Abandonaste el chat'];
 			}
 		}
@@ -283,15 +283,15 @@ class MainController {
 		if (empty($post['chat_id'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
 		} else {
-			$usuario = Usuario::get(SessionController::usuarioId());
-			if (!($chat = $usuario->chats($post['chat_id']))) {
+			$user = User::get(SessionController::userId());
+			if (!($chat = $user->chats($post['chat_id']))) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_wrong')];
 			} else {
 				$response = $chat->jsonSerialize();
-				$response['messages'] = array_values($chat->mensajes());
-				$response['members'] = array_values($chat->usuarios());
-				$response['candidates'] = $chat->candidates($usuario->id());
-				$usuario->readChat($chat->id());
+				$response['messages'] = array_values($chat->messages());
+				$response['members'] = array_values($chat->users());
+				$response['candidates'] = $chat->candidates($user->id());
+				$user->readChat($chat->id());
 			}
 		}
 		return $response;
@@ -300,35 +300,35 @@ class MainController {
 		if (empty($post['chat_id']) || empty($post['contact_id'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
 		} else {
-			$usuario = Usuario::get(SessionController::usuarioId());
-			if (!($chat = $usuario->chats($post['chat_id']))) {
+			$user = User::get(SessionController::userId());
+			if (!($chat = $user->chats($post['chat_id']))) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_wrong')];
-			} else if (!($friend = $usuario->amigos($post['contact_id']))) {
+			} else if (!($friend = $user->friends($post['contact_id']))) {
 				$response = ['type' => 'error', 'message' => Helper::error('no_friend')];
-			} else if (!$chat->addUsuario($friend)) {
+			} else if (!$chat->addUser($friend)) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_add')];
 			} else {
-				$response = ['type' => 'success', 'message' => 'Amigo añadido al chat'];
+				$response = ['type' => 'success', 'message' => 'Friend añadido al chat'];
 			}
 		}
 		return $response;
 	}
 	// ------------------------
-	// Funciones de mensajes
+	// Funciones de messages
 	// ------------------------
 	private static function sendMessage($post, $files) {
-		if (empty($post['chat_id']) || empty($post['mensaje'])) {
+		if (empty($post['chat_id']) || empty($post['message'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('missing_data')];
-		} else if (!Helper::validTexto($post['mensaje'])) {
+		} else if (!Helper::validTexto($post['message'])) {
 			$response = ['type' => 'error', 'message' => Helper::error('msg_wrong')];
 		} else {
-			$usuario = Usuario::get(SessionController::usuarioId());
-			if (!($chat = $usuario->chats($post['chat_id']))) {
+			$user = User::get(SessionController::userId());
+			if (!($chat = $user->chats($post['chat_id']))) {
 				$response = ['type' => 'error', 'message' => Helper::error('chat_wrong')];
-			} else if ($chat->addMensaje($usuario->id(), $post['mensaje'], $files['attachment'] ?? false) === false) {
+			} else if ($chat->addMessage($user->id(), $post['message'], $files['attachment'] ?? false) === false) {
 				$response = ['type' => 'error', 'message' => Helper::error('msg_add')];
 			} else {
-				$usuario->readChat($chat->id());
+				$user->readChat($chat->id());
 				$response = ['messages' => $chat->newMessages($post['last_read'])];
 			}
 		}

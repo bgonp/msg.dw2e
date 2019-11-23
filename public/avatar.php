@@ -4,10 +4,10 @@ require_once "../init.php";
 
 $imagen = 'default.png';
 if (isset($_GET['id']) && SessionController::check()) {
-	if ($usuario = Usuario::get(SessionController::usuarioId())) {
-		$contacto = $_GET['id'] == $usuario->id() ? $usuario : $usuario->amigos($_GET['id']);
-		if ($contacto) {
-			$avatar = $contacto->avatar();
+	if ($user = User::get(SessionController::userId())) {
+		$contact = $_GET['id'] == $user->id() ? $user : $user->friends($_GET['id']);
+		if ($contact) {
+			$avatar = $contact->avatar();
 			if (!empty($avatar) && file_exists(AVATAR_DIR.$avatar)){
 				$imagen = $avatar;
 			}

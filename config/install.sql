@@ -1,52 +1,54 @@
 CREATE TABLE `attachment` (
   `id` int(10) UNSIGNED NOT NULL,
-  `date_upload` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `mime_type` varchar(31) NOT NULL,
+  `height` int(10) UNSIGNED DEFAULT NULL,
+  `width` int(10) UNSIGNED DEFAULT NULL,
   `filename` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `chat` (
   `id` int(10) UNSIGNED NOT NULL,
-  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `nombre` varchar(127) DEFAULT NULL
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `name` varchar(127) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `contacto` (
-  `usuario_1_id` int(10) UNSIGNED NOT NULL,
-  `usuario_2_id` int(10) UNSIGNED NOT NULL,
-  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `fecha_upd` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `estado` tinyint(1) UNSIGNED NOT NULL DEFAULT 1,
-  `usuario_estado_id` int(10) UNSIGNED NOT NULL
+CREATE TABLE `contact` (
+  `user_1_id` int(10) UNSIGNED NOT NULL,
+  `user_2_id` int(10) UNSIGNED NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `date_upd` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `state` tinyint(1) UNSIGNED NOT NULL DEFAULT 1,
+  `user_state_id` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `mensaje` (
+CREATE TABLE `message` (
   `id` int(10) UNSIGNED NOT NULL,
-  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `usuario_id` int(10) UNSIGNED DEFAULT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_id` int(10) UNSIGNED DEFAULT NULL,
   `chat_id` int(10) UNSIGNED NOT NULL,
   `attachment_id` int(10) UNSIGNED DEFAULT NULL,
-  `contenido` varchar(1023) NOT NULL
+  `content` varchar(1023) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `participa` (
+CREATE TABLE `participate` (
   `chat_id` int(10) UNSIGNED NOT NULL,
-  `usuario_id` int(10) UNSIGNED NOT NULL,
-  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `last_read` int(10) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `usuario` (
+CREATE TABLE `user` (
   `id` int(10) UNSIGNED NOT NULL,
-  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `email` varchar(127) DEFAULT NULL,
-  `nombre` varchar(127) DEFAULT NULL,
+  `name` varchar(127) DEFAULT NULL,
   `password` char(60) DEFAULT NULL,
   `avatar` varchar(255) DEFAULT NULL,
-  `confirmado` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `confirmed` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
   `admin` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `clave` varchar(32) DEFAULT NULL,
-  `caducidad` timestamp NULL DEFAULT NULL
+  `code` varchar(32) DEFAULT NULL,
+  `expiration` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `option` (
@@ -79,23 +81,23 @@ ALTER TABLE `attachment`
 ALTER TABLE `chat`
   ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `contacto`
-  ADD PRIMARY KEY (`usuario_1_id`,`usuario_2_id`),
-  ADD KEY `FK_contacto_usuario_2` (`usuario_2_id`),
-  ADD KEY `FK_contacto_usuario_estado` (`usuario_estado_id`);
+ALTER TABLE `contact`
+  ADD PRIMARY KEY (`user_1_id`,`user_2_id`),
+  ADD KEY `FK_contact_user_2` (`user_2_id`),
+  ADD KEY `FK_contact_user_state` (`user_state_id`);
 
-ALTER TABLE `mensaje`
+ALTER TABLE `message`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `attachment_id` (`attachment_id`),
-  ADD KEY `FK_mensaje_usuario` (`usuario_id`),
-  ADD KEY `FK_mensaje_chat` (`chat_id`);
+  ADD KEY `FK_message_user` (`user_id`),
+  ADD KEY `FK_message_chat` (`chat_id`);
 
-ALTER TABLE `participa`
-  ADD PRIMARY KEY (`chat_id`,`usuario_id`),
-  ADD KEY `FK_participa_usuario` (`usuario_id`),
-  ADD KEY `FK_participa_mensaje` (`last_read`);
+ALTER TABLE `participate`
+  ADD PRIMARY KEY (`chat_id`,`user_id`),
+  ADD KEY `FK_participate_user` (`user_id`),
+  ADD KEY `FK_participate_message` (`last_read`);
 
-ALTER TABLE `usuario`
+ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
@@ -108,26 +110,26 @@ ALTER TABLE `attachment`
 ALTER TABLE `chat`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
-ALTER TABLE `mensaje`
+ALTER TABLE `message`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
-ALTER TABLE `usuario`
+ALTER TABLE `user`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 ALTER TABLE `option`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
-ALTER TABLE `contacto`
-  ADD CONSTRAINT `FK_contacto_usuario_1` FOREIGN KEY (`usuario_1_id`) REFERENCES `usuario` (`id`),
-  ADD CONSTRAINT `FK_contacto_usuario_2` FOREIGN KEY (`usuario_2_id`) REFERENCES `usuario` (`id`),
-  ADD CONSTRAINT `FK_contacto_usuario_estado` FOREIGN KEY (`usuario_estado_id`) REFERENCES `usuario` (`id`);
+ALTER TABLE `contact`
+  ADD CONSTRAINT `FK_contact_user_1` FOREIGN KEY (`user_1_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_contact_user_2` FOREIGN KEY (`user_2_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_contact_user_state` FOREIGN KEY (`user_state_id`) REFERENCES `user` (`id`);
 
-ALTER TABLE `mensaje`
-  ADD CONSTRAINT `FK_mensaje_attachment` FOREIGN KEY (`attachment_id`) REFERENCES `attachment` (`id`),
-  ADD CONSTRAINT `FK_mensaje_chat` FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`),
-  ADD CONSTRAINT `FK_mensaje_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`);
+ALTER TABLE `message`
+  ADD CONSTRAINT `FK_message_attachment` FOREIGN KEY (`attachment_id`) REFERENCES `attachment` (`id`),
+  ADD CONSTRAINT `FK_message_chat` FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`),
+  ADD CONSTRAINT `FK_message_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
-ALTER TABLE `participa`
-  ADD CONSTRAINT `FK_participa_chat` FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`),
-  ADD CONSTRAINT `FK_participa_mensaje` FOREIGN KEY (`last_read`) REFERENCES `mensaje` (`id`),
-  ADD CONSTRAINT `FK_participa_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`);
+ALTER TABLE `participate`
+  ADD CONSTRAINT `FK_participate_chat` FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`),
+  ADD CONSTRAINT `FK_participate_message` FOREIGN KEY (`last_read`) REFERENCES `message` (`id`),
+  ADD CONSTRAINT `FK_participate_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);

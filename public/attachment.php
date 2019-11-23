@@ -3,9 +3,9 @@
 require_once "../init.php";
 
 if (isset($_GET['id']) && SessionController::check()) {
-	if ($usuario = Usuario::get(SessionController::usuarioId())) {
+	if ($user = User::get(SessionController::userId())) {
 		if ($file = Attachment::get($_GET['id'])) {
-			if ($file->chat()->usuarios($usuario->id())) {
+			if ($file->chat()->users($user->id())) {
 				if (!empty($file->filename()) && file_exists(ATTACHMENT_DIR.$file->filename())) {
 					if ($file->isImage()) {
 						header('Content-Type: '.$file->mime_type());

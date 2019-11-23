@@ -21,14 +21,14 @@ class SessionController {
 		return self::$admin;
 	}
 
-	public static function usuarioId(){
-		return $_SESSION['usuarioId'];
+	public static function userId(){
+		return $_SESSION['userId'];
 	}
 
-	public static function logged( $usuario, $admin = false ) {
+	public static function logged( $user, $admin = false ) {
 		$_SESSION['logged'] = true;
 		$_SESSION['admin'] = boolval($admin);
-		$_SESSION['usuarioId'] = $usuario->id();
+		$_SESSION['userId'] = $user->id();
 	}
 
 	public static function logout() {

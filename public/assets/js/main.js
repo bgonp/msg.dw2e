@@ -90,11 +90,11 @@ function showAlert(type, message) {
 // PROCESS RESPONSE
 // ------------------
 function processResponse(response) {
-	// console.log(response); // TODO - A BORRAR
+	console.log(response); // TODO - A BORRAR
 	if (response.redirect)
 		location.href = response.redirect;
-	if (response.usuario_id && response.usuario_id != current_user)
-		current_user = response.usuario_id;
+	if (response.user_id && response.user_id != current_user)
+		current_user = response.user_id;
 	if (response.last_contact_upd && response.last_contact_upd != last_contact_upd)
 		last_contact_upd = response.last_contact_upd;
 	if (response.focus)
@@ -137,8 +137,8 @@ function update() {
 }
 
 function updateUserdata(userdata) {
-	$('#menu .saludo span').text(userdata.nombre);
-	$('#menu .edit-profile input[name="name"]').val(userdata.nombre);
+	$('#menu .saludo span').text(userdata.name);
+	$('#menu .edit-profile input[name="name"]').val(userdata.name);
 	$('#menu .edit-profile input[name="email"]').val(userdata.email);
 	$('#menu .edit-profile input[type="password"]').val('');
 	$('#menu .avatar img').attr('src','avatar.php?id='+userdata.id+'&'+(new Date().getTime()));
@@ -203,7 +203,7 @@ function putChat(chats_list) {
 			clases += ' active';
 		}
 		chat_dom.removeClass().addClass(clases);
-		chat_dom.find('.chat-link').text(chat.nombre);
+		chat_dom.find('.chat-link').text(chat.name);
 		if (current_chat != chat.id) chat_dom.addClass('unread');
 		chats.prepend(chat_dom);
 		updated = true;
@@ -216,9 +216,9 @@ function putMessage(messages_list) {
 	let message = messages_list.pop();
 	let message_dom = empty_message.clone();
 	message_dom.attr('id', 'message-'+message.id);
-	message_dom.find('.contenido').text(message.contenido);
-	message_dom.find('.fecha').text(message.fecha);
-	message_dom.find('.autor').text(message.usuario_nombre);
+	message_dom.find('.content').text(message.content);
+	message_dom.find('.date').text(message.date);
+	message_dom.find('.autor').text(message.user_name);
 	message_dom.removeClass('empty-message').addClass('a-message');
 	if (message.attachment_id) {
 		let btn_file = message_dom.find('.attachment');
@@ -232,8 +232,8 @@ function putMessage(messages_list) {
 			btn_file.find('.reserve').css('padding-bottom', ratio*100+'%');
 		}
 	}
-	if (!message.usuario_id) message_dom.addClass('aviso');
-	else if (message.usuario_id == current_user) message_dom.addClass('propio');
+	if (!message.user_id) message_dom.addClass('aviso');
+	else if (message.user_id == current_user) message_dom.addClass('propio');
 	else if (!replied && parseInt(message.id) > last_read) message_dom.addClass('nuevo');
 	message_dom.show();
 	messages.append(message_dom);
@@ -245,7 +245,7 @@ function putFriend(friends_list) {
 	let friend = friends_list.pop();
 	let friend_dom = empty_friend.clone();
 	friend_dom.find('.avatar img').attr('src','avatar.php?id='+friend.id);
-	friend_dom.find('.datos .nombre').text(friend.nombre);
+	friend_dom.find('.datos .name').text(friend.name);
 	friend_dom.find('.datos .email').text(friend.email);
 	friend_dom.find('input[name="members[]"], input[name="contact_id"]').val(friend.id);
 	friend_dom.removeClass('empty-friend').addClass('a-friend');
@@ -259,7 +259,7 @@ function putRequest(requests_list) {
 	if (requests_list.length == 0) return false;
 	let request = requests_list.pop();
 	let request_dom = empty_request.clone();
-	request_dom.find('.datos .nombre').text(request.nombre);
+	request_dom.find('.datos .name').text(request.name);
 	request_dom.find('.datos .email').text(request.email);
 	request_dom.find('input[name="contact_id"]').val(request.id);
 	request_dom.removeClass('empty-request').addClass('a-request');
@@ -274,9 +274,9 @@ function putMember(members_list) {
 	let member = members_list.pop();
 	let member_txt_dom = empty_member_txt.clone();
 	let member_img_dom = empty_member_img.clone();
-	member_txt_dom.find('.name').text(member.nombre);
+	member_txt_dom.find('.name').text(member.name);
 	member_txt_dom.find('.email').text(member.email);
-	member_img_dom.find('.avatar').attr('src','avatar.php?id='+member.id).attr('title',member.nombre);
+	member_img_dom.find('.avatar').attr('src','avatar.php?id='+member.id).attr('title',member.name);
 	member_txt_dom.removeClass('empty-member').addClass('a-member');
 	member_img_dom.removeClass('empty-member').addClass('a-member');
 	member_txt_dom.show();
@@ -289,8 +289,8 @@ function putMember(members_list) {
 function putCandidate(candidates_list) {
 	if (candidates_list.length == 0) return false;
 	let candidate = candidates_list.pop();
-	let nombre = candidate.nombre+' ('+candidate.email+')';
-	let candidate_dom = $('<option value="'+candidate.id+'">'+nombre+'</option>');
+	let name = candidate.name+' ('+candidate.email+')';
+	let candidate_dom = $('<option value="'+candidate.id+'">'+name+'</option>');
 	candidates.append(candidate_dom.addClass('a-candidate'));
 	return putCandidate(candidates_list) || true;
 }
@@ -314,7 +314,7 @@ function loadChat(chat_id) {
 		active_chat.addClass('active');
 		$('#messages .btn-upload').show();
 		$('#send-message-form input[name="chat_id"]').val(current_chat);
-		$('#send-message-form input[name="mensaje"]').prop('disabled', false);
+		$('#send-message-form input[name="message"]').prop('disabled', false);
 		$('#send-message-form input[type="submit"]').prop('disabled', false);
 		processResponse(response);
 		replied = busy = false;
@@ -329,7 +329,7 @@ function unloadChat() {
 	$('#messages .btn-upload').hide();
 	upload_attachment.val('').change();
 	$('#send-message-form input[name="chat_id"]').val(0);
-	$('#send-message-form input[name="mensaje"]').prop('disabled', true);
+	$('#send-message-form input[name="message"]').prop('disabled', true);
 	$('#send-message-form input[type="submit"]').prop('disabled', true);
 }
 

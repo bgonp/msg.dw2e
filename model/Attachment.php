@@ -3,7 +3,7 @@
 class Attachment extends Database {
 
 	private $id;
-	private $date_upload;
+	private $date;
 	private $mime_type;
 	private $height;
 	private $width;
@@ -11,9 +11,9 @@ class Attachment extends Database {
 	private $chat_id;
 	private $chat;
 
-	private function __construct($id, $date_upload, $mime_type, $height, $width, $filename, $chat_id) {
+	private function __construct($id, $date, $mime_type, $height, $width, $filename, $chat_id) {
 		$this->id = $id;
-		$this->date_upload = $date_upload;
+		$this->date = $date;
 		$this->mime_type = $mime_type;
 		$this->height = $height;
 		$this->width = $width;
@@ -25,20 +25,20 @@ class Attachment extends Database {
 		if (!($id = intval($id))) throw new Exception("ID de attachment inválido");
 		$sql = "
 			SELECT a.id,
-				   a.date_upload,
+				   a.date,
 				   a.mime_type,
 				   a.height,
 				   a.width,
 				   a.filename,
 				   m.chat_id
 			FROM attachment a
-			LEFT JOIN mensaje m
+			LEFT JOIN message m
 			ON a.id = m.attachment_id
 			WHERE a.id = $id";
 		$att = self::query($sql);
 		if ($att->num_rows == 0) throw new Exception("No existe attachment");
 		$att = $att->fetch_assoc();
-		return new Attachment($att['id'], $att['date_upload'], $att['mime_type'], $att['height'], $att['width'], $att['filename'], $att['chat_id']);
+		return new Attachment($att['id'], $att['date'], $att['mime_type'], $att['height'], $att['width'], $att['filename'], $att['chat_id']);
 	}
 
 	public static function new($file) {
@@ -61,8 +61,8 @@ class Attachment extends Database {
 		return $this->id;
 	}
 
-	public function date_upload() {
-		return $this->date_upload;
+	public function date() {
+		return $this->date;
 	}
 
 	public function mime_type() {

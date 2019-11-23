@@ -27,7 +27,7 @@ class Install {
 		if (!file_put_contents(CONFIG_DIR.'database.json', json_encode($db)))
 			throw new Exception(Helper::error('install_putfile'));
 
-		Usuario::new($email, 'admin', $post['password'], 0, 1, 1);
+		User::new($email, 'admin', $post['password'], 0, 1, 1);
 
 		return true;
 	}

@@ -36,7 +36,7 @@
 			<input type="email" name="email" placeholder="Add friends by e-mail...">
 			<input type="submit" value="Add">
 		</form>
-		<ul class="friends-list">{{AMIGOS}}</ul>
+		<ul class="friends-list">{{FRIENDS}}</ul>
 		<form action="ajax.php" method="post" id="create-chat-form" class="empty-on-submit">
 			<input type="hidden" name="action" value="createChat">
 			<input type="text" name="name" placeholder="Chat name..." required>
@@ -45,7 +45,7 @@
 		<li class="empty-friend deletable" style="display: none">
 			<div class="avatar"><img src=""></div>
 			<div class="datos">
-				<div class="nombre"></div>
+				<div class="name"></div>
 				<div class="email"></div>
 			</div>
 			<div class="buttons">
@@ -63,10 +63,10 @@
 		</li>
 	</div>
 	<div id="requests" class="tab-content requests-menu" style="display: none">
-		<ul class="requests-list">{{PENDIENTES}}</ul>
+		<ul class="requests-list">{{REQUESTS}}</ul>
 		<li class="empty-request deletable" style="display: none">
 			<div class="datos">
-				<div class="nombre"></div>
+				<div class="name"></div>
 				<div class="email"></div>
 			</div>
 			<div class="buttons">

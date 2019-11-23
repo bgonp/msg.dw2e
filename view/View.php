@@ -6,46 +6,46 @@ abstract class View {
 	// Pages
 	// ------------------------
 	public static function main($user, $options) {
-		$contenido = self::menu($user);
-		$contenido .= self::sidebar($user->chats(), $user->amigos(), $user->pendientes());
-		$contenido .= self::mensajes();
-		$contenido .= self::alert();
-		$contenido .= self::loading();
-		$contenido .= self::vars($user->id(), $user->lastReceived(), $user->lastContactUpd());
-		echo self::page($contenido, 'main', $options);
+		$content = self::menu($user);
+		$content .= self::sidebar($user->chats(), $user->friends(), $user->requests());
+		$content .= self::messages();
+		$content .= self::alert();
+		$content .= self::loading();
+		$content .= self::vars($user->id(), $user->lastReceived(), $user->lastContactUpd());
+		echo self::page($content, 'main', $options);
 	}
 
 	public static function login($options) {
-		$contenido = self::loginForm();
-		$contenido .= self::alert();
-		$contenido .= self::loading();
-		echo self::page($contenido, 'login', $options);
+		$content = self::loginForm();
+		$content .= self::alert();
+		$content .= self::loading();
+		echo self::page($content, 'login', $options);
 	}
 
-	public static function recover($user, $clave, $options) {
-		$contenido = self::recoverForm($user, $clave);
-		$contenido .= self::alert();
-		$contenido .= self::loading();
-		echo self::page($contenido, 'recover', $options);
+	public static function recover($user, $code, $options) {
+		$content = self::recoverForm($user, $code);
+		$content .= self::alert();
+		$content .= self::loading();
+		echo self::page($content, 'recover', $options);
 	}
 	
-	public static function error($mensaje, $options) {
-		$contenido = self::errorMessage($mensaje);
-		echo self::page($contenido, 'error', $options);
+	public static function error($message, $options) {
+		$content = self::errorMessage($message);
+		echo self::page($content, 'error', $options);
 	}
 
 	public static function options($options) {
-		$contenido = self::optionsForm($options);
-		$contenido .= self::alert();
-		$contenido .= self::loading();
-		echo self::page($contenido, 'options', $options);
+		$content = self::optionsForm($options);
+		$content .= self::alert();
+		$content .= self::loading();
+		echo self::page($content, 'options', $options);
 	}
 
 	public static function install($options) {
-		$contenido = self::installForm();
-		$contenido .= self::alert();
-		$contenido .= self::loading();
-		echo self::page($contenido, 'options', $options);
+		$content = self::installForm();
+		$content .= self::alert();
+		$content .= self::loading();
+		echo self::page($content, 'options', $options);
 	}
 
 	// ------------------------
@@ -54,40 +54,40 @@ abstract class View {
 	public static function emailConfirm($user) {
 		$replace = [
 			'{{ID}}' => $user->id(),
-			'{{NOMBRE}}' => $user->nombre(),
-			'{{CLAVE}}' => $user->getNewClave(),
+			'{{NAME}}' => $user->name(),
+			'{{CODE}}' => $user->getNewCode(),
 			'{{DOMAIN}}' => Helper::currentUrl()
 		];
-		$contenido = strtr(file_get_contents(HTML_DIR.'email/confirm.html'), $replace);
-		return self::email($contenido,'Confirm your account');
+		$content = strtr(file_get_contents(HTML_DIR.'email/confirm.html'), $replace);
+		return self::email($content,'Confirm your account');
 	}
 
 	public static function emailReset($user) {
 		$replace = [
 			'{{ID}}' => $user->id(),
-			'{{NOMBRE}}' => $user->nombre(),
-			'{{CLAVE}}' => $user->getNewClave(),
+			'{{NAME}}' => $user->name(),
+			'{{CODE}}' => $user->getNewCode(),
 			'{{DOMAIN}}' => Helper::currentUrl()
 		];
-		$contenido = strtr(file_get_contents(HTML_DIR.'email/recover.html'), $replace);
-		return self::email($contenido,'Reset your password');
+		$content = strtr(file_get_contents(HTML_DIR.'email/recover.html'), $replace);
+		return self::email($content,'Reset your password');
 	}
 
 	// ------------------------
 	// Page parts functions
 	// ------------------------
-	private static function email($contenido, $titulo) {
+	private static function email($content, $title) {
 		$replace = [
-			'{{CONTENIDO}}' => $contenido,
-			'{{TITULO}}' => $titulo
+			'{{CONTENT}}' => $content,
+			'{{TITLE}}' => $title
 		];
 		return strtr(file_get_contents(HTML_DIR.'email/email.html'), $replace);
 	}
 
-	private static function page($contenido, $clase, $options) {
+	private static function page($content, $clase, $options) {
 		$replace = [
-			'{{CONTENIDO}}' => $contenido,
-			'{{CLASE}}' => $clase,
+			'{{CONTENT}}' => $content,
+			'{{CLASS}}' => $clase,
 			'{{COLORS}}' => self::colors($options['color_main'], $options['color_bg'], $options['color_border']),
 		];
 		return strtr(file_get_contents(HTML_DIR.'page.html'), $replace);
@@ -106,10 +106,10 @@ abstract class View {
 		return file_get_contents(HTML_DIR.'install.html');
 	}
 
-	private static function recoverForm($user ,$clave) {
+	private static function recoverForm($user ,$code) {
 		$replace = [
 			'{{ID}}' => $user->id(),
-			'{{CLAVE}}' => $clave
+			'{{CODE}}' => $code
 		];
 		return strtr(file_get_contents(HTML_DIR.'recover.html'), $replace);
 	}
@@ -125,57 +125,57 @@ abstract class View {
 		$replace = [
 			'{{ID}}' => $user->id(),
 			'{{EMAIL}}' => $user->email(),
-			'{{NOMBRE}}' => $user->nombre()
+			'{{NAME}}' => $user->name()
 		];
 		return strtr(file_get_contents(HTML_DIR.'menu.html'), $replace);
 	}
 	
-	private static function sidebar($chats, $amigos, $pendientes) {
+	private static function sidebar($chats, $friends, $requests) {
 		$replace = [
 			'{{CHATS}}' => "",
-			'{{AMIGOS}}' => "",
-			'{{PENDIENTES}}' => ""
+			'{{FRIENDS}}' => "",
+			'{{REQUESTS}}' => ""
 		];
 		foreach ($chats as $chat)
 			$replace['{{CHATS}}'] .= self::chat($chat);
-		foreach ($amigos as $amigo)
-			$replace['{{AMIGOS}}'] .= self::amigo($amigo);
-		foreach ($pendientes as $pendiente)
-			$replace['{{PENDIENTES}}'] .= self::pendiente($pendiente);
-		$replace['{{NEWREQUESTS}}'] = $replace['{{PENDIENTES}}'] ? ' new' : '';
+		foreach ($friends as $friend)
+			$replace['{{FRIENDS}}'] .= self::friend($friend);
+		foreach ($requests as $request)
+			$replace['{{REQUESTS}}'] .= self::request($request);
+		$replace['{{NEWREQUESTS}}'] = $replace['{{REQUESTS}}'] ? ' new' : '';
 		return strtr(file_get_contents(HTML_DIR.'sidebar.html'), $replace);
 	}
 	
 	private static function chat($chat) {
 		$replace = [
 			'{{ID}}' => $chat->id(),
-			'{{NOMBRE}}' => $chat->nombre(),
+			'{{NAME}}' => $chat->name(),
 			'{{LASTMSG}}' => $chat->last_msg(),
-			'{{CLASE}}' => $chat->unread() ? ' unread' : ''
+			'{{CLASS}}' => $chat->unread() ? ' unread' : ''
 		];
 		return strtr(file_get_contents(HTML_DIR.'chat.html'), $replace);
 	}
 	
-	private static function amigo($amigo) {
+	private static function friend($friend) {
 		$replace = [
-			'{{ID}}' => $amigo->id(),
-			'{{NOMBRE}}' => $amigo->nombre(),
-			'{{EMAIL}}' => $amigo->email()
+			'{{ID}}' => $friend->id(),
+			'{{NAME}}' => $friend->name(),
+			'{{EMAIL}}' => $friend->email()
 		];
-		return strtr(file_get_contents(HTML_DIR.'amigo.html'), $replace);
+		return strtr(file_get_contents(HTML_DIR.'friend.html'), $replace);
 	}
 	
-	private static function pendiente($pendiente) {
+	private static function request($request) {
 		$replace = [
-			'{{ID}}' => $pendiente->id(),
-			'{{NOMBRE}}' => $pendiente->nombre(),
-			'{{EMAIL}}' => $pendiente->email()
+			'{{ID}}' => $request->id(),
+			'{{NAME}}' => $request->name(),
+			'{{EMAIL}}' => $request->email()
 		];
-		return strtr(file_get_contents(HTML_DIR.'pendiente.html'), $replace);
+		return strtr(file_get_contents(HTML_DIR.'request.html'), $replace);
 	}
 
-	private static function mensajes() {
-		return file_get_contents(HTML_DIR.'mensajes.html');
+	private static function messages() {
+		return file_get_contents(HTML_DIR.'messages.html');
 	}
 
 	private static function alert() {
@@ -195,9 +195,9 @@ abstract class View {
 		return strtr(file_get_contents(HTML_DIR.'vars.html'), $replace);
 	}
 
-	private static function errorMessage($mensaje) {
+	private static function errorMessage($message) {
 		$replace = [
-			'{{MENSAJE}}' => $mensaje,
+			'{{MESSAGE}}' => $message,
 			'{{URL}}' => Helper::currentUrl()
 		];
 		return strtr(file_get_contents(HTML_DIR.'error.html'), $replace);
