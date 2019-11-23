@@ -20,7 +20,7 @@ An instant messaging single page application to talk about topics in chat rooms 
 - If you don't remember your password, you can reset it by e-mail (disabled by default).
 - Request friendship to other users with their e-mails.
 - Create chat rooms and add some of your friends.
-- Send messages to chat rooms with other(s) user(s).
+- Send messages to chat rooms with other users.
 - Messages can contain attachment files or images.
 - You can accept or decline friendship or block a friend.
 - You can send messages to non-friends users if your are in the same chat room (but you can't see their avatars).
@@ -62,7 +62,7 @@ The admin user can modify some settings from the control panel:
 - Click on `Registration` tab.
 - Enter your name, e-mail and password (twice). Optionally, you can also upload an avatar.
 - If e-mail confirmation is enabled, you will receive an email with a button to confirm your account.
-- If not, you will be automaticly logged in.
+- If not, you will be automatically logged in.
 
 #### Login
 - Simply write your e-mail and password in the `Login` box.
@@ -84,7 +84,7 @@ The admin user can modify some settings from the control panel:
 - If you want to block a friend, click on the forbidden icon at the bottom-right corner of your friend box. A blocked friend won't be able to send you friendship requests or create chat rooms with you. But you will continue receiving their message in any chat room already created with both of you.
 
 #### Chats
-- If you want to create a chat room you first must select one or more friends in your friends list by clicking on the checkbox of each one. Then you have to introduce in the inbox below the new chat room name and click on `New chat` button.
+- If you want to create a chat room you must first select one or more friends in your friends list by clicking on the checkbox of each one. Then you have to introduce in the inbox below the new chat room name and click on `New chat` button.
 - You will be redirected to chats list and here you can see the new chat room. Click on it and you can start writing here.
 - If you want to add a friend to the current chat room, select him it in the `Add a friend...` box and click on the `+` icon.
 - If you want to leave a chat room, click on the forbidden icon at the right of the chat room and confirm.
