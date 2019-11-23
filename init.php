@@ -14,6 +14,7 @@ require_once VENDOR_DIR."autoload.php";
 require_once CORE_DIR."Install.php";
 require_once CORE_DIR."Database.php";
 require_once CORE_DIR."Helper.php";
+require_once CORE_DIR."Text.php";
 require_once MODEL_DIR."Message.php";
 require_once MODEL_DIR."User.php";
 require_once MODEL_DIR."Chat.php";

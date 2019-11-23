@@ -22,7 +22,7 @@ class Attachment extends Database {
 	}
 
 	public static function get($id) {
-		if (!($id = intval($id))) throw new Exception("ID de attachment inválido");
+		if (!($id = intval($id))) throw new Exception(Text::error('attachment_id'));
 		$sql = "
 			SELECT a.id,
 				   a.date,
@@ -36,23 +36,23 @@ class Attachment extends Database {
 			ON a.id = m.attachment_id
 			WHERE a.id = $id";
 		$att = self::query($sql);
-		if ($att->num_rows == 0) throw new Exception("No existe attachment");
+		if ($att->num_rows == 0) throw new Exception(Text::error('attachment_get'));
 		$att = $att->fetch_assoc();
 		return new Attachment($att['id'], $att['date'], $att['mime_type'], $att['height'], $att['width'], $att['filename'], $att['chat_id']);
 	}
 
 	public static function new($file) {
 		if (!$file || $file['error'])
-			throw new Exception("Adjunto no válido");
+			throw new Exception(Text::error('attachment_invalid'));
 		if (!($mime_type = self::escape($file['type'])) || !($filename = self::escape($file['name'])))
-			throw new Exception("Datos no válidos");
+			throw new Exception(Text::error('attachment_data'));
 		if (!($fileinfo = Helper::uploadAttachment($file)))
-			throw new Exception("No se pudo subir el archivo");
+			throw new Exception(Text::error('attachment_upload'));
 		$sql = "INSERT INTO attachment (mime_type, height, width, filename)
 				VALUES ('$mime_type', {$fileinfo['height']}, {$fileinfo['width']}, '{$fileinfo['name']}')";
 		if (!self::query($sql) || !($id = self::insertId())) {
 			Helper::removeAttachment($fileinfo['name']);
-			throw new Exception("No se creó el attachment");
+			throw new Exception(Text::error('attachment_new'));
 		}
 		return Attachment::get($id);		
 	}

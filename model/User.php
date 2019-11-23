@@ -30,15 +30,15 @@ class User extends Database implements JsonSerializable {
 	public static function get($id_o_email, $password = null) {
 		if (is_numeric($id_o_email)){
 			$id = intval($id_o_email);
-			if ($id <= 0) throw new Exception("Identificación de user inválida");
+			if ($id <= 0) throw new Exception(Text::error('user_id'));
 			$sql = "SELECT * FROM user WHERE id = $id";
 		} else {
 			$email = self::escape($id_o_email);
-			if (empty($email)) throw new Exception("Identificación de user inválida");
+			if (empty($email)) throw new Exception(Text::error('user_email'));
 			$sql = "SELECT * FROM user WHERE email = '$email'";
 		}
 		$user_db = self::query($sql);
-		if ($user_db->num_rows == 0) throw new Exception("No existe user");
+		if ($user_db->num_rows == 0) throw new Exception(Text::error('user_get'));
 		$user = $user_db->fetch_assoc();
 		$user = new User(
 			$user['id'],
@@ -51,22 +51,22 @@ class User extends Database implements JsonSerializable {
 			$user['code'],
 			$user['expiration']
 		);
-		if (!empty($password) && !$user->verificar($password)) throw new Exception("Autentificación errónea");
+		if (!empty($password) && !$user->verificar($password)) throw new Exception(Text::error('pass_wrong'));
 		return $user;
 	}
 
 	public static function new($email, $name, $password, $avatar = 0, $confirmed = 0, $admin = 0) {
-		if (!Helper::validEmail($email) || !($email = self::escape($email))) throw new Exception("E-mail no válido");
-		if (!Helper::validName($name) || !($name = self::escape($name))) throw new Exception("Name no válido");
-		if (!Helper::validPassword($password)) throw new Exception("Contraseña no válida");
+		if (!Helper::validEmail($email) || !($email = self::escape($email))) throw new Exception(Text::error('user_email'));
+		if (!Helper::validName($name) || !($name = self::escape($name))) throw new Exception(Text::error('user_name'));
+		if (!Helper::validPassword($password)) throw new Exception(Text::error('user_pass'));
 		if (!$avatar || $avatar['error'] == 4) $avatar = '';
-		else if (!($avatar = Helper::uploadImagen($avatar))) throw new Exception("Avatar no válido");
+		else if (!($avatar = Helper::uploadImagen($avatar))) throw new Exception(Text::error('user_avatar'));
 		$password = self::hash($password);
 		$sql = "
 			INSERT INTO user (email, name, password, avatar, confirmed, admin)
 			VALUES ('$email', '$name', '$password', '$avatar', $confirmed, $admin)";
 		self::query($sql);
-		if( !($id = self::insertId()) ) throw new Exception("No se creó user, quizá el e-mail ya esta en uso");
+		if( !($id = self::insertId()) ) throw new Exception(Text::error('user_new'));
 		return new User($id, $email, $name, $password, $avatar);
 	}
 
@@ -284,18 +284,18 @@ class User extends Database implements JsonSerializable {
 
 	public function addContact($id_o_email) {
 		$contact = self::get($id_o_email);
-		if ($contact->id === $this->id) throw new Exception("No puedes ser tu propio friend");		
+		if ($contact->id === $this->id) throw new Exception(Text::error('contact_self'));		
 		$user1_id = min($this->id, $contact->id);
 		$user2_id = max($this->id, $contact->id);
 		$sql = "
 			INSERT INTO contact (user_1_id, user_2_id, user_state_id)
 			VALUES ({$user1_id}, {$user2_id}, {$this->id})";
-		if (!self::query($sql)) throw new Exception("No se pudo solicitar amistad");
+		if (!self::query($sql)) throw new Exception(Text::error('contact_new'));
 		return true;
 	}
 
 	public function updateContact($contact_id, $state) {
-		if (!is_numeric($state)) throw new Exception( "Error de state de contact");
+		if (!is_numeric($state)) throw new Exception(Text::error('contact_state'));
 		$state = intval($state);
 		$user1_id = min($this->id, $contact_id);
 		$user2_id = max($this->id, $contact_id);
@@ -304,13 +304,13 @@ class User extends Database implements JsonSerializable {
 		else if ($state == Helper::BLOCKED)
 			$condition = "state = ".Helper::ACCEPTED;
 		else
-			throw new Exception("Error de state de contact");			
+			throw new Exception(Text::error('contact_state'));			
 		$sql = "
 			UPDATE contact SET state = {$state}, user_state_id = {$this->id}
 			WHERE user_1_id = {$user1_id}
 			AND user_2_id = {$user2_id}
 			AND $condition";
-		if (!self::query($sql)) throw new Exception("No se actualizó contact");
+		if (!self::query($sql)) throw new Exception(Text::error('contact_update'));
 		$this->friends = null;
 		$this->requests = null;
 		return true;

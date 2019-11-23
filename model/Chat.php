@@ -21,7 +21,7 @@ class Chat extends Database implements JsonSerializable {
 	}
 
 	public static function get($id) {
-		if (!($id = intval($id))) throw new Exception("ID de chat inválido");
+		if (!($id = intval($id))) throw new Exception(Text::error('chat_id'));
 		$sql = "
 			SELECT c.id,
 				   c.date,
@@ -32,16 +32,16 @@ class Chat extends Database implements JsonSerializable {
 			WHERE c.id = $id
 			GROUP BY c.id";
 		$chat_db = self::query($sql);
-		if (!$chat_db || $chat_db->num_rows == 0) throw new Exception("No existe chat");
+		if (!$chat_db || $chat_db->num_rows == 0) throw new Exception(Text::error('chat_get'));
 		$chat = $chat_db->fetch_assoc();
 		return new Chat($chat['id'], $chat['date'], $chat['name'], $chat['last_msg']);
 	}
 
 	public static function new($name = "") {
-		if (!Helper::validName($name) || !($name = self::escape($name))) throw new Exception("Name no válido");
+		if (!Helper::validName($name) || !($name = self::escape($name))) throw new Exception(Text::error('chat_invalid'));
 		$sql = "INSERT INTO chat (name) VALUES ('$name')";
 		self::query($sql);
-		if (!($id = self::insertId())) throw new Exception("No se creó chat");
+		if (!($id = self::insertId())) throw new Exception(Text::error('chat_new'));
 		return Chat::get($id);
 	}
 

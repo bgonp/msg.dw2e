@@ -10,7 +10,7 @@ abstract class Database {
 			if (!$conf) return false;
 			$conn = new mysqli($conf->host, $conf->user, $conf->pass, $conf->name);
 			if ($conn->connect_errno)
-				throw new Exception("Fallo al conectar a base de datos");
+				throw new Exception(Text::error('database_connect'));
 			else
 				self::$conn = $conn;
 		}

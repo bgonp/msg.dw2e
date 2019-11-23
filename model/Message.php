@@ -27,7 +27,7 @@ class Message extends Database implements JsonSerializable {
 	}
 
 	public static function get($id) {
-		if (($id = intval($id)) <= 0) throw new Exception("ID de message inválido");
+		if (($id = intval($id)) <= 0) throw new Exception(Text::error('message_id'));
 		$sql = "
 			SELECT m.id,
 				   m.date,
@@ -41,7 +41,7 @@ class Message extends Database implements JsonSerializable {
 			ON m.user_id = u.id
 			WHERE m.id = $id";
 		$message_db = self::query($sql);
-		if (!$message_db || $message_db->num_rows == 0) throw new Exception("No existe message");
+		if (!$message_db || $message_db->num_rows == 0) throw new Exception(Text::error('message_get'));
 		$message = $message_db->fetch_assoc();
 		return new Message(
 			$message['id'],
@@ -59,11 +59,11 @@ class Message extends Database implements JsonSerializable {
 		$chat_id = intval($chat_id);
 		$attachment_id = $attachment && $attachment['error'] != 4 ? Attachment::new($attachment)->id() : 'NULL';
 		$content = self::escape($content);
-		if (empty($chat_id) || empty($content)) throw new Exception("No se creó message");
+		if (empty($chat_id) || empty($content)) throw new Exception(Text::error('message_invalid'));
 		$sql = "INSERT INTO message (user_id, chat_id, attachment_id, content)
 				VALUES ($user_id, $chat_id, $attachment_id, '$content')";
 		self::query($sql);
-		if( !($id = self::insertId()) ) throw new Exception("No se creó message");
+		if( !($id = self::insertId()) ) throw new Exception(Text::error('message_new'));
 		return Message::get($id);
 	}
 

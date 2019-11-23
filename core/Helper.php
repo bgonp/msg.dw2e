@@ -97,43 +97,4 @@ class Helper {
 		return dirname($url);
 	}
 
-	public static function error($error) {
-		switch ($error) {
-			case 'invalid_action':
-				return 'Operación no válida'; break;
-			case 'missing_data':
-				return 'Falta información'; break;
-			case 'pass_diff':
-				return 'Passwords didn\'t match'; break;
-			case 'pass_wrong':
-				return 'Wrong credentials'; break;
-			case 'user_confirm':
-				return 'Can\'t verify user'; break;
-			case 'user_wrong':
-				return 'Wrong user'; break;
-			case 'key_check':
-				return 'No se pudo verificar el enlace, quizás han pasado más de 24 horas'; break;
-			case 'file_size':
-				return 'La imagen es mayor que el límite establecido (1000x1000)'; break;
-			case 'file_weight':
-				return 'La imagen pesa más que el límite establecido ('.Option::get('image_maxweight').'KB)'; break;
-			case 'chat_name':
-				return 'Name of chat can\'t be empty'; break;
-			case 'chat_member':
-				return 'Please, select at least a friend'; break;
-			case 'chat_add':
-				return 'Alguien no se pudo agregar al chat'; break;
-			case 'chat_wrong':
-				return 'Chat incorrecto'; break;
-			case 'msg_add':
-				return 'No se pudo enviar el message'; break;
-			case 'msg_wrong':
-				return 'El texto no puede contener más de 1000 caracteres'; break;
-			case 'no_friend':
-				return 'Someone is not your friend anymore'; break;
-			default:
-				return "Ocurrió un error inesperado: $error";
-		}
-	}
-
 }
