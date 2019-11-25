@@ -1,31 +1,31 @@
 <div id="menu">
-	<div class="saludo">Hello, <span>{{NAME}}</span>!</div>
+	<div class="saludo">{{TR:HELLO}}, <span>{{NAME}}</span>!</div>
 	<a href="#" class="edit-profile-btn">
 		<div class="avatar"><img src="avatar.php?id={{ID}}"></div>
-		<span>My profile</span>
+		<span>{{TR:MYPROFILE}}</span>
 	</a>
 	<form action="ajax.php" method="post" class="logout confirmable">
 		<input type="hidden" name="action" value="logout">
-		<input type="submit" value="Logout" class="btn btn-logout">
+		<input type="submit" value="{{TR:LOGOUT}}" class="btn btn-logout">
 	</form>
 	<div class="edit-profile" style="display: none">
-		<h2>Edit profile</h2>
+		<h2>{{TR:EDITPROFILE}}</h2>
 		<hr>
 		<form action="ajax.php" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="action" value="editProfile">
-			<label class="form-elem"><span>E-mail</span>
+			<label class="form-elem"><span>{{TR:EMAIL}}</span>
 				<input type="email" name="email" value="{{EMAIL}}" required></label>
-			<label class="form-elem"><span>Name</span>
+			<label class="form-elem"><span>{{TR:NAME}}</span>
 				<input type="text" name="name" value="{{NAME}}" required></label>
-			<label class="form-elem"><span>Password</span>
+			<label class="form-elem"><span>{{TR:PASSWORD}}</span>
 				<input type="password" name="password"></label>
-			<label class="form-elem"><span>Password (repeat)</span>
+			<label class="form-elem"><span>{{TR:PASSWORD}} ({{TR:REPEAT}})</span>
 				<input type="password" name="password_rep"></label>
-			<label class="form-elem"><span>Avatar</span>
+			<label class="form-elem"><span>{{TR:AVATAR}}</span>
 				<input type="file" name="avatar" style="display: none">
-				<a href="#" class="btn btn-upload">Change avatar</a></label>
+				<a href="#" class="btn btn-upload">{{TR:CHANGEAVATAR}}</a></label>
 			<hr>
-			<input type="submit" value="Save" class="btn">
+			<input type="submit" value="{{TR:SAVE}}" class="btn">
 		</form>
 	</div>
 </div>

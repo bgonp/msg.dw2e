@@ -2,6 +2,83 @@
 
 class Text {
 
+	private static $translate = [
+		'{{TR:ACCEPT}}' => 'Accept',
+		'{{TR:ADD}}' => 'Add',
+		'{{TR:ADDAFRIEND}}' => 'Add a friend...',
+		'{{TR:ADDFRIENDS}}' => 'Add friends by e-mail...',
+		'{{TR:AVATAR}}' => 'Avatar',
+		'{{TR:CHANGEAVATAR}}' => 'Change avatar',
+		'{{TR:CHATNAME}}' => 'Chat name...',
+		'{{TR:CHATS}}' => 'Chats',
+		'{{TR:CONFIRMBUTTON}}' => 'CONFIRM ACCOUNT',
+		'{{TR:CONFIRMTEXT}}' => 'Please check the link below to confirm your account.',
+		'{{TR:DECLINE}}' => 'Decline',
+		'{{TR:EDITPROFILE}}' => 'Edit profile',
+		'{{TR:EMAIL}}' => 'E-mail',
+		'{{TR:ERROROCCURRED}}' => 'AN ERROR OCCURRED',
+		'{{TR:FRIENDS}}' => 'Friends',
+		'{{TR:HELLO}}' => 'Hello',
+		'{{TR:JOINS}}' => 'joins the chat',
+		'{{TR:LEAVES}}' => 'leaves the chat',
+		'{{TR:LOGIN}}' => 'Login',
+		'{{TR:LOGOUT}}' => 'Logout',
+		'{{TR:MYPROFILE}}' => 'My profile',
+		'{{TR:NAME}}' => 'Name',
+		'{{TR:NEWCHAT}}' => 'New chat',
+		'{{TR:OPTIONS}}' => 'Options',
+		'{{TR:PASSWORD}}' => 'Password',
+		'{{TR:RECOVER}}' => 'Recover your password',
+		'{{TR:REGISTER}}' => 'Register',
+		'{{TR:REMEMBER}}' => 'I don\'t remember my password',
+		'{{TR:REPEAT}}' => 'Repeat',
+		'{{TR:REQUESTS}}' => 'Requests',
+		'{{TR:RESET}}' => 'Reset password',
+		'{{TR:RESETBUTTON}}' => 'RESET PASSWORD',
+		'{{TR:RESETTEXT}}' => 'Please check the link below to set a new password for your user.',
+		'{{TR:RETURN}}' => 'Return',
+		'{{TR:SAVE}}' => 'Save',
+		'{{TR:SEND}}' => 'Send',
+		'{{TR:UPLOADAVATAR}}' => 'Upload avatar',
+		'{{TR:WRITEMESSAGE}}' => 'Write your message...'
+	];
+
+	public static function translate($content) {
+		$pattern = '/{{TR:([A-Z_]+)}}/';
+		$replace = self::$translate;
+		$content = preg_replace_callback($pattern, function($matches) use($replace) {
+			return $replace[$matches[0]];
+		}, $content);
+		return $content;
+	}
+
+	public static function success($message) {
+		switch ($message) {
+			case 'chat_invite':
+				return 'Your friend joins the chat'; break;
+			case 'chat_leave':
+				return 'You left the chat'; break;
+			case 'confirmation_sent':
+				return 'A confirmation e-mail was sent'; break;
+			case 'confirmation_needed':
+				return 'You have to confirm your new e-mail in order to login again'; break;
+			case 'friendship_accepted':
+				return 'Friendship accepted'; break;
+			case 'friendship_blocked':
+				return 'Friendship blocked'; break;
+			case 'friendship_declined':
+				return 'Friendship declined'; break;
+			case 'friendship_sent':
+				return 'Friendship request sent'; break;
+			case 'recover_sent':
+				return 'An e-mail was sent to recover your password'; break;
+			case 'updated_profile':
+				return 'Your profile was updated'; break;
+			default:
+				return "Unregistered message: $message";
+		}
+	}
+
 	public static function error($error) {
 		switch ($error) {
 			case 'attachment_id':
@@ -110,33 +187,6 @@ class Text {
 				return 'Can\'t get the user'; break;
 			default:
 				return "Unexpected error occurred: $error";
-		}
-	}
-
-	public static function success($message) {
-		switch ($message) {
-			case 'chat_invite':
-				return 'Your friend joins the chat'; break;
-			case 'chat_leave':
-				return 'You left the chat'; break;
-			case 'confirmation_sent':
-				return 'A confirmation e-mail was sent'; break;
-			case 'confirmation_needed':
-				return 'You have to confirm your new e-mail in order to login again'; break;
-			case 'friendship_accepted':
-				return 'Friendship accepted'; break;
-			case 'friendship_blocked':
-				return 'Friendship blocked'; break;
-			case 'friendship_declined':
-				return 'Friendship declined'; break;
-			case 'friendship_sent':
-				return 'Friendship request sent'; break;
-			case 'recover_sent':
-				return 'An e-mail was sent to recover your password'; break;
-			case 'updated_profile':
-				return 'Your profile was updated'; break;
-			default:
-				return "Unregistered message: $message";
 		}
 	}
 

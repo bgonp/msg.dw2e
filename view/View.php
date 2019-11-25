@@ -78,7 +78,7 @@ abstract class View {
 	// ------------------------
 	private static function email($content, $title) {
 		$replace = [
-			'{{CONTENT}}' => $content,
+			'{{CONTENT}}' => Text::translate($content),
 			'{{TITLE}}' => $title
 		];
 		return strtr(file_get_contents(HTML_DIR.'email/email.html'), $replace);
@@ -86,8 +86,9 @@ abstract class View {
 
 	private static function page($content, $clase, $options) {
 		$replace = [
-			'{{CONTENT}}' => $content,
+			'{{CONTENT}}' => Text::translate($content),
 			'{{CLASS}}' => $clase,
+			'{{TITLE}}' => $options['page_title'],
 			'{{COLORS}}' => self::colors($options['color_main'], $options['color_bg'], $options['color_border']),
 		];
 		return strtr(file_get_contents(HTML_DIR.'page.html'), $replace);

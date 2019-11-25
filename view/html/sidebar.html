@@ -1,8 +1,8 @@
 <div id="sidebar">
 	<ul class="tabs">
-		<li><a href="#" class="tab chats active" data-target="chats-menu">Chats</a>
-		<li><a href="#" class="tab friends" data-target="friends-menu">Friends</a>
-		<li><a href="#" class="tab requests{{NEWREQUESTS}}" data-target="requests-menu">Requests</a>
+		<li><a href="#" class="tab chats active" data-target="chats-menu">{{TR:CHATS}}</a>
+		<li><a href="#" class="tab friends" data-target="friends-menu">{{TR:FRIENDS}}</a>
+		<li><a href="#" class="tab requests{{NEWREQUESTS}}" data-target="requests-menu">{{TR:REQUESTS}}</a>
 	</ul>
 	<div id="chats" class="tab-content chats-menu">
 		<ul class="chats-list">
@@ -21,7 +21,7 @@
 							<input type="hidden" name="action" value="addMember">
 							<input type="hidden" name="chat_id" value="">
 							<select class="candidates-list" name="contact_id">
-								<option value="0">Add a friend...</option>
+								<option value="0">{{TR:ADDAFRIEND}}</option>
 							</select>
 							<button type="submit" class="btn btn-add-member"><i class="fa fa-plus"></i></button>
 						</form>
@@ -33,14 +33,14 @@
 	<div id="friends" class="tab-content friends-menu" style="display: none">
 		<form action="ajax.php" method="post" id="request-friend-form" class="empty-on-submit">
 			<input type="hidden" name="action" value="requestFriend">
-			<input type="email" name="email" placeholder="Add friends by e-mail...">
-			<input type="submit" value="Add">
+			<input type="email" name="email" placeholder="{{TR:ADDFRIENDS}}">
+			<input type="submit" value="{{TR:ADD}}">
 		</form>
 		<ul class="friends-list">{{FRIENDS}}</ul>
 		<form action="ajax.php" method="post" id="create-chat-form" class="empty-on-submit">
 			<input type="hidden" name="action" value="createChat">
-			<input type="text" name="name" placeholder="Chat name..." required>
-			<input type="submit" value="New chat">
+			<input type="text" name="name" placeholder="{{TR:CHATNAME}}" required>
+			<input type="submit" value="{{TR:NEWCHAT}}">
 		</form>
 		<li class="empty-friend deletable" style="display: none">
 			<div class="avatar"><img src=""></div>
@@ -73,12 +73,12 @@
 				<form action="ajax.php" method="post" class="delete-parent">
 					<input type="hidden" name="action" value="acceptFriend">
 					<input type="hidden" name="contact_id" value="">
-					<input type="submit" class="btn btn-accept" value="Accept">
+					<input type="submit" class="btn btn-accept" value="{{TR:ACCEPT}}">
 				</form>
 				<form action="ajax.php" method="post" class="confirmable delete-parent">
 					<input type="hidden" name="action" value="rejectFriend">
 					<input type="hidden" name="contact_id" value="">
-					<input type="submit" class="btn btn-decline" value="Decline">
+					<input type="submit" class="btn btn-decline" value="{{TR:DECLINE}}">
 				</form>
 			</div>
 		</li>

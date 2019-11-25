@@ -7,12 +7,12 @@
 		<form action="ajax.php" method="post" class="delete-parent">
 			<input type="hidden" name="action" value="acceptFriend">
 			<input type="hidden" name="contact_id" value="{{ID}}">
-			<input type="submit" class="btn btn-accept" value="Accept">
+			<input type="submit" class="btn btn-accept" value="{{TR:ACCEPT}}">
 		</form>
 		<form action="ajax.php" method="post" class="confirmable delete-parent">
 			<input type="hidden" name="action" value="rejectFriend">
 			<input type="hidden" name="contact_id" value="{{ID}}">
-			<input type="submit" class="btn btn-decline" value="Decline">
+			<input type="submit" class="btn btn-decline" value="{{TR:DECLINE}}">
 		</form>
 	</div>
 </li>

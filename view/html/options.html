@@ -1,14 +1,14 @@
 <div id="options">
 	<form action="ajax.php" method="post" class="options-form">
-		<h2>Options</h2>
+		<h2>{{TR:OPTIONS}}</h2>
 		<hr>
 		<input type="hidden" name="action" value="updateOptions">
 		<ul class="options-list">{{OPTIONS}}</ul>
 		<hr>
-		<input type="submit" value="Save">
+		<input type="submit" value="{{TR:SAVE}}">
 	</form>
 	<form action="ajax.php" method="post" class="logout confirmable">
 		<input type="hidden" name="action" value="logout">
-		<input type="submit" value="Logout" class="btn btn-logout">
+		<input type="submit" value="{{TR:LOGOUT}}" class="btn btn-logout">
 	</form>
 </div>

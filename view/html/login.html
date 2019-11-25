@@ -1,47 +1,47 @@
 <div id="login-form" class="{{CLASS}}">
 	<ul class="tabs">
-		<li><a href="#" class="tab active" data-target="login-form">Login</a>
-		<li><a href="#" class="tab" data-target="register-form">Register</a>
+		<li><a href="#" class="tab active" data-target="login-form">{{TR:LOGIN}}</a>
+		<li><a href="#" class="tab" data-target="register-form">{{TR:REGISTER}}</a>
 	</ul>
 	<div class="form-container">
 		<div class="login-form tab-content">
 			<form action="ajax.php" method="post">
 				<input type="hidden" name="action" value="login">
-				<label class="form-elem"><span>E-mail</span>
+				<label class="form-elem"><span>{{TR:EMAIL}}</span>
 					<input type="email" name="email" required></label>
-				<label class="form-elem"><span>Password</span>
+				<label class="form-elem"><span>{{TR:PASSWORD}}</span>
 					<input type="password" name="password" required></label>
-				<a href="#" class="tab active btn-reset" data-target="recover-form">I don't remember my password</a>
+				<a href="#" class="tab active btn-reset" data-target="recover-form">{{TR:REMEMBER}}</a>
 				<hr>
-				<input type="submit" class="btn btn-login" value="Login">
+				<input type="submit" class="btn btn-login" value="{{TR:LOGIN}}">
 			</form>
 		</div>
 		<div class="register-form tab-content" style="display: none">
 			<form action="ajax.php" method="post" enctype="multipart/form-data" class="empty-on-submit">
 				<input type="hidden" name="action" value="register">
-				<label class="form-elem"><span>Name</span>
+				<label class="form-elem"><span>{{TR:NAME}}</span>
 					<input type="text" name="name" required></label>
-				<label class="form-elem"><span>E-mail</span>
+				<label class="form-elem"><span>{{TR:EMAIL}}</span>
 					<input type="email" name="email" required></label>
-				<label class="form-elem"><span>Password</span>
+				<label class="form-elem"><span>{{TR:PASSWORD}}</span>
 					<input type="password" name="password" required></label>
-				<label class="form-elem"><span>Re-Password</span>
+				<label class="form-elem"><span>{{TR:PASSWORD}} ({{TR:REPEAT}})</span>
 					<input type="password" name="password_rep" required></label>
-				<label class="form-elem"><span>Avatar</span>
+				<label class="form-elem"><span>{{TR:AVATAR}}</span>
 					<input type="file" name="avatar" style="display: none">
-					<a href="#" class="btn btn-upload">Upload avatar</a></label>
+					<a href="#" class="btn btn-upload">{{TR:UPLOADAVATAR}}</a></label>
 				<hr>
-				<input type="submit" class="btn btn-register" value="Register">
+				<input type="submit" class="btn btn-register" value="{{TR:REGISTER}}">
 			</form>
 		</div>
 		<div class="recover-form tab-content" style="display: none">
-			<h2>Recover your password</h2>
+			<h2>{{TR:RECOVER}}</h2>
 			<form action="ajax.php" method="post" enctype="multipart/form-data">
 				<input type="hidden" name="action" value="resetSend">
-				<label class="form-elem"><span>E-mail</span>
+				<label class="form-elem"><span>{{TR:EMAIL}}</span>
 					<input type="email" name="email" required></label>
 				<hr>
-				<input type="submit" class="btn btn-register" value="Reset password">
+				<input type="submit" class="btn btn-register" value="{{TR:RESET}}">
 			</form>
 		</div>
 	</div>
