@@ -1,6 +1,6 @@
 <?php
 
-class User extends Database implements JsonSerializable {
+class User extends DatabasePDO implements JsonSerializable {
 
 	private $id;
 	private $email;
@@ -29,17 +29,17 @@ class User extends Database implements JsonSerializable {
 
 	public static function get($id_o_email, $password = null) {
 		if (is_numeric($id_o_email)){
-			$id = intval($id_o_email);
-			if ($id <= 0) throw new Exception(Text::error('user_id'));
-			$sql = "SELECT * FROM user WHERE id = $id";
+			if ($id_o_email <= 0) throw new Exception(Text::error('user_id'));
+			$sql = "SELECT * FROM user WHERE id = :id";
+			self::query($sql, [':id' => $id_o_email]);
 		} else {
-			$email = self::escape($id_o_email);
-			if (empty($email)) throw new Exception(Text::error('user_email'));
-			$sql = "SELECT * FROM user WHERE email = '$email'";
+			if (empty($id_o_email)) throw new Exception(Text::error('user_email'));
+			$sql = "SELECT * FROM user WHERE email = :email";
+			self::query($sql, [':email' => $id_o_email]);
 		}
-		$user_db = self::query($sql);
-		if ($user_db->num_rows == 0) throw new Exception(Text::error('user_get'));
-		$user = $user_db->fetch_assoc();
+		if (!self::count())
+			throw new Exception(Text::error('user_get'));
+		$user = self::fetch();
 		$user = new User(
 			$user['id'],
 			$user['email'],
@@ -56,31 +56,43 @@ class User extends Database implements JsonSerializable {
 	}
 
 	public static function new($email, $name, $password, $avatar = 0, $confirmed = 0, $admin = 0) {
-		if (!Helper::validEmail($email) || !($email = self::escape($email))) throw new Exception(Text::error('user_email'));
-		if (!Helper::validName($name) || !($name = self::escape($name))) throw new Exception(Text::error('user_name'));
-		if (!Helper::validPassword($password)) throw new Exception(Text::error('user_pass'));
-		if (!$avatar || $avatar['error'] == 4) $avatar = '';
-		else if (!($avatar = Helper::uploadImagen($avatar))) throw new Exception(Text::error('user_avatar'));
+		if (!Helper::validEmail($email))
+			throw new Exception(Text::error('user_email'));
+		if (!Helper::validName($name))
+			throw new Exception(Text::error('user_name'));
+		if (!Helper::validPassword($password))
+			throw new Exception(Text::error('user_pass'));
+		if (!$avatar || $avatar['error'] == 4)
+			$avatar = '';
+		else if (!($avatar = Helper::uploadImagen($avatar)))
+			throw new Exception(Text::error('user_avatar'));
 		$password = self::hash($password);
 		$sql = "
 			INSERT INTO user (email, name, password, avatar, confirmed, admin)
-			VALUES ('$email', '$name', '$password', '$avatar', $confirmed, $admin)";
-		self::query($sql);
-		if( !($id = self::insertId()) ) throw new Exception(Text::error('user_new'));
-		return new User($id, $email, $name, $password, $avatar);
+			VALUES (:email, :name, :password, :avatar, :confirmed, :admin)";
+		self::query($sql, [
+			':email' => $email,
+			':name' => $name,
+			':password' => $password,
+			':avatar' => $avatar,
+			':confirmed' => $confirmed,
+			':admin' => $admin
+		]);
+		if (!self::count() || !($id = self::insertId()))
+			throw new Exception(Text::error('user_new'));
+		return new User($id, $email, $name, $password, $avatar, $confirmed, $admin);
 	}
 
-	public static function list($result_set) {
+	public static function list() {
 		$users = [];
-		if (is_object($result_set) && get_class($result_set) == 'mysqli_result')
-			while ($user = $result_set->fetch_assoc())
-				$users[$user['id']] = new User(
-					$user['id'],
-					$user['email'],
-					$user['name'],
-					$user['password'],
-					$user['avatar']
-				);
+		while ($user = self::fetch())
+			$users[$user['id']] = new User(
+				$user['id'],
+				$user['email'],
+				$user['name'],
+				$user['password'],
+				$user['avatar']
+			);
 		return $users;
 	}
 
@@ -90,14 +102,14 @@ class User extends Database implements JsonSerializable {
 
 	public function email($email = null) {
 		if (is_null($email)) return $this->email;
-		if (!Helper::validEmail($email) || !($email = self::escape($email))) return false;
+		if (!Helper::validEmail($email)) return false;
 		$this->email = $email;
 		return true;
 	}
 
 	public function name($name = null) {
 		if (is_null($name)) return $this->name;
-		if (!Helper::validName($name) || !($name = self::escape($name))) return false;
+		if (!Helper::validName($name)) return false;
 		$this->name = $name;
 		return true;
 	}
@@ -136,29 +148,33 @@ class User extends Database implements JsonSerializable {
 					   p.last_read,
 					   MAX(m.id) last_msg
 				FROM chat c
-				LEFT JOIN message m ON c.id = m.chat_id
-				LEFT JOIN participate p ON c.id = p.chat_id
-				WHERE p.user_id = {$this->id}
+				LEFT JOIN message m
+				ON c.id = m.chat_id
+				LEFT JOIN participate p
+				ON c.id = p.chat_id
+				WHERE p.user_id = :id
 				GROUP BY c.id
 				ORDER BY IF(MAX(m.id) > p.last_read, 1, 0) DESC, last_msg DESC";
-			$result = self::query($sql);
-			$this->chats = Chat::list($result);
+			self::query($sql, [':id' => $this->id]);
+			$this->chats = Chat::list();
 		}
 		if (is_null($chat_id)) return $this->chats;
 		return $this->chats[intval($chat_id)] ?? false;
 	}
 
 	public function readChat($chat_id) {
-		$chat_id = intval($chat_id);
 		$sql = "
 			UPDATE participate p SET p.last_read = (
-				SELECT MAX(m.id) FROM message m WHERE m.chat_id = {$chat_id}
-			) WHERE p.user_id = {$this->id} AND p.chat_id = {$chat_id};";
-		return self::query($sql) !== false;
+				SELECT MAX(m.id) FROM message m WHERE m.chat_id = :chatid
+			) WHERE p.user_id = :userid AND p.chat_id = :chatid";
+		self::query($sql, [
+			':chatid' => $chat_id,
+			':userid' => $this->id
+		]);
+		return self::count() !== 0;
 	}
 
 	public function newChats($last_received) {
-		$last_received = intval($last_received);
 		$sql = "
 			SELECT c.id,
 				   c.date,
@@ -169,13 +185,16 @@ class User extends Database implements JsonSerializable {
 			FROM chat c
 			LEFT JOIN message m ON c.id = m.chat_id
 			LEFT JOIN participate p ON c.id = p.chat_id
-			WHERE p.user_id = {$this->id}
+			WHERE p.user_id = :userid
 			AND (m.id > p.last_read OR p.last_read IS NULL)
 			GROUP BY c.id
-			HAVING last_msg > $last_received
+			HAVING last_msg > :lastid
 			ORDER BY last_msg DESC";
-		$result = self::query($sql);
-		return $result->fetch_all(MYSQLI_ASSOC);
+		self::query($sql, [
+			':userid' => $this->id,
+			':lastid' => $last_received
+		]);
+		return self::fetch(true);
 	}
 
 	public function friends($friend_id = null) {
@@ -225,7 +244,7 @@ class User extends Database implements JsonSerializable {
 	}
 
 	private function contacts($contact_id, $state) {
-		$and = $state == Helper::WAITING ? " AND c.user_state_id <> {$this->id}" : "";
+		$and = $state == Helper::WAITING ? "AND c.user_state_id <> :userid" : "";
 		$sql = "
 			SELECT u.id,
 				   u.email,
@@ -235,18 +254,21 @@ class User extends Database implements JsonSerializable {
 			FROM user u
 			WHERE u.admin = 0
 			AND id IN (
-				SELECT IF(c.user_1_id = {$this->id}, c.user_2_id, c.user_1_id) user_id
+				SELECT IF(c.user_1_id = :userid, c.user_2_id, c.user_1_id) user_id
 				FROM contact c
-				WHERE c.state = {$state}{$and}
-				AND (c.user_1_id = {$this->id} OR c.user_2_id = {$this->id})
+				WHERE c.state = :state {$and}
+				AND (c.user_1_id = :userid OR c.user_2_id = :userid)
 			)
 			ORDER BY u.name ASC";
-		$result = self::query($sql);
-		return self::list($result);
+		self::query($sql, [
+			':userid' => $this->id,
+			':state' => $state
+		]);
+		return self::list();
 	}
 
 	private function newContacts($last, $state) {
-		$and = $state == Helper::WAITING ? " AND c.user_state_id <> {$this->id}" : "";
+		$and = $state == Helper::WAITING ? " AND c.user_state_id <> :userid" : "";
 		$sql = "
 			SELECT u.id,
 				   u.name,
@@ -255,30 +277,36 @@ class User extends Database implements JsonSerializable {
 			FROM user u
 			RIGHT JOIN (
 				SELECT
-					c.date_upd, IF(c.user_1_id = {$this->id}, c.user_2_id, c.user_1_id) user_id
+					c.date_upd, IF(c.user_1_id = :userid, c.user_2_id, c.user_1_id) user_id
 				FROM contact c
-				WHERE c.state = {$state}{$and}
-				AND (c.user_1_id = {$this->id} OR c.user_2_id = {$this->id})
-				AND date_upd > '{$last}'
+				WHERE c.state = :state {$and}
+				AND (c.user_1_id = :userid OR c.user_2_id = :userid)
+				AND date_upd > :last
 			) t
 			ON u.id = t.user_id
 			ORDER BY t.date_upd DESC";
-		$result = self::query($sql);
-		return $result->fetch_all(MYSQLI_ASSOC);
+		self::query($sql, [
+			':userid' => $this->id,
+			':state' => $state,
+			':last' => $last
+		]);
+		return self::fetch(true);
 	}
 
 	public function lastContactUpd() {
 		$sql = "
 			SELECT MAX(date_upd) last_contact_upd
 			FROM contact c
-			WHERE c.user_1_id = {$this->id} OR c.user_2_id = {$this->id}";
-		return self::query($sql)->fetch_assoc()['last_contact_upd'];
+			WHERE c.user_1_id = :id OR c.user_2_id = :id";
+		self::query($sql, [':id' => $this->id]);
+		return self::fetch()['last_contact_upd'];
 	}
 
 	public function lastReceived() {
 		$last = 0;
 		foreach ($this->chats() as $chat)
-			if ($chat->last_msg() > $last)$last = $chat->last_msg();
+			if ($chat->last_msg() > $last)
+				$last = $chat->last_msg();
 		return $last;
 	}
 
@@ -289,28 +317,44 @@ class User extends Database implements JsonSerializable {
 		$user2_id = max($this->id, $contact->id);
 		$sql = "
 			INSERT INTO contact (user_1_id, user_2_id, user_state_id)
-			VALUES ({$user1_id}, {$user2_id}, {$this->id})";
-		if (!self::query($sql)) throw new Exception(Text::error('contact_new'));
+			VALUES (:user1id, :user2id, :userid)";
+		self::query($sql, [
+			':user1id' => $user1_id,
+			':user2id' => $user2_id,
+			':userid' => $this->id
+		]);
+		if (!self::count())
+			throw new Exception(Text::error('contact_new'));
 		return true;
 	}
 
 	public function updateContact($contact_id, $state) {
-		if (!is_numeric($state)) throw new Exception(Text::error('contact_state'));
 		$state = intval($state);
+		if ($state < Helper::ACCEPTED || $state > Helper::BLOCKED)
+			throw new Exception(Text::error('contact_state'));
 		$user1_id = min($this->id, $contact_id);
 		$user2_id = max($this->id, $contact_id);
-		if ($state === Helper::ACCEPTED || $state === Helper::DECLINED)
-			$condition = "state = ".Helper::WAITING." AND user_state_id = {$contact_id}";
-		else if ($state == Helper::BLOCKED)
-			$condition = "state = ".Helper::ACCEPTED;
-		else
-			throw new Exception(Text::error('contact_state'));			
 		$sql = "
-			UPDATE contact SET state = {$state}, user_state_id = {$this->id}
-			WHERE user_1_id = {$user1_id}
-			AND user_2_id = {$user2_id}
-			AND $condition";
-		if (!self::query($sql)) throw new Exception(Text::error('contact_update'));
+			UPDATE contact SET state = :state, user_state_id = :userid
+			WHERE user_1_id = :user1id
+			AND user_2_id = :user2id
+			AND state = :reqstate";
+		$replace = [
+			':state' => $state,
+			':userid' => $this->id,
+			':user1id' => $user1_id,
+			':user2id' => $user2_id
+		];
+		if ($state === Helper::ACCEPTED || $state === Helper::DECLINED) {
+			$replace[':reqstate'] = Helper::WAITING;
+			$replace[':contactid'] = $contact_id;
+			$sql .= " AND user_state_id = :contactid";
+		} else if ($state == Helper::BLOCKED) {
+			$replace[':reqstate'] = Helper::ACCEPTED;
+		}
+		self::query($sql, $replace);
+		if (!self::count())
+			throw new Exception(Text::error('contact_update'));
 		$this->friends = null;
 		$this->requests = null;
 		return true;

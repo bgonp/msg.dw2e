@@ -1,6 +1,6 @@
 <?php
 
-class Attachment extends Database {
+class Attachment extends DatabasePDO {
 
 	private $id;
 	private $date;
@@ -34,23 +34,29 @@ class Attachment extends Database {
 			FROM attachment a
 			LEFT JOIN message m
 			ON a.id = m.attachment_id
-			WHERE a.id = $id";
-		$att = self::query($sql);
-		if ($att->num_rows == 0) throw new Exception(Text::error('attachment_get'));
-		$att = $att->fetch_assoc();
+			WHERE a.id = :id";
+		self::query($sql, [':id' => $id]);
+		if (!self::count()) throw new Exception(Text::error('attachment_get'));
+		$att = self::fetch();
 		return new Attachment($att['id'], $att['date'], $att['mime_type'], $att['height'], $att['width'], $att['filename'], $att['chat_id']);
 	}
 
 	public static function new($file) {
 		if (!$file || $file['error'])
 			throw new Exception(Text::error('attachment_invalid'));
-		if (!($mime_type = self::escape($file['type'])) || !($filename = self::escape($file['name'])))
+		if (!$file['type'] || !$file['name'])
 			throw new Exception(Text::error('attachment_data'));
 		if (!($fileinfo = Helper::uploadAttachment($file)))
 			throw new Exception(Text::error('attachment_upload'));
 		$sql = "INSERT INTO attachment (mime_type, height, width, filename)
-				VALUES ('$mime_type', {$fileinfo['height']}, {$fileinfo['width']}, '{$fileinfo['name']}')";
-		if (!self::query($sql) || !($id = self::insertId())) {
+				VALUES (:type, :height, :width, :name)";
+		self::query($sql, [
+			':type' => $file['type'],
+			':height' => $fileinfo['height'],
+			':width' => $fileinfo['width'],
+			':name' => $fileinfo['name']
+		]);
+		if (!self::count() || !($id = self::insertId())) {
 			Helper::removeAttachment($fileinfo['name']);
 			throw new Exception(Text::error('attachment_new'));
 		}

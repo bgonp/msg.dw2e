@@ -1,6 +1,6 @@
 <?php
 
-class Option extends Database {
+class Option extends DatabasePDO {
 	
 	private $id;
 	private $key;
@@ -18,7 +18,7 @@ class Option extends Database {
 	}
 
 	public static function get($key = null) {
-		if (!is_array(self::$list)) self::list();
+		if (!is_array(self::$list)) self::all();
 		if (is_null($key)) return self::$list;
 		return empty(self::$list[$key]) ? false : self::$list[$key]->value;
 	}
@@ -35,35 +35,39 @@ class Option extends Database {
 		return $this->name;
 	}
 
-	public function value() {
-		return $this->value;
-	}
-
 	public function __toString() {
 		return $this->value;
 	}
 
 	public static function update($key, $value) {
-		if (!is_array(self::$list)) self::list();
+		if (!is_array(self::$list)) self::all();
 		if (isset(self::$list[$key])) {
-			$value = self::escape($value);
 			self::$list[$key]->value = $value;
 			return self::$list[$key]->save();
 		}
 		return false;
 	}
 
-	private static function list() {
+	private static function all() {
 		self::$list = [];
 		$sql = "SELECT * FROM option";
-		$list = self::query($sql);
-		while ($opt = $list->fetch_object())
-			self::$list[$opt->key] = new Option($opt->id, $opt->key, $opt->type, $opt->name, $opt->value);
+		self::query($sql, []);
+		while ($opt = self::fetch())
+			self::$list[$opt['key']] = new Option(
+				$opt['id'],
+				$opt['key'],
+				$opt['type'],
+				$opt['name'],
+				$opt['value']
+			);
 	}
 
 	private function save() {
-		$sql = "UPDATE option SET value = '{$this->value}' WHERE id = {$this->id}";
-		return self::query($sql);
+		$sql = "UPDATE option SET value = :value WHERE id = :id";
+		self::query($sql, [
+			':value' => $this->value,
+			':id' => $this->id
+		]);
 	}
 
 }

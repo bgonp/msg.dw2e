@@ -1,6 +1,6 @@
 <?php
 
-class Message extends Database implements JsonSerializable {
+class Message extends DatabasePDO implements JsonSerializable {
 
 	private $id;
 	private $date;
@@ -39,10 +39,11 @@ class Message extends Database implements JsonSerializable {
 			FROM message m
 			LEFT JOIN user u
 			ON m.user_id = u.id
-			WHERE m.id = $id";
-		$message_db = self::query($sql);
-		if (!$message_db || $message_db->num_rows == 0) throw new Exception(Text::error('message_get'));
-		$message = $message_db->fetch_assoc();
+			WHERE m.id = :id";
+		self::query($sql, [':id' => $id]);
+		if (!self::count())
+			throw new Exception(Text::error('message_get'));
+		$message = self::fetch();
 		return new Message(
 			$message['id'],
 			$message['date'],
@@ -55,34 +56,39 @@ class Message extends Database implements JsonSerializable {
 	}
 
 	public static function new($user_id, $chat_id, $content, $attachment = false) {
-		$user_id = $user_id == 0 ? 'NULL' : intval($user_id);
+		$user_id = $user_id ? intval($user_id) : null;
 		$chat_id = intval($chat_id);
-		$attachment_id = $attachment && $attachment['error'] != 4 ? Attachment::new($attachment)->id() : 'NULL';
-		$content = self::escape($content);
-		if (empty($chat_id) || empty($content)) throw new Exception(Text::error('message_invalid'));
+		$attachment_id = $attachment && $attachment['error'] != 4 ? Attachment::new($attachment)->id() : null;
+		if (empty($chat_id) || empty($content))
+			throw new Exception(Text::error('message_invalid'));
 		$sql = "INSERT INTO message (user_id, chat_id, attachment_id, content)
-				VALUES ($user_id, $chat_id, $attachment_id, '$content')";
-		self::query($sql);
-		if( !($id = self::insertId()) ) throw new Exception(Text::error('message_new'));
+				VALUES (:userid, :chatid, :attid, :content)";
+		self::query($sql, [
+			':userid' => $user_id,
+			':chatid' => $chat_id,
+			':attid' => $attachment_id,
+			':content' => $content,
+		]);
+		if (!self::count() || !($id = self::insertId()))
+			throw new Exception(Text::error('message_new'));
 		return Message::get($id);
 	}
 
-	public static function list($result_set) {
+	public static function list() {
 		$messages = [];
-		if (is_object($result_set) && get_class($result_set) == 'mysqli_result')
-			while ($msg = $result_set->fetch_assoc())
-				$messages[$msg['id']] = new Message(
-					$msg['id'],
-					$msg['date'],
-					$msg['user_id'],
-					$msg['user_name'],
-					$msg['chat_id'],
-					$msg['attachment_id'],
-					$msg['content'],
-					$msg['mime_type'],
-					$msg['height'],
-					$msg['width']
-				);
+		while ($msg = self::fetch())
+			$messages[$msg['id']] = new Message(
+				$msg['id'],
+				$msg['date'],
+				$msg['user_id'],
+				$msg['user_name'],
+				$msg['chat_id'],
+				$msg['attachment_id'],
+				$msg['content'],
+				$msg['mime_type'],
+				$msg['height'],
+				$msg['width']
+			);
 		return $messages;
 	}
 
@@ -115,7 +121,8 @@ class Message extends Database implements JsonSerializable {
 	}
 
 	public function content() {
-		return $this->content = $content;
+		if (!$this->user_id) return Text::translate($this->content);
+		return $this->content;
 	}
 
 	public function chat() {
@@ -130,7 +137,7 @@ class Message extends Database implements JsonSerializable {
 			'user_name' => $this->user_name,
 			'chat_id' => $this->chat_id,
 			'attachment_id' => $this->attachment_id,
-			'content' => $this->content,
+			'content' => $this->content(),
 			'mime_type' => $this->mime_type,
 			'height' => $this->height,
 			'width' => $this->width

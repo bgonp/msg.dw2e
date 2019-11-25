@@ -216,7 +216,7 @@ abstract class View {
 			'{{KEY}}' => $option->key(),
 			'{{TYPE}}' => $option->type(),
 			'{{NAME}}' => $option->name(),
-			'{{VALUE}}' => $option->value()
+			'{{VALUE}}' => $option
 		];
 		return strtr(file_get_contents(HTML_DIR.'option.html'), $replace);
 	}
