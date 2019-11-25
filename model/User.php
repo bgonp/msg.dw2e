@@ -365,24 +365,36 @@ class User extends DatabasePDO implements JsonSerializable {
 	}
 
 	public function save() {
-		$expiration = $this->expiration ? date('"Y-m-d H:i:s"', $this->expiration) : 'NULL';
+		$expiration = $this->expiration ? date('Y-m-d H:i:s', $this->expiration) : null;
 		$sql = "
 			UPDATE user SET
-			email = '{$this->email}',
-			name = '{$this->name}',
-			password = '{$this->password}',
-			avatar = '{$this->avatar}',
-			confirmed = '{$this->confirmed}',
-			admin = '{$this->admin}',
-			code = '{$this->code}',
-			expiration = {$expiration}
-			WHERE id = {$this->id}";
-		return self::query($sql) !== false;
+			email = :email,
+			name = :name,
+			password = :password,
+			avatar = :avatar,
+			confirmed = :confirmed,
+			admin = :admin,
+			code = :code,
+			expiration = :expiration
+			WHERE id = :id";
+		self::query($sql, [
+			':email' => $this->email,
+			':name' => $this->name,
+			':password' => $this->password,
+			':avatar' => $this->avatar,
+			':confirmed' => $this->confirmed,
+			':admin' => $this->admin,
+			':code' => $this->code,
+			':expiration' => $expiration,
+			':id' => $this->id
+		]);
+		return self::count();
 	}
 
 	public function delete() {
-		$sql = "DELETE FROM user WHERE id = {$this->id}";
-		return self::query($sql) !== false;
+		$sql = "DELETE FROM user WHERE id = :id";
+		self::query($sql, [':id' => $this->id]);
+		return self::count();
 	}
 
 	public function jsonSerialize() {

@@ -121,6 +121,8 @@ class Text {
 				return 'Friendship couldn\'t be updated'; break;
 			case 'database_connect':
 				return 'Database connection error'; break;
+			case 'database_query':
+				return 'Database error occurred while executing a query'; break;
 			case 'email_error':
 				return 'An error occurred while sending the e-mail'; break;
 			case 'email_config':
