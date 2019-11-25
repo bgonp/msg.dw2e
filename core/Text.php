@@ -3,51 +3,51 @@
 class Text {
 
 	private static $translate = [
-		'{{TR:ACCEPT}}' => 'Accept',
-		'{{TR:ADD}}' => 'Add',
-		'{{TR:ADDAFRIEND}}' => 'Add a friend...',
-		'{{TR:ADDFRIENDS}}' => 'Add friends by e-mail...',
-		'{{TR:AVATAR}}' => 'Avatar',
-		'{{TR:CHANGEAVATAR}}' => 'Change avatar',
-		'{{TR:CHATNAME}}' => 'Chat name...',
-		'{{TR:CHATS}}' => 'Chats',
-		'{{TR:CONFIRMBUTTON}}' => 'CONFIRM ACCOUNT',
-		'{{TR:CONFIRMTEXT}}' => 'Please check the link below to confirm your account.',
-		'{{TR:DECLINE}}' => 'Decline',
-		'{{TR:EDITPROFILE}}' => 'Edit profile',
-		'{{TR:EMAIL}}' => 'E-mail',
-		'{{TR:ERROROCCURRED}}' => 'AN ERROR OCCURRED',
-		'{{TR:FRIENDS}}' => 'Friends',
-		'{{TR:HELLO}}' => 'Hello',
-		'{{TR:JOINS}}' => 'joins the chat',
-		'{{TR:LEAVES}}' => 'leaves the chat',
-		'{{TR:LOGIN}}' => 'Login',
-		'{{TR:LOGOUT}}' => 'Logout',
-		'{{TR:MYPROFILE}}' => 'My profile',
-		'{{TR:NAME}}' => 'Name',
-		'{{TR:NEWCHAT}}' => 'New chat',
-		'{{TR:OPTIONS}}' => 'Options',
-		'{{TR:PASSWORD}}' => 'Password',
-		'{{TR:RECOVER}}' => 'Recover your password',
-		'{{TR:REGISTER}}' => 'Register',
-		'{{TR:REMEMBER}}' => 'I don\'t remember my password',
-		'{{TR:REPEAT}}' => 'Repeat',
-		'{{TR:REQUESTS}}' => 'Requests',
-		'{{TR:RESET}}' => 'Reset password',
-		'{{TR:RESETBUTTON}}' => 'RESET PASSWORD',
-		'{{TR:RESETTEXT}}' => 'Please check the link below to set a new password for your user.',
-		'{{TR:RETURN}}' => 'Return',
-		'{{TR:SAVE}}' => 'Save',
-		'{{TR:SEND}}' => 'Send',
-		'{{TR:UPLOADAVATAR}}' => 'Upload avatar',
-		'{{TR:WRITEMESSAGE}}' => 'Write your message...'
+		'ACCEPT' => 'Accept',
+		'ADD' => 'Add',
+		'ADDAFRIEND' => 'Add a friend...',
+		'ADDFRIENDS' => 'Add friends by e-mail...',
+		'AVATAR' => 'Avatar',
+		'CHANGEAVATAR' => 'Change avatar',
+		'CHATNAME' => 'Chat name...',
+		'CHATS' => 'Chats',
+		'CONFIRMBUTTON' => 'CONFIRM ACCOUNT',
+		'CONFIRMTEXT' => 'Please check the link below to confirm your account.',
+		'DECLINE' => 'Decline',
+		'EDITPROFILE' => 'Edit profile',
+		'EMAIL' => 'E-mail',
+		'ERROROCCURRED' => 'AN ERROR OCCURRED',
+		'FRIENDS' => 'Friends',
+		'HELLO' => 'Hello',
+		'JOINS' => 'joins the chat',
+		'LEAVES' => 'leaves the chat',
+		'LOGIN' => 'Login',
+		'LOGOUT' => 'Logout',
+		'MYPROFILE' => 'My profile',
+		'NAME' => 'Name',
+		'NEWCHAT' => 'New chat',
+		'OPTIONS' => 'Options',
+		'PASSWORD' => 'Password',
+		'RECOVER' => 'Recover your password',
+		'REGISTER' => 'Register',
+		'REMEMBER' => 'I don\'t remember my password',
+		'REPEAT' => 'repeat',
+		'REQUESTS' => 'Requests',
+		'RESET' => 'Reset password',
+		'RESETBUTTON' => 'RESET PASSWORD',
+		'RESETTEXT' => 'Please check the link below to set a new password for your user.',
+		'RETURN' => 'Return',
+		'SAVE' => 'Save',
+		'SEND' => 'Send',
+		'UPLOADAVATAR' => 'Upload avatar',
+		'WRITEMESSAGE' => 'Write your message...'
 	];
 
 	public static function translate($content) {
 		$pattern = '/{{TR:([A-Z_]+)}}/';
 		$replace = self::$translate;
 		$content = preg_replace_callback($pattern, function($matches) use($replace) {
-			return $replace[$matches[0]];
+			return $replace[$matches[1]];
 		}, $content);
 		return $content;
 	}
@@ -136,7 +136,7 @@ class Text {
 			case 'install_tables':
 				return 'Database tables couldn\'t be created'; break;
 			case 'install_putfile':
-				return 'Configuration file couldn\'t be created. This can be a permissions problem'; break;
+				return 'Configuration file couldn\'t be created. This could be a permissions problem'; break;
 			case 'installation':
 				return 'An error occurred during installation'; break;
 			case 'invalid_action':

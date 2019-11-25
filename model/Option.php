@@ -39,6 +39,10 @@ class Option extends Database {
 		return $this->value;
 	}
 
+	public function __toString() {
+		return $this->value;
+	}
+
 	public static function update($key, $value) {
 		if (!is_array(self::$list)) self::list();
 		if (isset(self::$list[$key])) {

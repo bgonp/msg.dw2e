@@ -96,9 +96,9 @@ abstract class View {
 
 	private static function colors($main, $background, $border) {
 		$replace = [
-			'{{MAIN}}' => is_object($main) ? $main->value() : $main,
-			'{{BACKGROUND}}' => is_object($background) ? $background->value() : $background,
-			'{{BORDER}}' => is_object($border) ? $border->value() : $border
+			'{{MAIN}}' => $main,
+			'{{BACKGROUND}}' => $background,
+			'{{BORDER}}' => $border
 		];
 		return strtr(file_get_contents(HTML_DIR.'colors.html'), $replace);
 	}

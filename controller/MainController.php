@@ -27,7 +27,12 @@ class MainController {
 		try {
 			if (!Database::connect()) {
 				SessionController::logout();
-				View::install(['color_main' => '#1b377a', 'color_bg' => '#f0f5ff', 'color_border' => '#939db5']);
+				View::install([
+					'page_title' => 'DW2E Messaging App',
+					'color_main' => '#1b377a',
+					'color_bg' => '#f0f5ff',
+					'color_border' => '#939db5'
+				]);
 			} else if (!empty($_GET)) {
 				if (SessionController::check() || empty($_GET['action']) || !method_exists(__CLASS__, $_GET['action'])) {
 					header('Location: '.Helper::currentUrl());
@@ -353,11 +358,10 @@ class MainController {
 		return $response;
 	}
 	private static function installApp($post, $files) {
-		if (Database::connect() || Install::run($post)) {
+		if (Database::connect() || Install::run($post))
 			$response = ['redirect' => Helper::currentUrl()];
-		} else {
+		else
 			$response = ['type' => 'error', 'message' => Text::error('installation')];
-		}
 		return $response;
 	}
 }
