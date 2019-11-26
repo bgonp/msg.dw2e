@@ -1,6 +1,6 @@
 <?php
 
-class Option extends DatabasePDO {
+class Option extends Database {
 	
 	private $id;
 	private $key;

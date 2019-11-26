@@ -1,6 +1,6 @@
 <?php
 
-class Attachment extends DatabasePDO {
+class Attachment extends Database {
 
 	private $id;
 	private $date;

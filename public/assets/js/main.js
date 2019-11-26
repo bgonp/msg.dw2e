@@ -74,6 +74,21 @@ $(document).ready(function() {
 			upload_attachment.siblings('.btn-upload').addClass('empty');
 	});
 
+	// Filter chats
+	var search_timeout;
+	$('.search-chat input').keyup(function() {
+		var search = $(this).val();
+		clearTimeout(search_timeout);
+		search_timeout = setTimeout(function() {
+			$('#chats .chats-list .a-chat').each(function() {
+				var this_chat = $(this);
+				var text = this_chat.children('.chat-link').text();
+				if (text.search(search) > -1) this_chat.show();
+				else this_chat.hide();
+			});
+		}, 150);
+	});
+
 });
 
 // ------------------
@@ -90,7 +105,6 @@ function showAlert(type, message) {
 // PROCESS RESPONSE
 // ------------------
 function processResponse(response) {
-	console.log(response); // TODO - A BORRAR
 	if (response.redirect)
 		location.href = response.redirect;
 	if (response.user_id && response.user_id != current_user)

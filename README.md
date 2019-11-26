@@ -25,6 +25,7 @@ An instant messaging single page application to talk about topics in chat rooms 
 - You can accept or decline friendship or block a friend.
 - You can send messages to non-friends users if your are in the same chat room (but you can't see their avatars).
 - You can modify your profile: name, e-mail, password and avatar.
+- Uploaded avatars will be resized to a square image of maximum 200x200.
 
 ## Requeriments
 
@@ -88,6 +89,7 @@ The admin user can modify some settings from the control panel:
 - You will be redirected to chats list and here you can see the new chat room. Click on it and you can start writing here.
 - If you want to add a friend to the current chat room, select him it in the `Add a friend...` box and click on the `+` icon.
 - If you want to leave a chat room, click on the forbidden icon at the right of the chat room and confirm.
+- You can also filter chat rooms by using the filter input here. This is useful if you belongs to several chat rooms.
 
 #### Messages
 - Once you are in a chat room you can see at the left who are in this room and will be able to see all the messages here. Also, you can see their avatars in the upper side of the messages section (if someone in the room is not your friend, you won't see his avatar, but you can see his messages and viceversa).

@@ -1,6 +1,6 @@
 <?php
 
-class User extends DatabasePDO implements JsonSerializable {
+class User extends Database implements JsonSerializable {
 
 	private $id;
 	private $email;
@@ -64,7 +64,7 @@ class User extends DatabasePDO implements JsonSerializable {
 			throw new Exception(Text::error('user_pass'));
 		if (!$avatar || $avatar['error'] == 4)
 			$avatar = '';
-		else if (!($avatar = Helper::uploadImagen($avatar)))
+		else if (!($avatar = Helper::uploadAvatar($avatar)))
 			throw new Exception(Text::error('user_avatar'));
 		$password = self::hash($password);
 		$sql = "
@@ -122,8 +122,8 @@ class User extends DatabasePDO implements JsonSerializable {
 
 	public function avatar($avatar = null) {
 		if (is_null($avatar)) return $this->avatar;
-		if (!($avatar = Helper::uploadImagen($avatar))) return false;
-		Helper::removeImagen($this->avatar);
+		if (!($avatar = Helper::uploadAvatar($avatar))) return false;
+		Helper::removeAvatar($this->avatar);
 		$this->avatar = $avatar;
 		return true;
 	}

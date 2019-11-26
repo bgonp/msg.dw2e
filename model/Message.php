@@ -1,6 +1,6 @@
 <?php
 
-class Message extends DatabasePDO implements JsonSerializable {
+class Message extends Database implements JsonSerializable {
 
 	private $id;
 	private $date;

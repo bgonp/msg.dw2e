@@ -1,6 +1,6 @@
 <?php
 
-class Chat extends DatabasePDO implements JsonSerializable {
+class Chat extends Database implements JsonSerializable {
 	
 	private $id;
 	private $date;

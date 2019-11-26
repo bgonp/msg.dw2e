@@ -27,28 +27,40 @@ class Helper {
 		return strlen($texto) <= 1000;
 	}
 
-	public static function uploadImagen($imagen) {
-		if ($imagen['error'] || $imagen['size'] > Option::get('image_maxweight') * 1024 )
+	public static function uploadAvatar($avatar) {
+		if ($avatar['error'] || $avatar['size'] > Option::get('image_maxweight') * 1024 )
 			return false;
 
-		$extension = strtolower(pathinfo($imagen['name'], PATHINFO_EXTENSION));
-		if (!in_array($extension, ['png','jpg','jpeg','gif']))
+		$extension = strtolower(pathinfo($avatar['name'], PATHINFO_EXTENSION));
+		if (!in_array($extension, ['jpg','jpeg','png','gif']))
 			return false;
-
-		$size = getimagesize($imagen['tmp_name']);
-		if ($size[0] > 1000 || $size[1] > 1000)
-			return false;
+		if ($extension == 'jpg') $extension = 'jpeg';
 
 		do {
 			$filename = self::randomString(16).'.'.$extension;
 		} while (file_exists(AVATAR_DIR.$filename));
-		if (!move_uploaded_file($imagen['tmp_name'], AVATAR_DIR.$filename))
+
+		$image = ('imagecreatefrom'.$extension)($avatar['tmp_name']);
+		$width = imagesx($image);
+		$height = imagesy($image);
+		$sidelength = min($width, $height);
+		$x = max(0, intval(($width-$sidelength)/2));
+		$y = max(0, intval(($height-$sidelength)/2));
+		if ($sidelength > 200) {
+			$extension = 'jpeg';
+			$resized = imagecreatetruecolor(200, 200);
+			imagecopyresized($resized, $image, 0, 0, $x, $y, 200, 200, $sidelength, $sidelength);
+		} else {
+			$resized = imagecrop($image, ['x' => $x, 'y' => $y, 'width' => $sidelength, 'height' => $sidelength]);
+		}
+		$quality = $extension == 'jpeg' ? 95 : $extension == 'png' ? -1 : null;
+		if (!('image'.$extension)($resized, AVATAR_DIR.$filename, $quality))
 			return false;
 
 		return $filename;
 	}
 
-	public static function removeImagen($filename) {
+	public static function removeAvatar($filename) {
 		$pattern = "/^[a-zA-Z0-9]{16}\.(?:png|jpg|jpeg|gif)$/";
 		if (!preg_match($pattern, $filename) || !file_exists(AVATAR_DIR.$filename)) return false;
 		return unlink(AVATAR_DIR.$filename);
