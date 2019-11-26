@@ -50,8 +50,10 @@ class Helper {
 			$extension = 'jpeg';
 			$resized = imagecreatetruecolor(200, 200);
 			imagecopyresized($resized, $image, 0, 0, $x, $y, 200, 200, $sidelength, $sidelength);
-		} else {
+		} else if ($height != $sidelength || $width != $sidelength){
 			$resized = imagecrop($image, ['x' => $x, 'y' => $y, 'width' => $sidelength, 'height' => $sidelength]);
+		} else {
+			$resized = $image;
 		}
 		$quality = $extension == 'jpeg' ? 95 : $extension == 'png' ? -1 : null;
 		if (!('image'.$extension)($resized, AVATAR_DIR.$filename, $quality))
