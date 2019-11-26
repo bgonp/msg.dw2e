@@ -11,6 +11,7 @@ class Text {
 		'CHANGEAVATAR' => 'Change avatar',
 		'CHATNAME' => 'Chat name...',
 		'CHATS' => 'Chats',
+		'CONFIRM' => 'Confirm your account',
 		'CONFIRMBUTTON' => 'CONFIRM ACCOUNT',
 		'CONFIRMTEXT' => 'Please check the link below to confirm your account.',
 		'DECLINE' => 'Decline',
@@ -28,12 +29,11 @@ class Text {
 		'NEWCHAT' => 'New chat',
 		'OPTIONS' => 'Options',
 		'PASSWORD' => 'Password',
-		'RECOVER' => 'Recover your password',
 		'REGISTER' => 'Register',
 		'REMEMBER' => 'I don\'t remember my password',
 		'REPEAT' => 'repeat',
 		'REQUESTS' => 'Requests',
-		'RESET' => 'Reset password',
+		'RESET' => 'Reset your password',
 		'RESETBUTTON' => 'RESET PASSWORD',
 		'RESETTEXT' => 'Please check the link below to set a new password for your user.',
 		'RETURN' => 'Return',
@@ -130,7 +130,7 @@ class Text {
 			case 'file_size':
 				return 'The image can\'t be greater than 1000 x 1000'; break;
 			case 'file_weight':
-				return 'The image can\'t be greater than '.Option::get('image_maxweight').'KB'; break;
+				return 'The image can\'t be greater than '.Option::get('avatar_maxweight').'KB'; break;
 			case 'install_userpass':
 				return 'Invalid user credentials'; break;
 			case 'install_getfile':

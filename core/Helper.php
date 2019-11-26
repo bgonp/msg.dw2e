@@ -28,7 +28,7 @@ class Helper {
 	}
 
 	public static function uploadAvatar($avatar) {
-		if ($avatar['error'] || $avatar['size'] > Option::get('image_maxweight') * 1024 )
+		if ($avatar['error'] || $avatar['size'] > Option::get('avatar_maxweight') * 1024 )
 			return false;
 
 		$extension = strtolower(pathinfo($avatar['name'], PATHINFO_EXTENSION));

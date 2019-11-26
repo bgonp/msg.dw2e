@@ -59,7 +59,7 @@ abstract class View {
 			'{{DOMAIN}}' => Helper::currentUrl()
 		];
 		$content = strtr(file_get_contents(HTML_DIR.'email/confirm.html'), $replace);
-		return self::email($content,'Confirm your account');
+		return self::email($content, Text::translate('{{TR:CONFIRM}}'));
 	}
 
 	public static function emailReset($user) {
@@ -70,7 +70,7 @@ abstract class View {
 			'{{DOMAIN}}' => Helper::currentUrl()
 		];
 		$content = strtr(file_get_contents(HTML_DIR.'email/recover.html'), $replace);
-		return self::email($content,'Reset your password');
+		return self::email($content,Text::translate('{{TR:RESET}}'));
 	}
 
 	// ------------------------
