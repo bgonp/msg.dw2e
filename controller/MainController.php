@@ -324,7 +324,7 @@ class MainController {
 	private static function sendMessage($post, $files) {
 		if (empty($post['chat_id']) || empty($post['message'])) {
 			$response = ['type' => 'error', 'message' => Text::error('missing_data')];
-		} else if (!Helper::validTexto($post['message'])) {
+		} else if (!Helper::validText($post['message'])) {
 			$response = ['type' => 'error', 'message' => Text::error('msg_invalid')];
 		} else {
 			$user = User::get(SessionController::userId());

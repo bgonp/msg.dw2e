@@ -1,32 +1,51 @@
 <?php
+/**
+ * Class to install the application for the first time use.
+ * 
+ * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
+ * @author Borja Gonzalez <borja@bgon.es>
+ */
+class Install { // TODO: Testear tras cambiar a PDO
 
-class Install {
-
+	/**
+	 * Run the installation process. It will check the database connection, install the whole database
+	 * tables, store the default options, creates the configuration file with database access data, and
+	 * create the admin user with the email and password given.
+	 * 
+	 * @param array $post Array of data (email, password, password_rep, host, name, user, pass)
+	 * @return bool True if installation was completed successfully
+	 * @throws Exception If error occurred while installation
+	 */
 	public static function run($post) {
+		// Check valid password and email
 		if (empty($post['password']) || $post['password'] != $post['password_rep'] ||
 			!($email = filter_var($post['email'], FILTER_VALIDATE_EMAIL)))
 			throw new Exception(Text::error('install_userpass'));
 
-		$db = [
-			'host' => $post['host'] ?? '',
-			'name' => $post['name'] ?? '',
-			'user' => $post['user'] ?? '',
-			'pass' => $post['pass'] ?? ''
-		];
-		$conn = new mysqli($db['host'], $db['user'], $db['pass'], $db['name']);
-		if ($conn->connect_errno)
+		// Try to connect to database
+		$conn_str = 'mysql:host='.($post['host']??'').';dbname='.($post['name']??'');
+		try {
+			$conn = new PDO($conn_str, $post['user']??'', $post['pass']??'');
+		} catch (PDOException $e) {
 			throw new Exception(Text::error('database_connect'));
+		}
 
+		// Get install SQL script from file
 		if (!($sql = file_get_contents(CONFIG_DIR.'install.sql')))
 			throw new Exception(Text::error('install_getfile'));
 
-		if ($conn->multi_query($sql)) {
-			while ($conn->next_result());
-		} else throw new Exception(Text::error('install_tables'));
+		// Install tables and store default options
+		try {
+			$conn->exec($sql);
+		} catch (PDOException $e) {
+			throw new Exception(Text::error('install_tables'));			
+		}
 
+		// Try to save the config file config/database.json
 		if (!file_put_contents(CONFIG_DIR.'database.json', json_encode($db)))
 			throw new Exception(Text::error('install_putfile'));
 
+		// Try to save the default admin user
 		User::new($email, 'admin', $post['password'], 0, 1, 1);
 
 		return true;

@@ -1,5 +1,11 @@
 <?php
-
+/**
+ * Class with text relative uses. Here you can find all the texts of the whole web application in order
+ * to make it easy to translate to another languages
+ * 
+ * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
+ * @author Borja Gonzalez <borja@bgon.es>
+ */
 class Text {
 
 	private static $translate = [
@@ -43,6 +49,13 @@ class Text {
 		'WRITEMESSAGE' => 'Write your message...'
 	];
 
+	/**
+	 * Will translate any appearances of string with form {{TR:____}} of $content to its associated
+	 * text setted in self::$translate array
+	 * 
+	 * @param  string $content The content string to translate
+	 * @return string Translated content
+	 */
 	public static function translate($content) {
 		$pattern = '/{{TR:([A-Z_]+)}}/';
 		$replace = self::$translate;
@@ -52,8 +65,14 @@ class Text {
 		return $content;
 	}
 
-	public static function success($message) {
-		switch ($message) {
+	/**
+	 * Will translate a success code into its associated description message.
+	 * 
+	 * @param string $code Code of the success message
+	 * @return string Message associated with the success code
+	 */
+	public static function success($code) {
+		switch ($code) {
 			case 'chat_invite':
 				return 'Your friend joins the chat'; break;
 			case 'chat_leave':
@@ -75,12 +94,18 @@ class Text {
 			case 'updated_profile':
 				return 'Your profile was updated'; break;
 			default:
-				return "Unregistered message: $message";
+				return "Unregistered code: $code";
 		}
 	}
 
-	public static function error($error) {
-		switch ($error) {
+	/**
+	 * Will translate an error code into its associated description message.
+	 * 
+	 * @param string $code Code of the error message
+	 * @return string Message associated with the error code
+	 */
+	public static function error($code) {
+		switch ($code) {
 			case 'attachment_id':
 				return 'Invalid attachment id'; break;
 			case 'attachment_get':
@@ -127,8 +152,14 @@ class Text {
 				return 'An error occurred while sending the e-mail'; break;
 			case 'email_config':
 				return 'E-mail configuration error'; break;
+			case 'file_extension':
+				return 'File type not allowed'; break;
+			case 'file_name':
+				return 'File name not allowed'; break;
 			case 'file_size':
 				return 'The image can\'t be greater than 1000 x 1000'; break;
+			case 'file_upload':
+				return 'An error occurred while uploading the file'; break;
 			case 'file_weight':
 				return 'The image can\'t be greater than '.Option::get('avatar_maxweight').'KB'; break;
 			case 'install_userpass':
@@ -188,7 +219,7 @@ class Text {
 			case 'user_wrong':
 				return 'Can\'t get the user'; break;
 			default:
-				return "Unexpected error occurred: $error";
+				return "Unexpected error occurred: $code";
 		}
 	}
 

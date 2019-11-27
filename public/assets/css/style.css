@@ -942,6 +942,9 @@ input[disabled] {
 #messages .messages-list .a-message .attachment.type-image i {
 	display: none;
 }
+#messages .messages-list .a-message .content {
+	white-space: pre-wrap;
+}
 #messages .messages-list .a-message .date {
 	font-size: 0.8rem;
 	font-weight: 700;
