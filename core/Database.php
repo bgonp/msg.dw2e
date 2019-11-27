@@ -24,8 +24,8 @@ abstract class Database {
 				return false;
 			try {
 				$conn = new PDO("mysql:host={$conf->host};dbname={$conf->name}", $conf->user, $conf->pass);
-			} catch (PDOException $e) {
-				throw new Exception(Text::error('database_connect'));
+			} finally {
+				if (!$conn) throw new Exception(Text::error('database_connect'));
 			}
 			self::$conn = $conn;
 		}

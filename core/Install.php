@@ -5,7 +5,7 @@
  * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
  * @author Borja Gonzalez <borja@bgon.es>
  */
-class Install { // TODO: Testear tras cambiar a PDO
+class Install {
 
 	/**
 	 * Run the installation process. It will check the database connection, install the whole database
@@ -18,14 +18,15 @@ class Install { // TODO: Testear tras cambiar a PDO
 	 */
 	public static function run($post) {
 		// Check valid password and email
-		if (empty($post['password']) || $post['password'] != $post['password_rep'] ||
-			!($email = filter_var($post['email'], FILTER_VALIDATE_EMAIL)))
+		if (!($email = filter_var($post['usr']['email'], FILTER_VALIDATE_EMAIL)) ||
+			!preg_match('/^(?=.*[0-9]+)(?=.*[A-Z]+)(?=.*[a-z]+).{6,16}$/', $post['usr']['password']) ||
+			$post['usr']['password'] != $post['usr']['password_rep'])
 			throw new Exception(Text::error('install_userpass'));
 
 		// Try to connect to database
-		$conn_str = 'mysql:host='.($post['host']??'').';dbname='.($post['name']??'');
+		$conn_str = 'mysql:host='.($post['db']['host']??'').';dbname='.($post['db']['name']??'');
 		try {
-			$conn = new PDO($conn_str, $post['user']??'', $post['pass']??'');
+			$conn = new PDO($conn_str, $post['db']['user']??'', $post['db']['pass']??'');
 		} catch (PDOException $e) {
 			throw new Exception(Text::error('database_connect'));
 		}
@@ -39,14 +40,16 @@ class Install { // TODO: Testear tras cambiar a PDO
 			$conn->exec($sql);
 		} catch (PDOException $e) {
 			throw new Exception(Text::error('install_tables'));			
+		} finally {
+			$conn = null;
 		}
 
 		// Try to save the config file config/database.json
-		if (!file_put_contents(CONFIG_DIR.'database.json', json_encode($db)))
+		if (!file_put_contents(CONFIG_DIR.'database.json', json_encode($post['db'])))
 			throw new Exception(Text::error('install_putfile'));
 
 		// Try to save the default admin user
-		User::new($email, 'admin', $post['password'], 0, 1, 1);
+		User::new($email, 'admin', $post['usr']['password'], 0, 1, 1);
 
 		return true;
 	}

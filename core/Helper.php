@@ -20,7 +20,7 @@ class Helper {
 	 * @return bool If name matches regex
 	 */
 	public static function validName($name) {
-		$pattern = '/'.Option::get('regex_name').'/';
+		$pattern = '/^'.Option::get('regex_name').'$/';
 		return boolval(preg_match($pattern, $name));
 	}
 
@@ -31,7 +31,7 @@ class Helper {
 	 * @return bool If password matches regex
 	 */
 	public static function validPassword($password) {
-		$pattern = '/'.Option::get('regex_password').'/';
+		$pattern = '/^'.Option::get('regex_password').'$/';
 		return boolval(preg_match($pattern, $password));
 	}
 
@@ -42,7 +42,7 @@ class Helper {
 	 * @return bool If email matches regex
 	 */
 	public static function validEmail($email) {
-		$pattern = '/'.Option::get('regex_email').'/';
+		$pattern = '/^'.Option::get('regex_email').'$/';
 		return boolval(preg_match($pattern, $email));
 	}
 

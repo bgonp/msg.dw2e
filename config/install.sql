@@ -61,9 +61,9 @@ CREATE TABLE `option` (
 
 INSERT INTO `option` (`id`, `key`, `type`, `name`, `value`) VALUES
 (1, 'page_title', 'text', 'Page title', 'DW2E Messaging App'),
-(2, 'regex_password', 'text', 'Password conditions', '^(?=.*[0-9]+)(?=.*[A-Z]+)(?=.*[a-z]+).{6,16}$'),
-(3, 'regex_name', 'text', 'Names conditions', '^\\w[ \\w]{2,32}\\w$'),
-(4, 'regex_email', 'text', 'E-mail conditions', '^[^@]+@[^@]+[a-zA-Z]{2,}$'),
+(2, 'regex_password', 'text', 'Password conditions', '(?=.*[0-9]+)(?=.*[A-Z]+)(?=.*[a-z]+).{6,16}'),
+(3, 'regex_name', 'text', 'Names conditions', '\\w[ \\w]{2,32}\\w'),
+(4, 'regex_email', 'text', 'E-mail conditions', '[^@]+@[^@]+[a-zA-Z]{2,}'),
 (5, 'color_main', 'color', 'Main color', '#1b377a'),
 (6, 'color_bg', 'color', 'Background color', '#f0f5ff'),
 (7, 'color_border', 'color', 'Border color', '#939db5'),
