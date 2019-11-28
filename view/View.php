@@ -1,10 +1,21 @@
 <?php
+/**
+ * Abstract class View with static methods to echo or get html content.
+ * Each method here calls another methods from the same class for each part
+ * of the html code to get.
+ * 
+ * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
+ * @author Borja Gonzalez <borja@bgon.es>
+ * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
+ */
+class View {
 
-abstract class View {
-
-	// ------------------------
-	// Pages
-	// ------------------------
+	/**
+	 * Echoes the whole main page of the app.
+	 * 
+	 * @param User $user Current logged user to echo his main page
+	 * @param array $options Associative array of strings with options to be applied
+	 */
 	public static function main($user, $options) {
 		$content = self::menu($user);
 		$content .= self::sidebar($user->chats(), $user->friends(), $user->requests());
@@ -15,6 +26,11 @@ abstract class View {
 		echo self::page($content, 'main', $options);
 	}
 
+	/**
+	 * Echoes the login page.
+	 * 
+	 * @param array $options Associative array of strings with options to be applied
+	 */
 	public static function login($options) {
 		$content = self::loginForm();
 		$content .= self::alert();
@@ -22,18 +38,36 @@ abstract class View {
 		echo self::page($content, 'login', $options);
 	}
 
+	/**
+	 * Echoes the reset password page.
+	 * 
+	 * @param User $user Current logged user to echo his main page
+	 * @param string $code Code to be validated
+	 * @param array $options Associative array of strings with options to be applied
+	 */
 	public static function recover($user, $code, $options) {
 		$content = self::recoverForm($user, $code);
 		$content .= self::alert();
 		$content .= self::loading();
 		echo self::page($content, 'recover', $options);
 	}
-	
+
+	/**
+	 * Echoes the error messager page.
+	 * 
+	 * @param string $message Error message to be shown
+	 * @param array $options Associative array of strings with options to be applied
+	 */
 	public static function error($message, $options) {
 		$content = self::errorMessage($message);
 		echo self::page($content, 'error', $options);
 	}
 
+	/**
+	 * Echoes the admin options page.
+	 * 
+	 * @param array $options Associative array of strings with options to be shown
+	 */
 	public static function options($options) {
 		$content = self::optionsForm($options);
 		$content .= self::alert();
@@ -41,6 +75,11 @@ abstract class View {
 		echo self::page($content, 'options', $options);
 	}
 
+	/**
+	 * Echoes the first use installation page.
+	 * 
+	 * @param array $options Associative array of strings with options to be applied
+	 */
 	public static function install($options) {
 		$content = self::installForm();
 		$content .= self::alert();
@@ -48,9 +87,12 @@ abstract class View {
 		echo self::page($content, 'options', $options);
 	}
 
-	// ------------------------
-	// E-mails
-	// ------------------------
+	/**
+	 * Returns the confirm account e-mail html body.
+	 * 
+	 * @param User $user User to be confirmed
+	 * @return string Html e-mail content
+	 */
 	public static function emailConfirm($user) {
 		$replace = [
 			'{{ID}}' => $user->id(),
@@ -62,6 +104,12 @@ abstract class View {
 		return self::email($content, Text::translate('{{TR:CONFIRM}}'));
 	}
 
+	/**
+	 * Returns the reset password e-mail html body.
+	 * 
+	 * @param User $user User to be confirmed
+	 * @return string Html e-mail content
+	 */
 	public static function emailReset($user) {
 		$replace = [
 			'{{ID}}' => $user->id(),
@@ -73,9 +121,12 @@ abstract class View {
 		return self::email($content,Text::translate('{{TR:RESET}}'));
 	}
 
-	// ------------------------
-	// Page parts functions
-	// ------------------------
+	// --------------------------------------------------
+	// Each of the following private function returns a
+	// part of the web html code from html files and
+	// replace {{KEYWORDS}} by crucial data.
+	// --------------------------------------------------
+
 	private static function email($content, $title) {
 		$replace = [
 			'{{CONTENT}}' => Text::translate($content),

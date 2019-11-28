@@ -284,6 +284,7 @@ class User extends Database implements JsonSerializable {
 				AND date_upd > :last
 			) t
 			ON u.id = t.user_id
+			WHERE u.admin = 0
 			ORDER BY t.date_upd DESC";
 		self::query($sql, [
 			':userid' => $this->id,

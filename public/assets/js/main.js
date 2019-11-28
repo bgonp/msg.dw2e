@@ -362,7 +362,7 @@ function formsListener(forms) {
 	forms.submit(function(event) {
 		var form = $(this);
 		event.preventDefault();
-		if (!form.hasClass('confirmable') || confirm('Are you sure?'))
+		if (!form.hasClass('confirmable') || confirm(sure_msg))
 			formSubmit(form);
 	});
 }

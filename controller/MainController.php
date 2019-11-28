@@ -210,37 +210,38 @@ class MainController {
 	private static function requestFriend($post, $files) {
 		$user = User::get(SessionController::userId());
 		$user->addContact($post['email']);
-		$response = ['type' => 'success', 'message' => Text::success('friendship_sent')];
-		$response['friends'] = $user->newFriends($post['last_contact_upd']);
-		$response['requests'] = $user->newRequests($post['last_contact_upd']);
-		$response['last_contact_upd'] = $user->lastContactUpd();
+		$response = [
+			'type' => 'success',
+			'message' => Text::success('friendship_sent')
+		];
 		return $response;
 	}
 	private static function acceptFriend($post, $files) {
 		$user = User::get(SessionController::userId());
 		$user->updateContact($post['contact_id'], Helper::ACCEPTED);
-		$response = ['type' => 'success', 'message' => Text::success('friendship_accepted')];
-		$response['friends'] = $user->newFriends($post['last_contact_upd']);
-		$response['requests'] = $user->newRequests($post['last_contact_upd']);
-		$response['last_contact_upd'] = $user->lastContactUpd();
+		$response = [
+			'type' => 'success',
+			'message' => Text::success('friendship_accepted'),
+			'focus' => 'friends'
+		];
 		return $response;
 	}
 	private static function rejectFriend($post, $files) {
 		$user = User::get(SessionController::userId());
 		$user->updateContact($post['contact_id'], Helper::DECLINED);
-		$response = ['type' => 'success', 'message' => Text::success('friendship_declined')];
-		$response['friends'] = $user->newFriends($post['last_contact_upd']);
-		$response['requests'] = $user->newRequests($post['last_contact_upd']);
-		$response['last_contact_upd'] = $user->lastContactUpd();
+		$response = [
+			'type' => 'success',
+			'message' => Text::success('friendship_declined')
+		];
 		return $response;
 	}
 	private static function blockFriend($post, $files) {
 		$user = User::get(SessionController::userId());
 		$user->updateContact($post['contact_id'], Helper::BLOCKED);
-		$response = ['type' => 'success', 'message' => Text::success('friendship_blocked')];
-		$response['friends'] = $user->newFriends($post['last_contact_upd']);
-		$response['requests'] = $user->newRequests($post['last_contact_upd']);
-		$response['last_contact_upd'] = $user->lastContactUpd();
+		$response = [
+			'type' => 'success',
+			'message' => Text::success('friendship_blocked')
+		];
 		return $response;
 	}
 	// ------------------------

@@ -5,6 +5,7 @@
  * 
  * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
  * @author Borja Gonzalez <borja@bgon.es>
+ * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
  */
 abstract class Database {
 

@@ -1,4 +1,12 @@
 <?php
+/**
+ * This file define all the constants to be used in the applicacion and
+ * then require all the files needed to load the whole environment.
+ * 
+ * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
+ * @author Borja Gonzalez <borja@bgon.es>
+ * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
+ */
 
 define("VENDOR_DIR", __DIR__.'/vendor/');
 define("CORE_DIR", __DIR__.'/core/');
