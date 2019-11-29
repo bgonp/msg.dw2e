@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Lorem ipsum
+ * 
+ * @package model
+ * @author Borja Gonzalez <borja@bgon.es>
+ * @link https://github.com/bgonp/msg.dw2e
+ * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
+ */
 class User extends Database implements JsonSerializable {
 
 	private $id;
@@ -55,7 +62,7 @@ class User extends Database implements JsonSerializable {
 		return $user;
 	}
 
-	public static function new($email, $name, $password, $avatar = 0, $confirmed = 0, $admin = 0) {
+	public static function create($email, $name, $password, $avatar = 0, $confirmed = 0, $admin = 0) {
 		if (!Helper::validEmail($email))
 			throw new Exception(Text::error('user_email'));
 		if (!Helper::validName($name))
@@ -83,7 +90,7 @@ class User extends Database implements JsonSerializable {
 		return new User($id, $email, $name, $password, $avatar, $confirmed, $admin);
 	}
 
-	public static function list() {
+	public static function gets() {
 		$users = [];
 		while ($user = self::fetch())
 			$users[$user['id']] = new User(
@@ -156,7 +163,7 @@ class User extends Database implements JsonSerializable {
 				GROUP BY c.id
 				ORDER BY IF(MAX(m.id) > p.last_read, 1, 0) DESC, last_msg DESC";
 			self::query($sql, [':id' => $this->id]);
-			$this->chats = Chat::list();
+			$this->chats = Chat::gets();
 		}
 		if (is_null($chat_id)) return $this->chats;
 		return $this->chats[intval($chat_id)] ?? false;
@@ -264,7 +271,7 @@ class User extends Database implements JsonSerializable {
 			':userid' => $this->id,
 			':state' => $state
 		]);
-		return self::list();
+		return self::gets();
 	}
 
 	private function newContacts($last, $state) {

@@ -1,42 +1,65 @@
 <?php
-
+/**
+ * Class with static functions to handle sessions in order to login, logout or check if
+ * there is a logged user and if he is admin or not.
+ * 
+ * @package controller
+ * @author Borja Gonzalez <borja@bgon.es>
+ * @link https://github.com/bgonp/msg.dw2e
+ * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
+ */
 class SessionController {
 
-	private static $checked = false;
-	private static $logged = false;
-	private static $admin = false;
-
-	public static function check() {
-		if (!self::$checked && session_status() === PHP_SESSION_NONE) {
-			self::$checked = true;
-			session_start();
-			self::$logged = !empty($_SESSION['logged']);
-			self::$admin = !empty($_SESSION['admin']);
-		}
-		return self::$logged;
+	/**
+	 * It starts a session if an started session doesn't exists. Then, it receives a
+	 * user and save his user_id and admin property into $_SESSION superglobal.
+	 * 
+	 * @param User $user User to be logged
+	 */
+	public static function login($user) {
+		self::start();
+		$_SESSION['admin'] = boolval($user->admin());
+		$_SESSION['user_id'] = intval($user->id());
 	}
 
-	public static function checkAdmin() {
-		self::check();
-		return self::$admin;
-	}
-
-	public static function userId(){
-		return $_SESSION['userId'];
-	}
-
-	public static function logged( $user, $admin = false ) {
-		$_SESSION['logged'] = true;
-		$_SESSION['admin'] = boolval($admin);
-		$_SESSION['userId'] = $user->id();
-	}
-
+	/**
+	 * It starts a session if an started session doesn't exists and destroys it,
+	 * logging out the current user.
+	 */
 	public static function logout() {
-		if (session_status() === PHP_SESSION_ACTIVE) {
-			$_SESSION = [];
-			setcookie(session_name(), "", time() - 3600);
-			session_destroy();
-		}
+		self::start();
+		if (session_status() !== PHP_SESSION_ACTIVE) return;
+		$_SESSION = [];
+		setcookie(session_name(), "", time() - 3600);
+		session_destroy();
+	}
+
+	/**
+	 * Check if there is a logged in user and return his ID.
+	 * 
+	 * @return int|bool User ID if logged or false if not
+	 */
+	public static function logged(){
+		self::start();
+		return $_SESSION['user_id'] ?? false;
+	}
+
+	/**
+	 * Check if there is a logged in user and return whetever he is admin or not.
+	 * 
+	 * @return bool True if logged user is admin or false if not
+	 */
+	public static function admin() {
+		self::start();
+		return $_SESSION['admin'] ?? false;
+	}
+
+	/**
+	 * Start a session if there isn't an already opened one.
+	 */
+	private static function start() {
+		if (session_status() === PHP_SESSION_NONE)
+			session_start();
 	}
 
 }

@@ -1,16 +1,20 @@
 <?php
 /**
- * Abstract class Database to be extended by modals in order to connect and make
+ * Abstract class Database to be extended by models in order to connect and make
  * operations over the database.
  * 
- * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
+ * @package core
  * @author Borja Gonzalez <borja@bgon.es>
+ * @link https://github.com/bgonp/msg.dw2e
  * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
  */
 abstract class Database {
 
+	/** @var PDO|boolean Main database connection object */
 	private static $conn = false;
-	private static $stmt;
+	
+	/** @var PDOStatement|boolean Main prepared statement object */
+	private static $stmt = false;
 
 	/**
 	 * Get database configuration from file config/database.json and stablish a connection

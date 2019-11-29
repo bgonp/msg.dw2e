@@ -2,8 +2,9 @@
 /**
  * Class to install the application for the first time use.
  * 
- * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
+ * @package core
  * @author Borja Gonzalez <borja@bgon.es>
+ * @link https://github.com/bgonp/msg.dw2e
  * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
  */
 class Install {
@@ -50,7 +51,7 @@ class Install {
 			throw new Exception(Text::error('install_putfile'));
 
 		// Try to save the default admin user
-		User::new($email, 'admin', $post['usr']['password'], 0, 1, 1);
+		User::create($email, 'admin', $post['usr']['password'], 0, 1, 1);
 
 		return true;
 	}

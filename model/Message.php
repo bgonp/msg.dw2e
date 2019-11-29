@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Lorem ipsum
+ * 
+ * @package model
+ * @author Borja Gonzalez <borja@bgon.es>
+ * @link https://github.com/bgonp/msg.dw2e
+ * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
+ */
 class Message extends Database implements JsonSerializable {
 
 	private $id;
@@ -55,10 +62,10 @@ class Message extends Database implements JsonSerializable {
 		);
 	}
 
-	public static function new($user_id, $chat_id, $content, $attachment = false) {
+	public static function create($user_id, $chat_id, $content, $attachment = false) {
 		$user_id = $user_id ? intval($user_id) : null;
 		$chat_id = intval($chat_id);
-		$attachment_id = $attachment && $attachment['error'] != 4 ? Attachment::new($attachment)->id() : null;
+		$attachment_id = $attachment && $attachment['error'] != 4 ? Attachment::create($attachment)->id() : null;
 		if (empty($chat_id) || empty($content))
 			throw new Exception(Text::error('message_invalid'));
 		$sql = "INSERT INTO message (user_id, chat_id, attachment_id, content)
@@ -74,7 +81,7 @@ class Message extends Database implements JsonSerializable {
 		return Message::get($id);
 	}
 
-	public static function list() {
+	public static function gets() {
 		$messages = [];
 		while ($msg = self::fetch())
 			$messages[$msg['id']] = new Message(

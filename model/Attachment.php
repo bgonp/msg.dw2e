@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Lorem ipsum
+ * 
+ * @package model
+ * @author Borja Gonzalez <borja@bgon.es>
+ * @link https://github.com/bgonp/msg.dw2e
+ * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
+ */
 class Attachment extends Database {
 
 	private $id;
@@ -11,6 +18,18 @@ class Attachment extends Database {
 	private $chat_id;
 	private $chat;
 
+	/**
+	 * Private constructor. An object can't be constructed directly, but through static
+	 * factory methods.
+	 * 
+	 * @param int $id Stored attachment ID
+	 * @param string $date Attachment upload date
+	 * @param string $mime_type Attachment mime type
+	 * @param int $height Image height in pixels (if attachment is an image)
+	 * @param int $width Image width in pixels (if attachment is an image)
+	 * @param string $filename Name of the file saved in upload/attachment/ folder
+	 * @param int $chat_id Chat ID where the attachment was sent
+	 */
 	private function __construct($id, $date, $mime_type, $height, $width, $filename, $chat_id) {
 		$this->id = $id;
 		$this->date = $date;
@@ -41,7 +60,7 @@ class Attachment extends Database {
 		return new Attachment($att['id'], $att['date'], $att['mime_type'], $att['height'], $att['width'], $att['filename'], $att['chat_id']);
 	}
 
-	public static function new($file) {
+	public static function create($file) {
 		if (!$file || $file['error'])
 			throw new Exception(Text::error('attachment_invalid'));
 		if (!$file['type'] || !$file['name'])
@@ -60,7 +79,7 @@ class Attachment extends Database {
 			Helper::removeAttachment($fileinfo['name']);
 			throw new Exception(Text::error('attachment_new'));
 		}
-		return Attachment::get($id);		
+		return Attachment::get($id);
 	}
 
 	public function id() {

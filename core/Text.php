@@ -1,14 +1,16 @@
 <?php
 /**
  * Class with text relative uses. Here you can find all the texts of the whole web application in order
- * to make it easy to translate to another languages
+ * to make it easy to translate to another languages.
  * 
- * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
+ * @package core
  * @author Borja Gonzalez <borja@bgon.es>
+ * @link https://github.com/bgonp/msg.dw2e
  * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
  */
 class Text {
 
+	/** @var array Associative arrays with texts */
 	private static $translate = [
 		'ACCEPT' => 'Accept',
 		'ADD' => 'Add',
@@ -52,7 +54,7 @@ class Text {
 	];
 
 	/**
-	 * Will translate any appearances of string with form {{TR:____}} of $content to its associated
+	 * Translate any appearances of string with form {{TR:____}} of $content to its associated
 	 * text setted in self::$translate array
 	 * 
 	 * @param  string $content The content string to translate
@@ -68,7 +70,7 @@ class Text {
 	}
 
 	/**
-	 * Will translate a success code into its associated description message.
+	 * Translate a success code into its associated description message.
 	 * 
 	 * @param string $code Code of the success message
 	 * @return string Message associated with the success code
@@ -101,7 +103,7 @@ class Text {
 	}
 
 	/**
-	 * Will translate an error code into its associated description message.
+	 * Translate an error code into its associated description message.
 	 * 
 	 * @param string $code Code of the error message
 	 * @return string Message associated with the error code

@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Lorem ipsum
+ * 
+ * @package model
+ * @author Borja Gonzalez <borja@bgon.es>
+ * @link https://github.com/bgonp/msg.dw2e
+ * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
+ */
 class Chat extends Database implements JsonSerializable {
 	
 	private $id;
@@ -38,7 +45,7 @@ class Chat extends Database implements JsonSerializable {
 		return new Chat($chat['id'], $chat['date'], $chat['name'], $chat['last_msg']);
 	}
 
-	public static function new($name = "") {
+	public static function create($name = "") {
 		if (!Helper::validName($name)) throw new Exception(Text::error('chat_invalid'));
 		$sql = "INSERT INTO chat (name) VALUES (:name)";
 		self::query($sql, [':name' => $name]);
@@ -47,7 +54,7 @@ class Chat extends Database implements JsonSerializable {
 		return Chat::get($id);
 	}
 
-	public static function list(){
+	public static function gets(){
 		$chats = [];
 		while ($chat = self::fetch())
 			$chats[$chat['id']] = new Chat(
@@ -83,7 +90,7 @@ class Chat extends Database implements JsonSerializable {
 
 	public function addMessage($user_id, $message, $file = false) {
 		if ($user_id > 0 && !$this->users($user_id)) return false;
-		if (!($message = Message::new($user_id, $this->id, $message, $file))) return false;
+		if (!($message = Message::create($user_id, $this->id, $message, $file))) return false;
 		$this->messages = null;
 		return $message;
 	}
@@ -133,7 +140,7 @@ class Chat extends Database implements JsonSerializable {
 				ORDER BY m.id DESC
 				LIMIT 100";
 			self::query($sql, [':id' => $this->id]);
-			$this->messages = Message::list();
+			$this->messages = Message::gets();
 		}
 		return $this->messages;
 	}
@@ -152,7 +159,7 @@ class Chat extends Database implements JsonSerializable {
 				WHERE p.chat_id = :id
 				ORDER BY u.name ASC";
 			self::query($sql, [':id' => $this->id]);
-			$this->users = User::list();
+			$this->users = User::gets();
 		}
 		if (is_null($user_id)) return $this->users;
 		return $this->users[$user_id] ?? false;
@@ -207,7 +214,7 @@ class Chat extends Database implements JsonSerializable {
 			':chatid' => $this->id,
 			':lastid' => $last_id
 		]);
-		$messages = array_values(Message::list());
+		$messages = array_values(Message::gets());
 		foreach ($messages as $message)
 			if (!$message->user_id()) {
 				$this->new_members = true;

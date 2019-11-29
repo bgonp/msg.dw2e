@@ -4,8 +4,9 @@
  * Each method here calls another methods from the same class for each part
  * of the html code to get.
  * 
- * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
+ * @package view
  * @author Borja Gonzalez <borja@bgon.es>
+ * @link https://github.com/bgonp/msg.dw2e
  * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
  */
 class View {
@@ -35,6 +36,7 @@ class View {
 		$content = self::loginForm();
 		$content .= self::alert();
 		$content .= self::loading();
+		$content .= self::vars();
 		echo self::page($content, 'login', $options);
 	}
 
@@ -72,6 +74,7 @@ class View {
 		$content = self::optionsForm($options);
 		$content .= self::alert();
 		$content .= self::loading();
+		$content .= self::vars();
 		echo self::page($content, 'options', $options);
 	}
 
@@ -127,6 +130,7 @@ class View {
 	// replace {{KEYWORDS}} by crucial data.
 	// --------------------------------------------------
 
+	/** Return email framed html content */
 	private static function email($content, $title) {
 		$replace = [
 			'{{CONTENT}}' => Text::translate($content),
@@ -135,6 +139,7 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'email/email.html'), $replace);
 	}
 
+	/** Return page framed html content */
 	private static function page($content, $clase, $options) {
 		$replace = [
 			'{{CONTENT}}' => Text::translate($content),
@@ -145,6 +150,7 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'page.html'), $replace);
 	}
 
+	/** Return html header code with style tag containing css colors vars */
 	private static function colors($main, $background, $border) {
 		$replace = [
 			'{{MAIN}}' => $main,
@@ -154,10 +160,12 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'colors.html'), $replace);
 	}
 
+	/** Return install html form */
 	private static function installForm() {
 		return file_get_contents(HTML_DIR.'install.html');
 	}
 
+	/** Return reset password html form */
 	private static function recoverForm($user ,$code) {
 		$replace = [
 			'{{ID}}' => $user->id(),
@@ -166,6 +174,7 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'recover.html'), $replace);
 	}
 
+	/** Return login/register html form */
 	private static function loginForm() {
 		$replace = [
 			'{{CLASS}}' => 'email-' . Option::get('email_confirm')
@@ -173,6 +182,7 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'login.html'), $replace);
 	}
 	
+	/** Return main menu of main page */
 	private static function menu($user) {
 		$replace = [
 			'{{ID}}' => $user->id(),
@@ -182,6 +192,7 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'menu.html'), $replace);
 	}
 	
+	/** Return sidebar of main page */
 	private static function sidebar($chats, $friends, $requests) {
 		$replace = [
 			'{{CHATS}}' => "",
@@ -198,6 +209,7 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'sidebar.html'), $replace);
 	}
 	
+	/** Return single chat list element */
 	private static function chat($chat) {
 		$replace = [
 			'{{ID}}' => $chat->id(),
@@ -208,6 +220,7 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'chat.html'), $replace);
 	}
 	
+	/** Return single friend list element */
 	private static function friend($friend) {
 		$replace = [
 			'{{ID}}' => $friend->id(),
@@ -217,6 +230,7 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'friend.html'), $replace);
 	}
 	
+	/** Return single request list element */
 	private static function request($request) {
 		$replace = [
 			'{{ID}}' => $request->id(),
@@ -226,27 +240,32 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'request.html'), $replace);
 	}
 
+	/** Return messages container */
 	private static function messages() {
 		return file_get_contents(HTML_DIR.'messages.html');
 	}
 
+	/** Return alert message box */
 	private static function alert() {
 		return file_get_contents(HTML_DIR.'alert.html');
 	}
 
+	/** Return loading screen (hidden by default) */
 	private static function loading() {
 		return file_get_contents(HTML_DIR.'loading.html');
 	}
 
-	private static function vars($user_id, $last_msg, $last_contact_upd) {
+	/** Return html code with script tag containing js vars */
+	private static function vars($user_id = null, $last_msg = null, $last_contact_upd = null) {
 		$replace = [
-			'{{ID}}' => $user_id,
-			'{{LASTMESSAGE}}' => $last_msg,
-			'{{LASTCONTACT}}' => $last_contact_upd
+			'{{ID}}' => $user_id ?? 0,
+			'{{LASTMESSAGE}}' => $last_msg ?? 0,
+			'{{LASTCONTACT}}' => $last_contact_upd ?? ''
 		];
 		return strtr(file_get_contents(HTML_DIR.'vars.html'), $replace);
 	}
 
+	/** Return critical error screen */
 	private static function errorMessage($message) {
 		$replace = [
 			'{{MESSAGE}}' => $message,
@@ -255,6 +274,7 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'error.html'), $replace);
 	}
 
+	/** Return admin options form */
 	private static function optionsForm($options) {
 		$replace = ['{{OPTIONS}}' => ""];
 		foreach ($options as $option)
@@ -262,6 +282,7 @@ class View {
 		return strtr(file_get_contents(HTML_DIR.'options.html'), $replace);
 	}
 
+	/** Return single option list element */
 	private static function option($option) {
 		$replace = [
 			'{{KEY}}' => $option->key(),

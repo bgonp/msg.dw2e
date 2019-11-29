@@ -2,17 +2,21 @@
 /**
  * Class with useful static functions for several uses.
  * 
- * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
+ * @package core
  * @author Borja Gonzalez <borja@bgon.es>
+ * @link https://github.com/bgonp/msg.dw2e
  * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
  */
 class Helper {
 
-	// States of contacts
-	public const WAITING = 1;
-	public const ACCEPTED = 2;
-	public const DECLINED = 3;
-	public const BLOCKED = 4;
+	/** Friendship state: waiting for accept or decline */
+	const WAITING = 1;
+	/** Friendship state: accepted, they are now friends */
+	const ACCEPTED = 2;
+	/** Friendship state: declined, they aren't friends */
+	const DECLINED = 3;
+	/** Friendship state: blocked, they aren't friends anymore */
+	const BLOCKED = 4;
 
 	/**
 	 * Apply the stored regular expression to a name and returns if it matches.

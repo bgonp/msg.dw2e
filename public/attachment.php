@@ -6,8 +6,9 @@
  * the request comes from a logged user and he is allowed to get this file.
  * Finally, it returns the file to be downloaded or show the whole file if it is an image.
  * 
- * @package msg.dw2e (https://github.com/bgonp/msg.dw2e)
+ * @package public
  * @author Borja Gonzalez <borja@bgon.es>
+ * @link https://github.com/bgonp/msg.dw2e
  * @license https://opensource.org/licenses/GPL-3.0 GNU GPL 3
  */
 
@@ -15,8 +16,8 @@ require_once "../init.php";
 
 // Check if there is an ID passed by GET and a valid file with that ID
 if (isset($_GET['id']) && $file = Attachment::get($_GET['id'])) {
-	// Check if there is a valid user logged in
-	if (SessionController::check() && $user = User::get(SessionController::userId())) {
+	// Check if there is a valid logged user
+	if (($user_id = SessionController::logged()) && ($user = User::get($user_id))) {
 		// Check if the user belongs to the chat where this attachment was sent
 		if ($file->chat()->users($user->id())) {
 			// Check if the file exists in upload/attachment/ folder
