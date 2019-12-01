@@ -11,7 +11,7 @@
 
 ## Description
 
-An instant messaging single page application to talk about topics in chat rooms with other people. This project has been done as an assignment of Server Side Programming module.
+A responsive instant messaging single page application to talk about topics in chat rooms with other people. This project has been done as an assignment of Server Side Programming module.
 
 ## Features
 
