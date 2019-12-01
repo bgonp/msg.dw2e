@@ -1,15 +1,21 @@
-<div id="recover-form">
-	<h2>{{TR:RESET}}</h2>
-	<hr>
-	<form action="ajax.php" method="post">
-		<input type="hidden" name="action" value="resetPassword">
-		<input type="hidden" name="id" value="{{ID}}">
-		<input type="hidden" name="key" value="{{CODE}}">
-		<label class="form-elem"><span>{{TR:PASSWORD}}</span>
-			<input type="password" name="password" required></label>
-		<label class="form-elem"><span>{{TR:PASSWORD}} ({{TR:REPEAT}})</span>
-			<input type="password" name="password_rep" required></label>
+<div id="recover-form" class="row justify-content-center p-2">
+	<div class="col-12 col-sm-8 col-md-6 p-4 mt-sm-5 bg-white text-main rounded shadow-lg">
+		<h4 class="text-center">{{TR:RESET}}</h4>
 		<hr>
-		<input type="submit" class="btn btn-recover" value="{{TR:RESET}}">
-	</form>
+		<form action="ajax.php" method="post">
+			<input type="hidden" name="action" value="resetPassword">
+			<input type="hidden" name="id" value="{{ID}}">
+			<input type="hidden" name="key" value="{{CODE}}">
+			<div class="form-group">
+				<label for="reset-pass">{{TR:PASSWORD}}</label>
+				<input id="reset-pass" class="form-control" type="password" name="password" required>
+			</div>
+			<div class="form-group">
+				<label for="reset-passrep">{{TR:PASSWORD}} ({{TR:REPEAT}})</label>
+				<input id="reset-passrep" class="form-control" type="password" name="password_rep" required>
+			</div>
+			<hr>
+			<button type="submit" class="btn btn-block text-white bg-main btn-recover">{{TR:RESET}}</button>
+		</form>
+	</div>
 </div>

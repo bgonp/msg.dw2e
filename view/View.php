@@ -19,8 +19,7 @@ class View {
 	 */
 	public static function main($user, $options) {
 		$content = self::menu($user);
-		$content .= self::sidebar($user->chats(), $user->friends(), $user->requests());
-		$content .= self::messages();
+		$content .= self::content($user->chats(), $user->friends(), $user->requests());
 		$content .= self::alert();
 		$content .= self::loading();
 		$content .= self::vars($user->id(), $user->lastReceived(), $user->lastContactUpd());
@@ -145,17 +144,16 @@ class View {
 			'{{CONTENT}}' => Text::translate($content),
 			'{{CLASS}}' => $clase,
 			'{{TITLE}}' => $options['page_title'],
-			'{{COLORS}}' => self::colors($options['color_main'], $options['color_bg'], $options['color_border']),
+			'{{COLORS}}' => self::colors($options['color_main'], $options['color_aux']),
 		];
 		return strtr(file_get_contents(HTML_DIR.'page.html'), $replace);
 	}
 
 	/** Return html header code with style tag containing css colors vars */
-	private static function colors($main, $background, $border) {
+	private static function colors($main, $aux) {
 		$replace = [
 			'{{MAIN}}' => $main,
-			'{{BACKGROUND}}' => $background,
-			'{{BORDER}}' => $border
+			'{{AUX}}' => $aux
 		];
 		return strtr(file_get_contents(HTML_DIR.'colors.html'), $replace);
 	}
@@ -190,6 +188,15 @@ class View {
 			'{{NAME}}' => $user->name()
 		];
 		return strtr(file_get_contents(HTML_DIR.'menu.html'), $replace);
+	}
+	
+	/** Return main content of main page */
+	private static function content($chats, $friends, $requests) {
+		$replace = [
+			'{{SIDEBAR}}' => self::sidebar($chats, $friends, $requests),
+			'{{MESSAGES}}' => self::messages()
+		];
+		return strtr(file_get_contents(HTML_DIR.'content.html'), $replace);
 	}
 	
 	/** Return sidebar of main page */

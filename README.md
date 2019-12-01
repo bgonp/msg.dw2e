@@ -11,7 +11,7 @@
 
 ## Description
 
-An instant messaging single page application to talk about topics in chat rooms with other people. This project has been done as an assignment of Server Side Programming module.
+A responsive instant messaging single page application to talk about topics in chat rooms with other people. This project has been done as an assignment of Server Side Programming module.
 
 ## Features
 
@@ -38,7 +38,7 @@ An instant messaging single page application to talk about topics in chat rooms 
 - Create in your server a MySQL database with a user who can use it.
 - In the target folder clone this project `$ git clone https://github.com/bgonp/msg.dw2e.git .`
 - Ensure the folders `config/` `upload/attachment/` and `upload/avatar/` have write permissions.
-- Install needed packages `$ composer install`
+- Install needed packages `$ composer install`. Required packages are PHPMailer, jQuery, font-awesome, bootstrap.
 - Visit the url where the app has been installed to see the installation menu.
 - Here you have to introduce your e-mail and password in order to create the admin user.
 - In addition you need to introduce the information to access the database.

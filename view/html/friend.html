@@ -1,19 +1,21 @@
-<li class="a-friend deletable">
-	<div class="avatar"><img src="avatar.php?id={{ID}}"></div>
-	<div class="datos">
-		<div class="name">{{NAME}}</div>
-		<div class="email">{{EMAIL}}</div>
+<li class="a-friend deletable card d-flex align-items-center flex-row overflow-hidden p-3 mx-3 mb-2">
+	<img class="avatar avatar-lg rounded-circle" src="avatar.php?id={{ID}}">
+	<div class="datos px-2 text-break">
+		<div class="name text-main font-weight-bold">{{NAME}}</div>
+		<div class="email text-main">{{EMAIL}}</div>
 	</div>
-	<div class="buttons">
-		<label class="custom-checkbox">
+	<div class="buttons position-absolute d-flex flex-column">
+		<label class="custom-checkbox m-0 flex-grow-1">
 			<input type="checkbox" form="create-chat-form" name="members[]" value="{{ID}}">
-			<span class="checked"><i class="fa fa-check-square-o"></i></span>
-			<span class="unchecked"><i class="fa fa-square-o"></i></span>
+			<span class="btn px-1 text-main checked"><i class="fa fa-lg fa-fw fa-check-square"></i></span>
+			<span class="btn px-1 text-main unchecked"><i class="fa fa-lg fa-fw fa-square-o font-weight-bold"></i></span>
 		</label>
 		<form action="ajax.php" method="post" class="confirmable delete-parent">
 			<input type="hidden" name="action" value="blockFriend">
 			<input type="hidden" name="contact_id" value="{{ID}}">
-			<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
+			<button type="submit" class="btn px-1 text-main" title="{{TR:BLOCK}}">
+				<i class="fa fa-lg fa-fw fa-ban"></i>
+			</button>
 		</form>
 	</div>
 </li>
