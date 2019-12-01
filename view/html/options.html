@@ -1,14 +1,16 @@
-<div id="options">
-	<form action="ajax.php" method="post" class="options-form">
-		<h2>{{TR:OPTIONS}}</h2>
-		<hr>
-		<input type="hidden" name="action" value="updateOptions">
-		<ul class="options-list">{{OPTIONS}}</ul>
-		<hr>
-		<input type="submit" value="{{TR:SAVE}}">
-	</form>
-	<form action="ajax.php" method="post" class="logout confirmable">
-		<input type="hidden" name="action" value="logout">
-		<input type="submit" value="{{TR:LOGOUT}}" class="btn btn-logout">
-	</form>
+<div id="options" class="row justify-content-center p-2">
+	<div class="col-12 col-sm-8 col-md-6 p-4 my-sm-2 bg-white text-main rounded shadow-lg">
+		<form action="ajax.php" method="post" class="options-form mb-3">
+			<h4 class="text-center">{{TR:OPTIONS}}</h4>
+			<hr>
+			<input type="hidden" name="action" value="updateOptions">
+			<ul class="options-list list-unstyled m-0">{{OPTIONS}}</ul>
+			<hr>
+			<button type="submit" class="btn btn-block text-white bg-main">{{TR:SAVE}}</button>
+		</form>
+		<form action="ajax.php" method="post" class="logout confirmable">
+			<input type="hidden" name="action" value="logout">
+			<button type="submit" class="btn btn-block text-main bg-aux btn-logout">{{TR:LOGOUT}}</button>
+		</form>
+	</div>
 </div>

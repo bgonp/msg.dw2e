@@ -1,3 +1,6 @@
+/*
+	OVERRIDE SOME BOOSTRAP PROPERTIES
+ */
 .text-main {
 	color: var(--main);
 }
@@ -7,6 +10,9 @@
 .bg-aux {
     background: var(--aux);
 }
+.form-control {
+	color: var(--main);
+}
 .form-control:focus,
 .btn:focus {
 	box-shadow: none;
@@ -14,6 +20,10 @@
 .btn:hover {
 	color: var(--main);
 }
+
+/*
+	SOME GENERAL STYLES
+ */
 #content {
     max-width: 960px;
 }
@@ -34,6 +44,22 @@ img.avatar-lg {
 .custom-checkbox input[type="checkbox"]:not(:checked) ~ .checked {
 	display: none;
 }
+.tab.active {
+	font-weight: 700;
+	background: #FFFFFF;
+	border-bottom-color: transparent!important;
+}
+
+/*
+	LOGIN FORM
+ */
+#login-form.email-0 .btn-reset {
+	display: none;
+}
+
+/*
+	MENU
+ */
 #menu .edit-profile-btn:hover,
 #menu .logout-btn:hover {
 	background: rgba(255,255,255,0.15);
@@ -54,10 +80,10 @@ img.avatar-lg {
 	border-left: 8px solid transparent!important;
 	border-right: 8px solid transparent!important;
 }
-#sidebar .tab,
-.btn-sidebar {
-	line-height: 2.7rem;
-}
+
+/*
+	SIDEBAR
+ */
 #sidebar {
 	z-index: 10;
 }
@@ -74,10 +100,9 @@ img.avatar-lg {
 		box-shadow: 0 0 50px rgba(0,0,0,0.1);
 	}
 }
-#sidebar .tab.active {
-	font-weight: 700;
-	background: #FFFFFF;
-	border-bottom-color: transparent!important;
+#sidebar .tab,
+#sidebar .btn-sidebar {
+	line-height: 2.7rem;
 }
 #sidebar .tabs .tab.new:not(.active)::after {
 	content: '';
@@ -116,6 +141,10 @@ img.avatar-lg {
 	right: 0;
 	bottom: 0;
 }
+
+/*
+	MESSAGES
+ */
 #messages .messages-list .a-message {
 	position: relative;
 	width: max-content;
@@ -224,6 +253,10 @@ img.avatar-lg {
 	border-bottom-right-radius: 3px;
 	background-color: var(--main);
 }
+
+/*
+	ALERT MESSAGE
+ */
 #alert-msg {
 	position: fixed;
 	top: 0;
@@ -253,6 +286,10 @@ img.avatar-lg {
 	line-height: 2rem;
 	width: 2rem;
 }
+
+/*
+	LOADING SCREEN
+ */
 #loading {
 	position: fixed;
 	top: 0;

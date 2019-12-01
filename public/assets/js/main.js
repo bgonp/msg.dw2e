@@ -28,7 +28,7 @@ $(document).ready(function() {
 	chatsListener(chats.find('.chat-link'));
 
 	// Tabs
-	tabs_buttons = $('#content a.tab');
+	tabs_buttons = $('#content .tab.btn');
 	tabs_contents = $('#content .tab-content');
 	tabs_buttons.click(function(event) {
 		event.preventDefault();

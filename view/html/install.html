@@ -1,33 +1,42 @@
-<div id="options">
-	<form action="ajax.php" method="post" class="install-form">
-		<h2>Install</h2>
-		<hr>
-		<input type="hidden" name="action" value="installApp">
-		<ul class="options-list">
-			<li class="a-option">
-				<label><span>Admin e-mail</span><input type="email" name="usr[email]"></label>
-			</li>
-			<li class="a-option">
-				<label><span>Admin Password</span><input type="password" name="usr[password]"></label>
-			</li>
-			<li class="a-option">
-				<label><span>Admin Password (repeat)</span><input type="password" name="usr[password_rep]"></label>
-			</li>
-			<li><hr></li>
-			<li class="a-option">
-				<label><span>Database host</span><input type="text" name="db[host]"></label>
-			</li>
-			<li class="a-option">
-				<label><span>Database name</span><input type="text" name="db[name]"></label>
-			</li>
-			<li class="a-option">
-				<label><span>Database user</span><input type="text" name="db[user]"></label>
-			</li>
-			<li class="a-option">
-				<label><span>Database password</span><input type="text" name="db[pass]"></label>
-			</li>
-		</ul>
-		<hr>
-		<input type="submit" value="Install">
-	</form>
+<div id="options" class="row justify-content-center p-2">
+	<div class="col-12 col-sm-8 col-md-6 p-4 my-sm-2 bg-white text-main rounded shadow-lg">
+		<form action="ajax.php" method="post" class="install-form">
+			<h4 class="text-center">Install</h4>
+			<hr>
+			<input type="hidden" name="action" value="installApp">
+			<ul class="options-list list-unstyled m-0">
+				<li class="a-option form-group">
+					<label for="install-usremail">Admin e-mail</label>
+					<input id="install-usremail" class="form-control" type="email" name="usr[email]">
+				</li>
+				<li class="a-option form-group">
+					<label for="install-usrpass">Admin Password</label>
+					<input id="install-usrpass" class="form-control" type="password" name="usr[password]">
+				</li>
+				<li class="a-option form-group">
+					<label for="install-usrpassrep">Admin Password (repeat)</label>
+					<input id="install-usrpassrep" class="form-control" type="password" name="usr[password_rep]">
+				</li>
+				<li><hr></li>
+				<li class="a-option form-group">
+					<label for="install-dbhost">Database host</label>
+					<input id="install-dbhost" class="form-control" type="text" name="db[host]">
+				</li>
+				<li class="a-option form-group">
+					<label for="install-dbname">Database name</label>
+					<input id="install-dbname" class="form-control" type="text" name="db[name]">
+				</li>
+				<li class="a-option form-group">
+					<label for="install-dbuser">Database user</label>
+					<input id="install-dbuser" class="form-control" type="text" name="db[user]">
+				</li>
+				<li class="a-option form-group">
+					<label for="install-dbpass">Database password</label>
+					<input id="install-dbpass" class="form-control" type="text" name="db[pass]">
+				</li>
+			</ul>
+			<hr>
+			<button type="submit" class="btn btn-block text-white bg-main">Install</button>
+		</form>
+	</div>
 </div>

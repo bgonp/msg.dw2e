@@ -1,48 +1,71 @@
-<div id="login-form" class="{{CLASS}}">
-	<ul class="tabs">
-		<li><a href="#" class="tab active" data-target="login-form">{{TR:LOGIN}}</a>
-		<li><a href="#" class="tab" data-target="register-form">{{TR:REGISTER}}</a>
-	</ul>
-	<div class="form-container">
-		<div class="login-form tab-content">
-			<form action="ajax.php" method="post">
-				<input type="hidden" name="action" value="login">
-				<label class="form-elem"><span>{{TR:EMAIL}}</span>
-					<input type="email" name="email" required></label>
-				<label class="form-elem"><span>{{TR:PASSWORD}}</span>
-					<input type="password" name="password" required></label>
-				<a href="#" class="tab active btn-reset" data-target="recover-form">{{TR:REMEMBER}}</a>
+<div id="login-form" class="{{CLASS}} row justify-content-center p-2">
+	<div class="col-12 col-sm-8 col-md-6 mt-sm-5 bg-white rounded shadow-lg">
+		<ul class="tabs row list-unstyled mb-0">
+			<li class="col-6 p-0">
+				<button class="tab btn btn-block text-main bg-aux px-0 py-3 border-bottom border-right rounded-0 active" data-target="login-form">{{TR:LOGIN}}</button>
+			</li>
+			<li class="col-6 p-0">
+				<button class="tab btn btn-block text-main bg-aux px-0 py-3 border-bottom rounded-0" data-target="register-form">{{TR:REGISTER}}</button>
+			</li>
+		</ul>
+		<div class="form-container row text-main p-4">
+			<div class="login-form tab-content w-100">
+				<form action="ajax.php" method="post">
+					<input type="hidden" name="action" value="login">
+					<div class="form-group">
+						<label for="login-email">{{TR:EMAIL}}</label>
+						<input id="login-email" class="form-control" type="email" name="email" required>
+					</div>
+					<div class="form-group">
+						<label for="login-pass">{{TR:PASSWORD}}</label>
+						<input id="login-pass" class="form-control" type="password" name="password" required>
+						<button type="button" class="tab btn btn-reset form-text p-0 text-main" data-target="recover-form">{{TR:REMEMBER}}</button>
+					</div>
+					<hr>
+					<button type="submit" class="btn btn-block text-white bg-main btn-login">{{TR:LOGIN}}</button>
+				</form>
+			</div>
+			<div class="register-form tab-content w-100" style="display: none">
+				<form action="ajax.php" method="post" enctype="multipart/form-data" class="empty-on-submit">
+					<input type="hidden" name="action" value="register">
+					<div class="form-group">
+						<label for="register-name">{{TR:NAME}}</label>
+						<input id="register-name" class="form-control" type="text" name="name" required>
+					</div>
+					<div class="form-group">
+						<label for="register-email">{{TR:EMAIL}}</label>
+						<input id="register-email" class="form-control" type="email" name="email" required>
+					</div>
+					<div class="form-group">
+						<label for="register-pass">{{TR:PASSWORD}}</label>
+						<input id="register-pass" class="form-control" type="password" name="password" required>
+					</div>
+					<div class="form-group">
+						<label for="register-passrep">{{TR:PASSWORD}} ({{TR:REPEAT}})</label>
+						<input id="register-passrep" class="form-control" type="password" name="password_rep" required>
+					</div>
+					<div class="form-group">
+						<label for="register-avatar">{{TR:AVATAR}}</label>
+						<input id="register-avatar" type="file" name="avatar" style="display: none">
+						<button type="button" class="btn btn-block text-white bg-main btn-upload">{{TR:UPLOADAVATAR}}</button>
+					</div>
+					<hr>
+					<input type="submit" class="btn btn-block text-white bg-main btn-register" value="{{TR:REGISTER}}">
+				</form>
+			</div>
+			<div class="recover-form tab-content w-100" style="display: none">
+				<h4 class="text-center">{{TR:RESET}}</h4>
 				<hr>
-				<input type="submit" class="btn btn-login" value="{{TR:LOGIN}}">
-			</form>
-		</div>
-		<div class="register-form tab-content" style="display: none">
-			<form action="ajax.php" method="post" enctype="multipart/form-data" class="empty-on-submit">
-				<input type="hidden" name="action" value="register">
-				<label class="form-elem"><span>{{TR:NAME}}</span>
-					<input type="text" name="name" required></label>
-				<label class="form-elem"><span>{{TR:EMAIL}}</span>
-					<input type="email" name="email" required></label>
-				<label class="form-elem"><span>{{TR:PASSWORD}}</span>
-					<input type="password" name="password" required></label>
-				<label class="form-elem"><span>{{TR:PASSWORD}} ({{TR:REPEAT}})</span>
-					<input type="password" name="password_rep" required></label>
-				<label class="form-elem"><span>{{TR:AVATAR}}</span>
-					<input type="file" name="avatar" style="display: none">
-					<a href="#" class="btn btn-upload">{{TR:UPLOADAVATAR}}</a></label>
-				<hr>
-				<input type="submit" class="btn btn-register" value="{{TR:REGISTER}}">
-			</form>
-		</div>
-		<div class="recover-form tab-content" style="display: none">
-			<h2>{{TR:RESET}}</h2>
-			<form action="ajax.php" method="post" enctype="multipart/form-data">
-				<input type="hidden" name="action" value="resetSend">
-				<label class="form-elem"><span>{{TR:EMAIL}}</span>
-					<input type="email" name="email" required></label>
-				<hr>
-				<input type="submit" class="btn btn-register" value="{{TR:RESET}}">
-			</form>
+				<form action="ajax.php" method="post" enctype="multipart/form-data">
+					<input type="hidden" name="action" value="resetSend">
+					<div class="form-group">
+						<label for="reset-email">{{TR:EMAIL}}</label>
+						<input id="reset-email" class="form-control" type="email" name="email" required></label>
+					</div>
+					<hr>
+					<input type="submit" class="btn btn-block text-white bg-main btn-reset" value="{{TR:RESET}}">
+				</form>
+			</div>
 		</div>
 	</div>
 </div>
