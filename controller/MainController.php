@@ -60,8 +60,7 @@ class MainController {
 				View::install([
 					'page_title' => 'DW2E Messaging App',
 					'color_main' => '#1b377a',
-					'color_bg' => '#f0f5ff',
-					'color_border' => '#939db5'
+					'color_aux' => '#f0f5ff'
 				]);
 			} else if (!empty($_GET)) {
 				// If GET data exists, calls the related method or redirect if it doesn't exist

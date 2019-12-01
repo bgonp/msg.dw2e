@@ -15,9 +15,9 @@ $(document).ready(function() {
 	members_img = $('#messages .members-list');
 
 	// Empty elements
-	empty_chat = $('#chats .empty-chat');
-	empty_friend = $('#friends .empty-friend');
-	empty_request = $('#requests .empty-request');
+	empty_chat = $('#sidebar .empty-chat');
+	empty_friend = $('#sidebar .empty-friend');
+	empty_request = $('#sidebar .empty-request');
 	empty_message = $('#messages .empty-message');
 	empty_member_img = members_img.find('.empty-member');
 
@@ -43,7 +43,7 @@ $(document).ready(function() {
 
 	// Message
 	alert_msg = $('#alert-msg');
-	alert_msg.find('a.close').click(function(event){
+	alert_msg.find('a.btn-close').click(function(event){
 		event.preventDefault();
 		alert_msg.fadeOut(200);
 	});
@@ -74,6 +74,12 @@ $(document).ready(function() {
 			upload_attachment.siblings('.btn-upload').addClass('empty');
 	});
 
+	// Slide sidebar
+	$('.btn-sidebar').click(function(event) {
+		event.preventDefault();
+		$('#sidebar').toggleClass('visible');
+	});
+
 	// Filter chats
 	var search_timeout;
 	$('.search-chat input').keyup(function() {
@@ -82,7 +88,7 @@ $(document).ready(function() {
 		search_timeout = setTimeout(function() {
 			$('#chats .chats-list .a-chat').each(function() {
 				var this_chat = $(this);
-				var text = this_chat.children('.chat-link').text();
+				var text = this_chat.find('.chat-link').text();
 				if (text.search(search) > -1) this_chat.show();
 				else this_chat.hide();
 			});
@@ -113,6 +119,8 @@ function processResponse(response) {
 		last_contact_upd = response.last_contact_upd;
 	if (response.focus)
 		tabs_buttons.filter('.'+response.focus).click();
+	if (response.members)
+		updateMembers(response.members);
 	if (response.message)
 		showAlert(response.type, response.message);
 	if (response.userdata)
@@ -125,8 +133,6 @@ function processResponse(response) {
 		updateFriends(response.friends);
 	if (response.requests)
 		updateRequests(response.requests);
-	if (response.members)
-		updateMembers(response.members);
 	if (response.candidates)
 		updateCandidates(response.candidates);
 }
@@ -151,11 +157,11 @@ function update() {
 }
 
 function updateUserdata(userdata) {
-	$('#menu .saludo span').text(userdata.name);
+	$('#menu .saludo .name').text(userdata.name);
 	$('#menu .edit-profile input[name="name"]').val(userdata.name);
 	$('#menu .edit-profile input[name="email"]').val(userdata.email);
 	$('#menu .edit-profile input[type="password"]').val('');
-	$('#menu .avatar img').attr('src','avatar.php?id='+userdata.id+'&'+(new Date().getTime()));
+	$('#menu .avatar').attr('src','avatar.php?id='+userdata.id+'&'+(new Date().getTime()));
 }
 
 function updateChats(chats_list) {
@@ -258,7 +264,7 @@ function putFriend(friends_list) {
 	if (friends_list.length == 0) return false;
 	let friend = friends_list.pop();
 	let friend_dom = empty_friend.clone();
-	friend_dom.find('.avatar img').attr('src','avatar.php?id='+friend.id);
+	friend_dom.find('.avatar').attr('src','avatar.php?id='+friend.id);
 	friend_dom.find('.datos .name').text(friend.name);
 	friend_dom.find('.datos .email').text(friend.email);
 	friend_dom.find('input[name="members[]"], input[name="contact_id"]').val(friend.id);
@@ -329,7 +335,8 @@ function loadChat(chat_id) {
 		$('#messages .btn-upload').show();
 		$('#send-message-form input[name="chat_id"]').val(current_chat);
 		$('#send-message-form input[name="message"]').prop('disabled', false);
-		$('#send-message-form input[type="submit"]').prop('disabled', false);
+		$('#send-message-form button[type="submit"]').prop('disabled', false);
+		$('#send-message-form button.btn-upload').prop('disabled', false);
 		processResponse(response);
 		replied = busy = false;
 	});
@@ -344,7 +351,8 @@ function unloadChat() {
 	upload_attachment.val('').change();
 	$('#send-message-form input[name="chat_id"]').val(0);
 	$('#send-message-form input[name="message"]').prop('disabled', true);
-	$('#send-message-form input[type="submit"]').prop('disabled', true);
+	$('#send-message-form button[type="submit"]').prop('disabled', true);
+	$('#send-message-form button.btn-upload').prop('disabled', true);
 }
 
 // ------------------

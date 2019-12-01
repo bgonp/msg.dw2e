@@ -1,31 +1,48 @@
-<div id="menu">
-	<div class="saludo">{{TR:HELLO}}, <span>{{NAME}}</span>!</div>
-	<a href="#" class="edit-profile-btn">
-		<div class="avatar"><img src="avatar.php?id={{ID}}"></div>
-		<span>{{TR:MYPROFILE}}</span>
-	</a>
-	<form action="ajax.php" method="post" class="logout confirmable">
-		<input type="hidden" name="action" value="logout">
-		<input type="submit" value="{{TR:LOGOUT}}" class="btn btn-logout">
-	</form>
-	<div class="edit-profile" style="display: none">
-		<h2>{{TR:EDITPROFILE}}</h2>
-		<hr>
-		<form action="ajax.php" method="post" enctype="multipart/form-data">
-			<input type="hidden" name="action" value="editProfile">
-			<label class="form-elem"><span>{{TR:EMAIL}}</span>
-				<input type="email" name="email" value="{{EMAIL}}" required></label>
-			<label class="form-elem"><span>{{TR:NAME}}</span>
-				<input type="text" name="name" value="{{NAME}}" required></label>
-			<label class="form-elem"><span>{{TR:PASSWORD}}</span>
-				<input type="password" name="password"></label>
-			<label class="form-elem"><span>{{TR:PASSWORD}} ({{TR:REPEAT}})</span>
-				<input type="password" name="password_rep"></label>
-			<label class="form-elem"><span>{{TR:AVATAR}}</span>
-				<input type="file" name="avatar" style="display: none">
-				<a href="#" class="btn btn-upload">{{TR:CHANGEAVATAR}}</a></label>
-			<hr>
-			<input type="submit" value="{{TR:SAVE}}" class="btn">
-		</form>
+<header id="menu" class="row bg-main">
+	<div class="col-sm-6 d-none d-sm-flex align-items-center">
+		<span class="saludo text-white p-3">{{TR:HELLO}}, <span class="name">{{NAME}}</span>!</span>
 	</div>
-</div>
+	<nav class="col-12 col-sm-6 d-flex align-items-center justify-content-between justify-content-sm-end">
+		<a href="#" class="btn rounded-0 edit-profile-btn d-flex align-items-center p-0">
+			<img src="avatar.php?id={{ID}}" class="avatar rounded-circle px-2 py-1">
+			<div class="d-none d-sm-block text-white pt-3 pr-3 pb-3 pl-0">{{TR:MYPROFILE}}</div>
+		</a>
+		<form action="ajax.php" method="post" class="logout confirmable">
+			<input type="hidden" name="action" value="logout">
+			<button type="submit" class="btn logout-btn rounded-0 text-white p-3">
+				<span class="d-none d-sm-block">{{TR:LOGOUT}}</span>
+				<span class="d-sm-none"><i class="fa fa-lg fa-sign-out"></i></span>
+			</button>
+		</form>
+		<div class="edit-profile bg-white text-main w-100 p-4 rounded-bottom shadow" style="display: none">
+			<h4 class="text-center">{{TR:EDITPROFILE}}</h4>
+			<hr>
+			<form action="ajax.php" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="action" value="editProfile">
+				<div class="form-group">
+					<label for="profile-email">{{TR:EMAIL}}</label>
+					<input type="email" name="email" value="{{EMAIL}}" id="profile-email" class="form-control" required>
+				</div>
+				<div class="form-group">
+					<label for="profile-name">{{TR:NAME}}</label>
+					<input type="text" name="name" value="{{NAME}}" id="profile-name" class="form-control" required>
+				</div>
+				<div class="form-group">
+					<label for="profile-pass">{{TR:PASSWORD}}</label>
+					<input type="password" name="password" id="profile-pass" class="form-control">
+				</div>
+				<div class="form-group">
+					<label for="profile-passrep">{{TR:PASSWORD}} ({{TR:REPEAT}})</label>
+					<input type="password" name="password_rep" id="profile-passrep" class="form-control">
+				</div>
+				<div class="form-group">
+					<label for="profile-avatar">{{TR:AVATAR}}</label>
+					<input type="file" name="avatar" id="profile-avatar" style="display: none">
+					<a href="#" class="btn btn-block btn-upload bg-main text-white">{{TR:CHANGEAVATAR}}</a>
+				</div>
+				<hr>
+				<input type="submit" value="{{TR:SAVE}}" class="btn btn-block bg-main text-white">
+			</form>
+		</div>
+	</nav>
+</header>

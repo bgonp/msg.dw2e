@@ -65,16 +65,15 @@ INSERT INTO `option` (`id`, `key`, `type`, `name`, `value`) VALUES
 (3, 'regex_name', 'text', 'Names conditions', '\\w[ \\w]{2,32}\\w'),
 (4, 'regex_email', 'text', 'E-mail conditions', '[^@]+@[^@]+[a-zA-Z]{2,}'),
 (5, 'color_main', 'color', 'Main color', '#1b377a'),
-(6, 'color_bg', 'color', 'Background color', '#f0f5ff'),
-(7, 'color_border', 'color', 'Border color', '#939db5'),
-(8, 'avatar_maxweight', 'number', 'Max avatar weight (KB)', '1024'),
-(9, 'attachment_maxweight', 'number', 'Max attachment file weight (KB)', '2048'),
-(10, 'email_confirm', 'number', 'E-mail confirmation required', '0'),
-(11, 'email_host', 'text', 'E-mail host', ''),
-(12, 'email_user', 'text', 'E-mail user', ''),
-(13, 'email_pass', 'text', 'E-mail password', ''),
-(14, 'email_from', 'text', 'E-mail from address', ''),
-(15, 'email_name', 'text', 'E-mail from name', '');
+(6, 'color_aux', 'color', 'Auxiliary color', '#f0f5ff'),
+(7, 'avatar_maxweight', 'number', 'Max avatar weight (KB)', '1024'),
+(8, 'attachment_maxweight', 'number', 'Max attachment file weight (KB)', '2048'),
+(9, 'email_confirm', 'number', 'E-mail confirmation required', '0'),
+(10, 'email_host', 'text', 'E-mail host', ''),
+(11, 'email_user', 'text', 'E-mail user', ''),
+(12, 'email_pass', 'text', 'E-mail password', ''),
+(13, 'email_from', 'text', 'E-mail from address', ''),
+(14, 'email_name', 'text', 'E-mail from name', '');
 
 ALTER TABLE `attachment`
   ADD PRIMARY KEY (`id`);
@@ -118,7 +117,7 @@ ALTER TABLE `user`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 ALTER TABLE `option`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 ALTER TABLE `contact`
   ADD CONSTRAINT `FK_contact_user_1` FOREIGN KEY (`user_1_id`) REFERENCES `user` (`id`),

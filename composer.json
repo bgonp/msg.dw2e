@@ -9,6 +9,7 @@
         "post-install-cmd": [
             "cp ./vendor/components/jquery/jquery.min.js ./public/assets/js/",
             "cp ./vendor/fortawesome/font-awesome/css/font-awesome.css ./public/assets/css/",
+            "cp ./vendor/twbs/bootstrap/dist/css/bootstrap.min.css ./public/assets/css/",
             "mkdir -p ./public/assets/fonts && cp ./vendor/fortawesome/font-awesome/fonts/fontawesome-webfont.* ./public/assets/fonts/"
         ]
     }

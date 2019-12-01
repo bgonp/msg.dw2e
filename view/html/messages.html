@@ -1,23 +1,36 @@
-<div id="messages">
-	<ul class="members-list">
-		<li class="empty-member" style="display: none">
-			<img src="" class="avatar"></img>
-		</li>
-	</ul>
-	<ul class="messages-list">
-		<li class="empty-message">
-			<div class="autor"></div>
-			<a class="attachment" style="display: none" download><i class="fa fa-paperclip"></i><img class="preview"/><div class="reserve"></div></a>
-			<p class="content"></p>
-			<div class="date"></div>
-		</li>
-	</ul>
-	<form action="ajax.php" method="post" id="send-message-form" class="empty-on-submit" enctype="multipart/form-data">
-		<input type="hidden" name="action" value="sendMessage">
-		<input type="hidden" name="chat_id" value="0">
-		<input type="hidden" name="last_read" value="0">
-		<a href="#" class="btn-upload empty" style="display: none"><i class="fa fa-paperclip"></i></a>
-		<input type="file" name="attachment" style="display: none">
-		<input type="text" name="message" placeholder="{{TR:WRITEMESSAGE}}" disabled required><input type="submit" class="btn btn-send" value="{{TR:SEND}}" disabled>
-	</form>
-</div>
+<section id="messages" class="col-12 col-sm-6 col-md-7 d-flex flex-column">
+	<header class="row border-bottom">
+		<ul class="members-list col-12 m-0 list-unstyled text-right text-nowrap overflow-auto">
+			<li class="empty-member d-inline-block" style="display: none!important">
+				<img src="" class="avatar rounded-circle p-1">
+			</li>
+		</ul>
+	</header>
+	<div class="row bg-aux flex-grow-1 position-relative overflow-auto inset-shadow">
+		<div class="col-12 px-0 pb-3 messages-list position-absolute w-100 h-100">
+			<article class="empty-message m-3 py-2 px-3 border rounded" style="display: none">
+				<header><small class="autor font-weight-bold mb-2"></small></header>
+				<a class="attachment" style="display: none" download><i class="fa fa-paperclip"></i><img class="preview"/><div class="reserve"></div></a>
+				<p class="content text-break m-0"></p>
+				<footer><small class="date font-weight-bold mt-2"></small></footer>
+			</article>
+		</div>
+	</div>
+	<footer class="row bg-main">
+		<form action="ajax.php" method="post" id="send-message-form" class="empty-on-submit col-12 p-3" enctype="multipart/form-data">
+			<input type="hidden" name="action" value="sendMessage">
+			<input type="hidden" name="chat_id" value="0">
+			<input type="hidden" name="last_read" value="0">
+			<div class="form-group input-group m-0">
+				<div class="input-group-prepend">
+					<button type="button" class="btn-upload bg-aux text-main input-group-text" disabled><i class="fa fa-lg fa-paperclip"></i></button>
+					<input type="file" name="attachment" style="display: none">
+				</div>
+				<input type="text" class="form-control flex-grow-1" name="message" placeholder="{{TR:WRITEMESSAGE}}" disabled required>
+				<div class="input-group-append">
+					<button type="submit" class="btn-send bg-aux text-main input-group-text font-weight-bold" disabled>{{TR:SEND}}</button>
+				</div>
+			</div>
+		</form>
+	</footer>
+</section>

@@ -17,6 +17,7 @@ class Text {
 		'ADDAFRIEND' => 'Add a friend...',
 		'ADDFRIENDS' => 'Add friends by e-mail...',
 		'AVATAR' => 'Avatar',
+		'BLOCK' => 'Block friend',
 		'CHANGEAVATAR' => 'Change avatar',
 		'CHATNAME' => 'Chat name...',
 		'CHATS' => 'Chats',

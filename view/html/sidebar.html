@@ -1,87 +1,118 @@
-<div id="sidebar">
-	<ul class="tabs">
-		<li><a href="#" class="tab chats active" data-target="chats-menu">{{TR:CHATS}}</a>
-		<li><a href="#" class="tab friends" data-target="friends-menu">{{TR:FRIENDS}}</a>
-		<li><a href="#" class="tab requests{{NEWREQUESTS}}" data-target="requests-menu">{{TR:REQUESTS}}</a>
-	</ul>
-	<div id="chats" class="tab-content chats-menu">
-		<div class="search-chat"><input type="text" name="search-chat" placeholder="Filter chats..."></div>
-		<ul class="chats-list">
-			{{CHATS}}
-			<li class="empty-chat deletable" style="display: none">
-				<a href="#" class="chat-link"></a>
-				<form action="ajax.php" method="post" class="confirmable delete-parent unload-chat">
-					<input type="hidden" name="action" value="leaveChat">
-					<input type="hidden" name="chat_id" value="">
-					<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
-				</form>
-				<ul class="members-list">
-					<li class="empty-member" style="display: none"><strong class="name"></strong><span class="email"></span></li>
-					<li class="add-member">
-						<form action="ajax.php" method="post" class="add-member-form">
-							<input type="hidden" name="action" value="addMember">
-							<input type="hidden" name="chat_id" value="">
-							<select class="candidates-list" name="contact_id">
-								<option value="0">{{TR:ADDAFRIEND}}</option>
-							</select>
-							<button type="submit" class="btn btn-add-member"><i class="fa fa-plus"></i></button>
-						</form>
-					</li>
-				</ul>
-			</li>
-		</ul>
-	</div>
-	<div id="friends" class="tab-content friends-menu" style="display: none">
-		<form action="ajax.php" method="post" id="request-friend-form" class="empty-on-submit">
-			<input type="hidden" name="action" value="requestFriend">
-			<input type="email" name="email" placeholder="{{TR:ADDFRIENDS}}">
-			<input type="submit" value="{{TR:ADD}}">
-		</form>
-		<ul class="friends-list">{{FRIENDS}}</ul>
-		<form action="ajax.php" method="post" id="create-chat-form" class="empty-on-submit">
-			<input type="hidden" name="action" value="createChat">
-			<input type="text" name="name" placeholder="{{TR:CHATNAME}}" required>
-			<input type="submit" value="{{TR:NEWCHAT}}">
-		</form>
-		<li class="empty-friend deletable" style="display: none">
-			<div class="avatar"><img src=""></div>
-			<div class="datos">
-				<div class="name"></div>
-				<div class="email"></div>
+<section id="sidebar" class="d-flex flex-column col-10 col-sm-6 col-md-5 bg-white border-right">
+	<nav class="tabs row">
+		<a href="#" class="col-4 tab btn rounded-0 px-0 py-1 text-center bg-aux text-main border-bottom border-right chats active" data-target="chats-menu">
+			{{TR:CHATS}}
+		</a>
+		<a href="#" class="col-4 tab btn rounded-0 px-0 py-1 text-center bg-aux text-main border-bottom border-right friends" data-target="friends-menu">
+			{{TR:FRIENDS}}
+		</a>
+		<a href="#" class="col-4 tab btn rounded-0 px-0 py-1 text-center bg-aux text-main border-bottom requests{{NEWREQUESTS}}" data-target="requests-menu">
+			{{TR:REQUESTS}}
+		</a>
+		<button type="button" class="d-sm-none btn btn-sidebar position-absolute bg-white text-main border rounded-0 px-3 py-1">
+			<i class="fa fa-lg fa-bars"></i>
+		</button>
+	</nav>
+	<aside id="chats" class="row flex-grow-1 tab-content chats-menu">
+		<div class="col-12 d-flex flex-column p-0">
+			<div class="search-chat p-3 bg-white">
+				<div class="form-group m-0">
+					<input type="text" name="search-chat" placeholder="Filter chats..." class="form-control">
+				</div>
 			</div>
-			<div class="buttons">
-				<label class="custom-checkbox">
+			<div class="flex-grow-1 position-relative overflow-auto">
+				<ul class="chats-list position-absolute list-unstyled w-100 h-100 m-0">{{CHATS}}</ul>
+			</div>
+		</div>
+	</aside>
+	<aside id="friends" class="row flex-grow-1 tab-content friends-menu" style="display: none">
+		<div class="col-12 d-flex flex-column p-0">
+			<form action="ajax.php" method="post" id="request-friend-form" class="empty-on-submit p-3 bg-white">
+				<input type="hidden" name="action" value="requestFriend">
+				<div class="form-group input-group m-0">
+					<input type="email" class="form-control flex-grow-1" name="email" placeholder="{{TR:ADDFRIENDS}}" required>
+					<div class="input-group-append">
+						<button type="submit" class="bg-aux text-main input-group-text font-weight-bold">{{TR:ADD}}</button>
+					</div>
+				</div>
+			</form>
+			<div class="flex-grow-1 position-relative overflow-auto">
+				<ul class="friends-list position-absolute list-unstyled w-100 h-100 m-0">{{FRIENDS}}</ul>
+			</div>
+			<form action="ajax.php" method="post" id="create-chat-form" class="empty-on-submit p-3 bg-main">
+				<input type="hidden" name="action" value="createChat">
+				<div class="form-group input-group m-0">
+					<input type="text" class="form-control flex-grow-1" name="name" placeholder="{{TR:CHATNAME}}" required>
+					<div class="input-group-append">
+						<button type="submit" class="bg-aux text-main input-group-text font-weight-bold">{{TR:NEWCHAT}}</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</aside>
+	<aside id="requests" class="row flex-grow-1 tab-content requests-menu position-relative overflow-auto" style="display: none">
+		<ul class="requests-list position-absolute list-unstyled w-100 h-100 py-3 m-0">{{REQUESTS}}</ul>
+	</aside>
+	<div class="empty-elements d-none">
+		<li class="empty-chat deletable">
+			<a href="#" class="chat-link"></a>
+			<form action="ajax.php" method="post" class="confirmable delete-parent unload-chat">
+				<input type="hidden" name="action" value="leaveChat">
+				<input type="hidden" name="chat_id" value="">
+				<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
+			</form>
+			<ul class="members-list">
+				<li class="empty-member" style="display: none"><strong class="name"></strong><span class="email"></span></li>
+				<li class="add-member">
+					<form action="ajax.php" method="post" class="add-member-form">
+						<input type="hidden" name="action" value="addMember">
+						<input type="hidden" name="chat_id" value="">
+						<select class="candidates-list" name="contact_id">
+							<option value="0">{{TR:ADDAFRIEND}}</option>
+						</select>
+						<button type="submit" class="btn btn-add-member"><i class="fa fa-plus"></i></button>
+					</form>
+				</li>
+			</ul>
+		</li>				
+		<li class="empty-friend deletable card d-flex align-items-center flex-row overflow-hidden p-3 mx-3 mb-2">
+			<img class="avatar avatar-lg rounded-circle" src="">
+			<div class="datos px-2">
+				<div class="name text-main font-weight-bold"></div>
+				<div class="email text-main"></div>
+			</div>
+			<div class="buttons position-absolute d-flex flex-column">
+				<label class="custom-checkbox m-0 flex-grow-1">
 					<input type="checkbox" form="create-chat-form" name="members[]" value="">
-					<span class="checked"><i class="fa fa-check-square-o"></i></span>
-					<span class="unchecked"><i class="fa fa-square-o"></i></span>
+					<span class="btn px-1 text-main checked"><i class="fa fa-lg fa-fw fa-check-square"></i></span>
+					<span class="btn px-1 text-main unchecked"><i class="fa fa-lg fa-fw fa-square-o font-weight-bold"></i></span>
 				</label>
 				<form action="ajax.php" method="post" class="confirmable delete-parent">
 					<input type="hidden" name="action" value="blockFriend">
 					<input type="hidden" name="contact_id" value="">
-					<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
+					<button type="submit" class="btn px-1 text-main" title="">
+						<i class="fa fa-lg fa-fw fa-ban"></i>
+					</button>
 				</form>
 			</div>
 		</li>
-	</div>
-	<div id="requests" class="tab-content requests-menu" style="display: none">
-		<ul class="requests-list">{{REQUESTS}}</ul>
-		<li class="empty-request deletable" style="display: none">
-			<div class="datos">
-				<div class="name"></div>
+		<li class="empty-request deletable card d-flex align-items-center flex-row overflow-hidden p-2 mx-3 mb-2">
+			<div class="datos text-break text-main flex-grow-1 p-1">
+				<div class="name font-weight-bold"></div>
 				<div class="email"></div>
 			</div>
 			<div class="buttons">
-				<form action="ajax.php" method="post" class="delete-parent">
+				<form action="ajax.php" method="post" class="delete-parent mb-2">
 					<input type="hidden" name="action" value="acceptFriend">
 					<input type="hidden" name="contact_id" value="">
-					<input type="submit" class="btn btn-accept" value="{{TR:ACCEPT}}">
+					<input type="submit" class="btn btn-block btn-sm bg-main text-white btn-accept" value="{{TR:ACCEPT}}">
 				</form>
 				<form action="ajax.php" method="post" class="confirmable delete-parent">
 					<input type="hidden" name="action" value="rejectFriend">
 					<input type="hidden" name="contact_id" value="">
-					<input type="submit" class="btn btn-decline" value="{{TR:DECLINE}}">
+					<input type="submit" class="btn btn-block btn-sm bg-main text-white btn-decline" value="{{TR:DECLINE}}">
 				</form>
 			</div>
 		</li>
 	</div>
-</div>
+</section>

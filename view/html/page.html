@@ -2,16 +2,18 @@
 <html>
 <head>
 	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>{{TITLE}}</title>
 	<link rel="icon" type="image/png" href="assets/img/favicon.png">
 	<link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+	<link href="assets/css/bootstrap.min.css" rel="stylesheet">
 	<link href="assets/css/font-awesome.css" rel="stylesheet">
 	<link href="assets/css/style.css" rel="stylesheet">
 	{{COLORS}}
 	<script src="assets/js/jquery.min.js"></script>
 	<script type="text/javascript" src="assets/js/main.js"></script>
 </head>
-<body>
-	<div id="content" class="{{CLASS}}">{{CONTENT}}</div>
+<body class="bg-dark">
+	<div id="content" class="{{CLASS}} container-fluid d-flex flex-column vh-100 bg-white shadow-lg">{{CONTENT}}</div>
 </body>
 </html>
