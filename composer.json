@@ -3,7 +3,6 @@
         "phpmailer/phpmailer": "^6.1",
         "components/jquery": "^3.4",
         "fortawesome/font-awesome": "4.7.0",
-        "apigen/apigen": "^4.1",
         "twbs/bootstrap": "^4.3"
     },
     "scripts": {

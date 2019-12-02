@@ -29,7 +29,7 @@ A responsive instant messaging single page application to talk about topics in c
 
 ## Requeriments
 
-- PHP >= 7.2
+- PHP >= 7.1
 - Composer
 - MySQL
 
