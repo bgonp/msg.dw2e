@@ -1,6 +1,7 @@
 <?php
 /**
  * Class with static functions to handle requests of the whole app.
+ * 
  * It takes requests data, calls the models needed, manage the actions to perform and returns json
  * response or calls the view to echo html content or send an email.
  * 

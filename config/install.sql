@@ -68,7 +68,7 @@ INSERT INTO `option` (`id`, `key`, `type`, `name`, `value`) VALUES
 (6, 'color_aux', 'color', 'Auxiliary color', '#f0f5ff'),
 (7, 'avatar_maxweight', 'number', 'Max avatar weight (KB)', '1024'),
 (8, 'attachment_maxweight', 'number', 'Max attachment file weight (KB)', '2048'),
-(9, 'email_confirm', 'number', 'E-mail confirmation required', '0'),
+(9, 'email_confirm', 'number', 'E-mail confirm required (0 or 1)', '0'),
 (10, 'email_host', 'text', 'E-mail host', ''),
 (11, 'email_user', 'text', 'E-mail user', ''),
 (12, 'email_pass', 'text', 'E-mail password', ''),

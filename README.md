@@ -53,8 +53,8 @@ The admin user can modify some settings from the control panel:
 - Password requisites with a regex for security reasons.
 - Name of users and chats requisites with a regex.
 - E-mail conditions with a regex to, for example, limit registration to a certain domain.
-- Colors of the app (main color, background and borders color).
-- Max file size of avatars and messages attachments
+- Colors of the app (main and auxiliary colors).
+- Max file size of avatars and messages attachments.
 - Enable e-mail confirmation at register and set e-mail credentials.
 
 ## Usage
