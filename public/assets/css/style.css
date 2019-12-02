@@ -116,6 +116,14 @@ img.avatar-lg {
 	top: 0;
 	left: 100%;
 }
+#sidebar .a-chat.unread::after {
+	content: '';
+	position: absolute;
+	top: -1px;
+	right: -1px;
+	border-top: 20px solid var(--main)!important;
+	border-left: 20px solid transparent;
+}
 #sidebar .a-chat:not(.active) .card-header {
 	border: none!important;
 	background: #FFFFFF;
@@ -252,6 +260,10 @@ img.avatar-lg {
 	border-top-right-radius: 3px;
 	border-bottom-right-radius: 3px;
 	background-color: var(--main);
+}
+#messages .btn-upload.empty {
+	color: var(--main)!important;
+	background: var(--aux)!important;
 }
 
 /*

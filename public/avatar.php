@@ -20,29 +20,26 @@ require_once "../init.php";
 if (isset($_GET['id']) && $user = User::get($_GET['id'])) {
 	// Check if there is a logged user
 	if ($logged_id = SessionController::logged()) {
+		$avatar = 'default.png';
 		// Check if the requested avatar is from an allowed user (himself or a friend)
 		if ($logged_id == $user->id() || $user->friends($logged_id)) {
 			// Check if the requested user has an avatar or set the default image
 			$avatar = $user->avatar() ?: 'default.png';
 			// Check if the file exists
-			if (file_exists(AVATAR_DIR.$avatar)) {
-				// Print the avatar
-				$type = getimagesize(AVATAR_DIR.$avatar)['mime'];
-				header("Content-Type: $type");
-				readfile(AVATAR_DIR.$avatar);
-			} else {
-				// File not found
+			if (!file_exists(AVATAR_DIR.$avatar)) {
 				http_response_code(404);
+				die();
 			}
-		} else {
-			// User unable to view the avatar
-			http_build_query(403);
 		}
+		// Print the image
+		$type = getimagesize(AVATAR_DIR.$avatar)['mime'];
+		header("Content-Type: $type");
+		readfile(AVATAR_DIR.$avatar);
 	} else {
 		// User not authenticated
-		http_build_query(401);
+		http_response_code(401);
 	}
 } else {
 	// Bad request
-	http_build_query(400);
+	http_response_code(400);
 }

@@ -181,20 +181,20 @@ class Text {
 				return 'Invalid operation'; break;
 			case 'key_check':
 				return 'Can\'t verify your code. Remember: that link explires after 24 hours'; break;
+			case 'message_add':
+				return 'Message can\'t be sent'; break;
 			case 'message_id':
 				return 'Invalid message id'; break;
 			case 'message_get':
 				return 'Message doesn\'t exist'; break;
 			case 'message_invalid':
 				return 'Invalid message content'; break;
+			case 'message_length':
+				return 'Text must have less than 1000 characters'; break;
 			case 'message_new':
 				return 'Unable to create message'; break;
 			case 'missing_data':
 				return 'Some data is missing'; break;
-			case 'msg_add':
-				return 'Message can\'t be sent'; break;
-			case 'msg_invalid':
-				return 'Text must have less than 1000 characters'; break;
 			case 'no_friend':
 				return 'Someone is not your friend anymore'; break;
 			case 'pass_diff':

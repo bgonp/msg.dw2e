@@ -11,8 +11,10 @@
  */
 class MainController {
 
-	// This class uses traits AdminController, ChatController, FriendController, UserController in
-	// order to organize the different actions by groups of related ones.
+	/**
+	 * This class uses traits AdminController, ChatController, FriendController, UserController in
+	 * order to organize the different actions by groups of related ones.
+	 */
 	use AdminController, ChatController, FriendController, UserController;
 
 	/**

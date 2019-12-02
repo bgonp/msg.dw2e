@@ -1,6 +1,6 @@
 <?php
 /**
- * Option model that represents a stored option. Extends Database class in order to user
+ * Option model that represents a stored option. Extends Database class in order to use
  * its methods to connect and handle database queries.
  * 
  * @package model
@@ -10,7 +10,7 @@
  */
 class Option extends Database {
 	
-	/** @var int Option ID */
+	/** @var integer Option ID */
 	private $id;
 	/** @var string Option key */
 	private $key;
@@ -20,14 +20,14 @@ class Option extends Database {
 	private $name;
 	/** @var string Option value */
 	private $value;
-	/** @var array List of all stored options */
+	/** @var array Array with all stored options */
 	private static $list;
 
 	/**
 	 * Private constructor. An object can't be constructed directly, but through static
 	 * factory methods.
 	 * 
-	 * @param int $id Stored option ID
+	 * @param integer $id Stored option ID
 	 * @param string $key Option key
 	 * @param string $type Option type
 	 * @param string $name Option display name
@@ -42,7 +42,7 @@ class Option extends Database {
 	}
 
 	/**
-	 * Static factory methods that initialize static array with all the stored options if
+	 * Static factory method that initialize static array with all the stored options if
 	 * it isn't initialized yet. Then returns the Option object with passed $key or false
 	 * if option doesn't exist.
 	 * 

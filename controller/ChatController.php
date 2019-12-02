@@ -144,13 +144,13 @@ trait ChatController {
 		if (empty($post['chat_id']) || empty($post['message'])) {
 			$response = ['type' => 'error', 'message' => Text::error('missing_data')];
 		} else if (!Helper::validText($post['message'])) {
-			$response = ['type' => 'error', 'message' => Text::error('msg_invalid')];
+			$response = ['type' => 'error', 'message' => Text::error('message_length')];
 		} else {
 			$user = User::get(SessionController::logged());
 			if (!($chat = $user->chats($post['chat_id']))) {
 				$response = ['type' => 'error', 'message' => Text::error('chat_wrong')];
 			} else if ($chat->addMessage($user->id(), $post['message'], $files['attachment'] ?? false) === false) {
-				$response = ['type' => 'error', 'message' => Text::error('msg_add')];
+				$response = ['type' => 'error', 'message' => Text::error('message_add')];
 			} else {
 				$user->readChat($chat->id());
 				$response = ['messages' => $chat->newMessages($post['last_read'])];

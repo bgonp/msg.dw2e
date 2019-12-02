@@ -66,7 +66,7 @@ class Helper {
 	 * Creates and save an image in upload/avatar/ from an array of an uploaded file.
 	 * If necessary, it will crop and resize the image to get the 200x200 central square.
 	 * 
-	 * @param  array $avatar Array with the info of the received file
+	 * @param array $avatar Array with the info of the received file
 	 * @return string Name of the uploaded file
 	 * @throws Exception If error occurred while handling the avatar
 	 */
@@ -129,7 +129,7 @@ class Helper {
 	/**
 	 * Upload an attachment file in upload/attachment/ from an array of an uploaded file.
 	 * 
-	 * @param  array $attachment Array with the info of the received file
+	 * @param array $attachment Array with the info of the received file
 	 * @return array Associative array with file info (name, width, height)
 	 * @throws Exception If error occurred while handling the file
 	 */

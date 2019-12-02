@@ -83,12 +83,12 @@ $(document).ready(function() {
 	// Filter chats
 	var search_timeout;
 	$('.search-chat input').keyup(function() {
-		var search = $(this).val();
+		var search = $(this).val().toLowerCase();
 		clearTimeout(search_timeout);
 		search_timeout = setTimeout(function() {
 			$('#chats .chats-list .a-chat').each(function() {
 				var this_chat = $(this);
-				var text = this_chat.find('.chat-link').text();
+				var text = this_chat.find('.chat-link').text().toLowerCase();
 				if (text.search(search) > -1) this_chat.show();
 				else this_chat.hide();
 			});
@@ -171,17 +171,15 @@ function updateChats(chats_list) {
 
 function updateMessages(messages_list) {
 	last_read = putMessage(messages_list);
-	messages.scrollTop(messages[0].scrollHeight);
+	messages.parent().scrollTop(messages[0].scrollHeight);
 }
 
 function updateFriends(friends_list) {
-	friends.find('.a-friend').remove();
 	if (putFriend(friends_list))
 		tabs_buttons.filter('.friends:not(.active)').addClass('new');
 }
 
 function updateRequests(requests_list) {
-	requests.find('.a-request').remove();
 	if (putRequest(requests_list))
 		tabs_buttons.filter('.requests:not(.active)').addClass('new');
 }
@@ -211,7 +209,7 @@ function putChat(chats_list) {
 	let updated = false;
 	if (parseInt(chat.last_msg) > last_received) last_received = parseInt(chat.last_msg);
 	if (!chat_dom.hasClass('lastmsg-'+chat.last_msg)) {
-		let clases = 'a-chat deletable chat-'+chat.id+' lastmsg-'+chat.last_msg;
+		let classes = 'a-chat deletable chat-'+chat.id+' lastmsg-'+chat.last_msg;
 		if (chat_dom.length == 0) {
 			chat_dom = empty_chat.clone();
 			chat_dom.find('input[name="chat_id"]').val(chat.id);
@@ -220,9 +218,9 @@ function putChat(chats_list) {
 			formsListener(chat_dom.find('form[action="ajax.php"]'));
 			chat_dom.show();
 		} else if (chat_dom.hasClass('active')) {
-			clases += ' active';
+			classes += ' active';
 		}
-		chat_dom.removeClass().addClass(clases);
+		chat_dom.removeClass('empty-chat').addClass(classes);
 		chat_dom.find('.chat-link').text(chat.name);
 		if (current_chat != chat.id) chat_dom.addClass('unread');
 		chats.prepend(chat_dom);
@@ -320,7 +318,7 @@ function putCandidate(candidates_list) {
 // ------------------
 function loadChat(chat_id) {
 	if (busy) {
-		setTimeout(function() {loadChat(chat_id);}, 50);
+		setTimeout(function() { loadChat(chat_id); }, 50);
 		return;
 	}
 	if (active_chat && active_chat.length > 0) unloadChat();

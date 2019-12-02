@@ -54,27 +54,42 @@
 		<ul class="requests-list position-absolute list-unstyled w-100 h-100 py-3 m-0">{{REQUESTS}}</ul>
 	</aside>
 	<div class="empty-elements d-none">
-		<li class="empty-chat deletable">
-			<a href="#" class="chat-link"></a>
-			<form action="ajax.php" method="post" class="confirmable delete-parent unload-chat">
-				<input type="hidden" name="action" value="leaveChat">
-				<input type="hidden" name="chat_id" value="">
-				<button type="submit" class="btn-block"><i class="fa fa-ban"></i></button>
-			</form>
-			<ul class="members-list">
-				<li class="empty-member" style="display: none"><strong class="name"></strong><span class="email"></span></li>
-				<li class="add-member">
-					<form action="ajax.php" method="post" class="add-member-form">
-						<input type="hidden" name="action" value="addMember">
-						<input type="hidden" name="chat_id" value="">
-						<select class="candidates-list" name="contact_id">
-							<option value="0">{{TR:ADDAFRIEND}}</option>
-						</select>
-						<button type="submit" class="btn btn-add-member"><i class="fa fa-plus"></i></button>
-					</form>
-				</li>
-			</ul>
-		</li>				
+		<li class="empty-chat deletable card overflow-hidden mx-3 mb-2">
+			<div class="card-header p-0 d-flex">
+				<a href="#" class="chat-link btn btn-block text-left text-main px-3 py-2"></a>
+				<form action="ajax.php" method="post" class="confirmable delete-parent unload-chat">
+					<input type="hidden" name="action" value="leaveChat">
+					<input type="hidden" name="chat_id" value="">
+					<button type="submit" class="btn text-main px-3 py-2" title="Leave chat">
+						<i class="fa fa-lg fa-ban"></i>
+					</button>
+				</form>
+			</div>
+			<div class="card-body p-3">
+				<ul class="members-list list-unstyled text-main">
+					<li class="empty-member mb-2" style="display: none">
+						<span class="name font-weight-bold d-block"></span>
+						<span class="email d-block"></span>
+					</li>
+					<li class="add-member">
+						<form action="ajax.php" method="post" class="add-member-form">
+							<input type="hidden" name="action" value="addMember">
+							<input type="hidden" name="chat_id" value="">
+							<div class="form-group input-group m-0">
+								<select class="candidates-list form-control flex-grow-1" name="contact_id">
+									<option value="0">{{TR:ADDAFRIEND}}</option>
+								</select>
+								<div class="input-group-append">
+									<button type="submit" class="btn btn-add-member bg-main text-white input-group-text px-2" title="Add friend">
+										<i class="fa fa-lg fa-plus"></i>
+									</button>
+								</div>
+							</div>
+						</form>
+					</li>
+				</ul>
+			</div>
+		</li>
 		<li class="empty-friend deletable card d-flex align-items-center flex-row overflow-hidden p-3 mx-3 mb-2">
 			<img class="avatar avatar-lg rounded-circle" src="">
 			<div class="datos px-2">
