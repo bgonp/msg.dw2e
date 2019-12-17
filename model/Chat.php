@@ -231,9 +231,9 @@ class Chat extends Database implements JsonSerializable {
 		if (!is_array($this->messages) || $limit > count($this->messages)){
 			$sql = "
 				SELECT m.`id`,
-					   DATE_FORMAT(m.`date`, '%H:%i %d/%m/%Y') date,
+					   DATE_FORMAT(m.`date`, '%H:%i %d/%m/%Y') 'date',
 					   m.`user_id`,
-					   u.`name user_name`,
+					   u.`name` user_name,
 					   m.`chat_id`,
 					   m.`attachment_id`,
 					   m.`content`,
