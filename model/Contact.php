@@ -76,22 +76,22 @@ trait Contact {
 	 * @return array Associative array of users
 	 */
 	private function contacts($state) {
-		$and = $state == Helper::WAITING ? "AND c.user_state_id <> :userid" : "";
+		$and = $state == Helper::WAITING ? "AND c.`user_state_id` <> :userid" : "";
 		$sql = "
-			SELECT u.id,
-				   u.email,
-				   u.name,
-				   u.password,
-				   u.avatar
-			FROM user u
-			WHERE u.admin = 0
-			AND id IN (
-				SELECT IF(c.user_1_id = :userid, c.user_2_id, c.user_1_id) user_id
-				FROM contact c
-				WHERE c.state = :state {$and}
-				AND (c.user_1_id = :userid OR c.user_2_id = :userid)
+			SELECT u.`id`,
+				   u.`email`,
+				   u.`name`,
+				   u.`password`,
+				   u.`avatar`
+			FROM `user` u
+			WHERE u.`admin` = 0
+			AND u.`id` IN (
+				SELECT IF(c.`user_1_id` = :userid, c.`user_2_id`, c.`user_1_id`) user_id
+				FROM `contact` c
+				WHERE c.`state` = :state {$and}
+				AND (c.`user_1_id` = :userid OR c.`user_2_id` = :userid)
 			)
-			ORDER BY u.name ASC";
+			ORDER BY u.`name` ASC";
 		self::query($sql, [
 			':userid' => $this->id,
 			':state' => $state
@@ -107,24 +107,24 @@ trait Contact {
 	 * @return array Array of contacts
 	 */
 	private function newContacts($last, $state) {
-		$and = $state == Helper::WAITING ? " AND c.user_state_id <> :userid" : "";
+		$and = $state == Helper::WAITING ? " AND c.`user_state_id` <> :userid" : "";
 		$sql = "
-			SELECT u.id,
-				   u.name,
-				   u.email,
-				   t.date_upd
-			FROM user u
+			SELECT u.`id`,
+				   u.`name`,
+				   u.`email`,
+				   t.`date_upd`
+			FROM `user` u
 			RIGHT JOIN (
 				SELECT
-					c.date_upd, IF(c.user_1_id = :userid, c.user_2_id, c.user_1_id) user_id
-				FROM contact c
-				WHERE c.state = :state {$and}
-				AND (c.user_1_id = :userid OR c.user_2_id = :userid)
-				AND date_upd > :last
+					c.`date_upd`, IF(c.`user_1_id` = :userid, c.`user_2_id`, c.`user_1_id`) user_id
+				FROM `contact` c
+				WHERE c.`state` = :state {$and}
+				AND (c.`user_1_id` = :userid OR c.`user_2_id` = :userid)
+				AND `date_upd` > :last
 			) t
-			ON u.id = t.user_id
-			WHERE u.admin = 0
-			ORDER BY t.date_upd DESC";
+			ON u.`id` = t.`user_id`
+			WHERE u.`admin` = 0
+			ORDER BY t.`date_upd` DESC";
 		self::query($sql, [
 			':userid' => $this->id,
 			':state' => $state,
@@ -140,9 +140,9 @@ trait Contact {
 	 */
 	public function lastContactUpd() {
 		$sql = "
-			SELECT MAX(date_upd) last_contact_upd
-			FROM contact c
-			WHERE c.user_1_id = :id OR c.user_2_id = :id";
+			SELECT MAX(c.`date_upd`) last_contact_upd
+			FROM `contact` c
+			WHERE c.`user_1_id` = :id OR c.`user_2_id` = :id";
 		self::query($sql, [':id' => $this->id]);
 		return self::fetch()['last_contact_upd'];
 	}
@@ -161,7 +161,7 @@ trait Contact {
 		$user1_id = min($this->id, $contact->id);
 		$user2_id = max($this->id, $contact->id);
 		$sql = "
-			INSERT INTO contact (user_1_id, user_2_id, user_state_id)
+			INSERT INTO `contact` (`user_1_id`, `user_2_id`, `user_state_id`)
 			VALUES (:user1id, :user2id, :userid)";
 		self::query($sql, [
 			':user1id' => $user1_id,
@@ -190,10 +190,10 @@ trait Contact {
 		$user1_id = min($this->id, $contact_id);
 		$user2_id = max($this->id, $contact_id);
 		$sql = "
-			UPDATE contact SET state = :state, user_state_id = :userid
-			WHERE user_1_id = :user1id
-			AND user_2_id = :user2id
-			AND state = :reqstate";
+			UPDATE `contact` SET `state` = :state, `user_state_id` = :userid
+			WHERE `user_1_id` = :user1id
+			AND `user_2_id` = :user2id
+			AND `state` = :reqstate";
 		$replace = [
 			':state' => $state,
 			':userid' => $this->id,
@@ -203,7 +203,7 @@ trait Contact {
 		if ($state === Helper::ACCEPTED || $state === Helper::DECLINED) {
 			$replace[':reqstate'] = Helper::WAITING;
 			$replace[':contactid'] = $contact_id;
-			$sql .= " AND user_state_id = :contactid";
+			$sql .= " AND `user_state_id` = :contactid";
 		} else if ($state == Helper::BLOCKED) {
 			$replace[':reqstate'] = Helper::ACCEPTED;
 		}

@@ -60,15 +60,15 @@ class Attachment extends Database {
 	public static function get($id) {
 		if (!($id = intval($id))) throw new Exception(Text::error('attachment_id'));
 		$sql = "
-			SELECT a.id,
-				   a.date,
-				   a.mime_type,
-				   a.height,
-				   a.width,
-				   a.filename,
-				   m.chat_id
-			FROM attachment a
-			LEFT JOIN message m
+			SELECT a.`id`,
+				   a.`date`,
+				   a.`mime_type`,
+				   a.`height`,
+				   a.`width`,
+				   a.`filename`,
+				   m.`chat_id`
+			FROM `attachment` a
+			LEFT JOIN `message` m
 			ON a.id = m.attachment_id
 			WHERE a.id = :id";
 		self::query($sql, [':id' => $id]);
@@ -92,7 +92,7 @@ class Attachment extends Database {
 			throw new Exception(Text::error('attachment_data'));
 		if (!($fileinfo = Helper::uploadAttachment($file)))
 			throw new Exception(Text::error('attachment_upload'));
-		$sql = "INSERT INTO attachment (mime_type, height, width, filename)
+		$sql = "INSERT INTO `attachment` (`mime_type`, `height`, `width`, `filename`)
 				VALUES (:type, :height, :width, :name)";
 		self::query($sql, [
 			':type' => $file['type'],

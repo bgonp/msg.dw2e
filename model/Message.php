@@ -76,17 +76,17 @@ class Message extends Database implements JsonSerializable {
 		if (($id = intval($id)) <= 0)
 			throw new Exception(Text::error('message_id'));
 		$sql = "
-			SELECT m.id,
-				   m.date,
-				   m.user_id,
-				   u.name user_name,
-				   m.chat_id,
-				   m.attachment_id,
-				   m.content
-			FROM message m
-			LEFT JOIN user u
-			ON m.user_id = u.id
-			WHERE m.id = :id";
+			SELECT m.`id`,
+				   m.`date`,
+				   m.`user_id`,
+				   u.`name` user_name,
+				   m.`chat_id`,
+				   m.`attachment_id`,
+				   m.`content`
+			FROM `message` m
+			LEFT JOIN `user` u
+			ON m.`user_id` = u.`id`
+			WHERE m.`id` = :id";
 		self::query($sql, [':id' => $id]);
 		if (!self::count())
 			throw new Exception(Text::error('message_get'));
@@ -119,7 +119,7 @@ class Message extends Database implements JsonSerializable {
 		$attachment_id = $attachment && $attachment['error'] != 4 ? Attachment::create($attachment)->id() : null;
 		if (empty($chat_id) || empty($content))
 			throw new Exception(Text::error('message_invalid'));
-		$sql = "INSERT INTO message (user_id, chat_id, attachment_id, content)
+		$sql = "INSERT INTO `message` (`user_id`, `chat_id`, `attachment_id`, `content`)
 				VALUES (:userid, :chatid, :attid, :content)";
 		self::query($sql, [
 			':userid' => $user_id,

@@ -114,7 +114,7 @@ class Option extends Database {
 	 */
 	private static function all() {
 		self::$list = [];
-		$sql = "SELECT * FROM option";
+		$sql = "SELECT * FROM `option`";
 		self::query($sql, []);
 		while ($opt = self::fetch())
 			self::$list[$opt['key']] = new Option(
@@ -130,7 +130,7 @@ class Option extends Database {
 	 * Update option in database with the current option object properties
 	 */
 	private function save() {
-		$sql = "UPDATE option SET value = :value WHERE id = :id";
+		$sql = "UPDATE `option` SET `value` = :value WHERE `id` = :id";
 		self::query($sql, [
 			':value' => $this->value,
 			':id' => $this->id

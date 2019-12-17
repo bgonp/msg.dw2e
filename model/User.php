@@ -81,11 +81,11 @@ class User extends Database implements JsonSerializable {
 	public static function get($id_o_email, $password = null) {
 		if (is_numeric($id_o_email)){
 			if ($id_o_email <= 0) throw new Exception(Text::error('user_id'));
-			$sql = "SELECT * FROM user WHERE id = :id";
+			$sql = "SELECT * FROM `user` WHERE `id` = :id";
 			self::query($sql, [':id' => $id_o_email]);
 		} else {
 			if (empty($id_o_email)) throw new Exception(Text::error('user_email'));
-			$sql = "SELECT * FROM user WHERE email = :email";
+			$sql = "SELECT * FROM `user` WHERE `email` = :email";
 			self::query($sql, [':email' => $id_o_email]);
 		}
 		if (!self::count())
@@ -132,7 +132,7 @@ class User extends Database implements JsonSerializable {
 			throw new Exception(Text::error('user_avatar'));
 		$password = self::hash($password);
 		$sql = "
-			INSERT INTO user (email, name, password, avatar, confirmed, admin)
+			INSERT INTO `user` (`email`, `name`, `password`, `avatar`, `confirmed`, `admin`)
 			VALUES (:email, :name, :password, :avatar, :confirmed, :admin)";
 		self::query($sql, [
 			':email' => $email,
@@ -320,20 +320,20 @@ class User extends Database implements JsonSerializable {
 	public function chats($chat_id = null) {
 		if (!is_array($this->chats)){
 			$sql = "
-				SELECT c.id,
-					   c.date,
-					   c.name,
-					   COUNT(m.id) n_messages,
-					   p.last_read,
-					   MAX(m.id) last_msg
-				FROM chat c
-				LEFT JOIN message m
-				ON c.id = m.chat_id
-				LEFT JOIN participate p
-				ON c.id = p.chat_id
-				WHERE p.user_id = :id
-				GROUP BY c.id
-				ORDER BY IF(MAX(m.id) > p.last_read, 1, 0) DESC, last_msg DESC";
+				SELECT c.`id`,
+					   c.`date`,
+					   c.`name`,
+					   COUNT(m.`id`) n_messages,
+					   p.`last_read`,
+					   MAX(m.`id`) last_msg
+				FROM `chat` c
+				LEFT JOIN `message` m
+				ON c.`id` = m.`chat_id`
+				LEFT JOIN `participate` p
+				ON c.`id` = p.`chat_id`
+				WHERE p.`user_id` = :id
+				GROUP BY c.`id`
+				ORDER BY IF(MAX(m.`id`) > p.`last_read`, 1, 0) DESC, last_msg DESC";
 			self::query($sql, [':id' => $this->id]);
 			$this->chats = Chat::gets();
 		}
@@ -350,9 +350,9 @@ class User extends Database implements JsonSerializable {
 	 */
 	public function readChat($chat_id) {
 		$sql = "
-			UPDATE participate p SET p.last_read = (
-				SELECT MAX(m.id) FROM message m WHERE m.chat_id = :chatid
-			) WHERE p.user_id = :userid AND p.chat_id = :chatid";
+			UPDATE `participate` p SET p.`last_read` = (
+				SELECT MAX(m.`id`) FROM `message` m WHERE m.`chat_id` = :chatid
+			) WHERE p.`user_id` = :userid AND p.`chat_id` = :chatid";
 		self::query($sql, [
 			':chatid' => $chat_id,
 			':userid' => $this->id
@@ -369,18 +369,18 @@ class User extends Database implements JsonSerializable {
 	 */
 	public function newChats($last_received) {
 		$sql = "
-			SELECT c.id,
-				   c.date,
-				   c.name,
-				   COUNT(m.id) n_messages,
-				   p.last_read,
-				   MAX(m.id) last_msg
-			FROM chat c
-			LEFT JOIN message m ON c.id = m.chat_id
-			LEFT JOIN participate p ON c.id = p.chat_id
-			WHERE p.user_id = :userid
-			AND (m.id > p.last_read OR p.last_read IS NULL)
-			GROUP BY c.id
+			SELECT c.`id`,
+				   c.`date`,
+				   c.`name`,
+				   COUNT(m.`id`) n_messages,
+				   p.`last_read`,
+				   MAX(m.`id`) last_msg
+			FROM `chat` c
+			LEFT JOIN `message` m ON c.`id` = m.`chat_id`
+			LEFT JOIN `participate` p ON c.`id` = p.`chat_id`
+			WHERE p.`user_id` = :userid
+			AND (m.`id` > p.`last_read` OR p.`last_read` IS NULL)
+			GROUP BY c.`id`
 			HAVING last_msg > :lastid
 			ORDER BY last_msg DESC";
 		self::query($sql, [
@@ -420,15 +420,15 @@ class User extends Database implements JsonSerializable {
 	public function save() {
 		$expiration = $this->expiration ? date('Y-m-d H:i:s', $this->expiration) : null;
 		$sql = "
-			UPDATE user SET
-			email = :email,
-			name = :name,
-			password = :password,
-			avatar = :avatar,
-			confirmed = :confirmed,
-			admin = :admin,
-			code = :code,
-			expiration = :expiration
+			UPDATE `user` SET
+			`email` = :email,
+			`name` = :name,
+			`password` = :password,
+			`avatar` = :avatar,
+			`confirmed` = :confirmed,
+			`admin` = :admin,
+			`code` = :code,
+			`expiration` = :expiration
 			WHERE id = :id";
 		self::query($sql, [
 			':email' => $this->email,
@@ -450,7 +450,7 @@ class User extends Database implements JsonSerializable {
 	 * @return integer 1 if user could be deleted. 0 if not
 	 */
 	public function delete() {
-		$sql = "DELETE FROM user WHERE id = :id";
+		$sql = "DELETE FROM `user` WHERE `id` = :id";
 		self::query($sql, [':id' => $this->id]);
 		return self::count();
 	}
