@@ -96,3 +96,28 @@ The admin user can modify some settings from the control panel:
 - To write a message simply write it in the text box below and click on `Send` button. Max 1000 characters.
 - Addionally, you can attach a file to your message by clicking on the paperclip button. If this file is an image you will see a preview of it once you send the message. If it isn't an image, you will see an icon in your message to download the file.
 - You can't upload a file if you don't write anything in the message box. A message text will be always needed.
+
+## Full Documentation
+
+You can download full documentation PDF [**here**](https://raw.githubusercontent.com/bgonp/msg.dw2e/master/doc/DW2E%20MSG.png)
+
+## Database Schema
+
+![Database schema](https://raw.githubusercontent.com/bgonp/msg.dw2e/master/doc/db_schema.png)
+
+## Screenshots
+
+### Installation
+![Installation](https://raw.githubusercontent.com/bgonp/msg.dw2e/master/doc/02_install_fill.png)
+
+### Options
+![Options](https://raw.githubusercontent.com/bgonp/msg.dw2e/master/doc/05_options.png)
+
+### Registration
+![Registration](https://raw.githubusercontent.com/bgonp/msg.dw2e/master/doc/07_register_fill.png)
+
+### Main screen with friends
+![Friends](https://raw.githubusercontent.com/bgonp/msg.dw2e/master/doc/12_friends.png)
+
+### Main screen with chat and attachments
+![Chat](https://raw.githubusercontent.com/bgonp/msg.dw2e/master/doc/16_chat_attachments.png)
