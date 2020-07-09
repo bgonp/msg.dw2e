@@ -99,7 +99,7 @@ The admin user can modify some settings from the control panel:
 
 ## Full Documentation
 
-You can download full documentation PDF [**here**](https://raw.githubusercontent.com/bgonp/msg.dw2e/master/doc/DW2E%20MSG.png)
+You can download full documentation PDF [**here**](https://github.com/bgonp/msg.dw2e/raw/master/doc/DW2E%20MSG.pdf).
 
 ## Database Schema
 
