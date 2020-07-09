@@ -361,7 +361,7 @@ class Chat extends Database implements JsonSerializable {
 
 	/**
 	 * Return whetever there is new members in (or someone leaves) the chat.
-	 * This will be always falso until newMessages method was called.
+	 * This will be always false until newMessages method was called.
 	 * 
 	 * @return bool True if there are changes in members list
 	 */
